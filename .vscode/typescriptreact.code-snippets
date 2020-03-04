@@ -1,0 +1,10 @@
+{
+  "Component stories for Storybook": {
+    "prefix": "component stories for storybook",
+    "scope": "typescriptreact",
+    "body": [
+      "storiesOf(\"${TM_DIRECTORY/(.*?src\\/)?\\/?(\\w+)(\\-)?/${2:/capitalize}${3:? :\/}/g}${TM_FILENAME/(^\\w+)?(\\-)?(\\w+)?(\\..+$)?/${1:/capitalize}${2:+ }${3:/capitalize}/g}\", module)",
+      "  .add(\"${1:Default}\", () => $0)"
+    ]
+  }
+}
