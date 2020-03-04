@@ -1,10 +1,14 @@
 {
-  "name": "template-js",
+  "name": "react-sortful",
   "version": "0.1.0",
-  "description": "The description of this package.",
-  "keywords": [],
-  "homepage": "https://github.com/jagaapple/template-js",
-  "bugs": "https://github.com/jagaapple/template-js/issues",
+  "description": "Sortable components for horizontal and vertical, and tree forms.",
+  "keywords": [
+    "React",
+    "sort",
+    "tree"
+  ],
+  "homepage": "https://github.com/jagaapple/react-sortful",
+  "bugs": "https://github.com/jagaapple/react-sortful/issues",
   "license": "MIT",
   "author": "Jaga Apple",
   "contributors": [],
@@ -21,7 +25,7 @@
   "man": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jagaapple/template-js.git"
+    "url": "https://github.com/jagaapple/react-sortful.git"
   },
   "scripts": {
     "prebuild": "rm -rf ./lib",
