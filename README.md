@@ -12,6 +12,7 @@ returnOne(); // 1
 <a href="https://www.npmjs.com/package/react-sortful"><img src="https://img.shields.io/npm/v/react-sortful.svg" alt="npm"></a>
 <a href="https://circleci.com/gh/jagaapple/react-sortful"><img src="https://img.shields.io/circleci/project/github/jagaapple/react-sortful/master.svg" alt="CircleCI"></a>
 <a href="https://codecov.io/gh/jagaapple/react-sortful"><img src="https://img.shields.io/codecov/c/github/jagaapple/react-sortful.svg"></a>
+<a href="https://www.chromaticqa.com/library?appId=5e6025bcf2b5b700222c2c33"><img src="https://img.shields.io/static/v1?label=catalogs&message=storybook&color=ff69b4"></a>
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/jagaapple/react-sortful.svg" alt="license"></a>
 <a href="https://twitter.com/jagaapple_tech"><img src="https://img.shields.io/badge/contact-%40jagaapple_tech-blue.svg" alt="@jagaapple_tech"></a>
 </div>
@@ -39,6 +40,8 @@ returnOne(); // 1
 | 2️⃣ **Feature 2**  | You can do it               |
 | 3️⃣ **Feature 3**  | You can do it               |
 | 🎩 **Type Safe** | You can use with TypeScript |
+
+When you become interested in react-sortful, see [online catalogs (Storybook)](https://www.chromaticqa.com/library?appId=5e6025bcf2b5b700222c2c33)!
 
 
 ## Quick Start
