@@ -33,3 +33,4 @@ lib
 
 # Generated files created by tests.
 coverage
+.out

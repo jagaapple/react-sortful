@@ -36,7 +36,9 @@
     "test": "jest --coverage",
     "coverage": "codecov",
     "clean": "rm -rf ./lib ./coverage",
-    "storybook": "start-storybook"
+    "storybook": "start-storybook",
+    "build-storybook": "build-storybook --config-dir ./.storybook --output-dir ./.out",
+    "chromatic": "CHROMATIC_APP_CODE=kmmyjbiwtyq chromatic"
   },
   "config": {},
   "dependencies": {},
@@ -67,6 +69,7 @@
     "prettier": "^1.19.1",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
+    "storybook-chromatic": "^3.5.2",
     "ts-jest": "^25.2.1",
     "typescript": "^3.8.3"
   },
