@@ -26,6 +26,9 @@ jobs:
       - run:
           name: "Build"
           command: "npm run build"
+      - run:
+          name: "Execute visual regression tests"
+          command: "npm run chromatic"
   node_v10:
     working_directory: "~/repo"
     docker:
