@@ -36,7 +36,7 @@
     "test": "jest --coverage",
     "coverage": "codecov",
     "clean": "rm -rf ./lib ./coverage",
-    "storybook": "start-storybook",
+    "storybook": "start-storybook --port 5000",
     "build-storybook": "build-storybook --config-dir ./.storybook --output-dir ./.out",
     "chromatic": "CHROMATIC_APP_CODE=kmmyjbiwtyq chromatic"
   },
