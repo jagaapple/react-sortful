@@ -30,7 +30,7 @@
   "scripts": {
     "prebuild": "rm -rf ./lib",
     "build": "tsc",
-    "lint": "eslint ./src/**/*.ts",
+    "lint": "tsc --noEmit && eslint ./src/**/*.ts",
     "fix": "eslint --fix ./src/**/*.ts",
     "prepublishOnly": "npm run build",
     "test": "jest --coverage",
