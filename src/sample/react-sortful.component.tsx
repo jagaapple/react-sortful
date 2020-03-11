@@ -1,39 +1,10 @@
 import * as React from "react";
 import { useGesture } from "react-use-gesture";
 
-type Position = {
-  top: number;
-  left: number;
-};
-type ItemPosition = {
-  width: number;
-  height: number;
-  relativePosition: Position;
-  absolutePosition: Position;
-};
+import { getDropLinePosition, getOveredNodeMeta, NodeIdentifier, OveredNodeMeta } from "./react-sortful";
 
-type FocusDirection = "TOP" | "RIGHT" | "BOTTOM" | "LEFT";
-const getFocusDirection = (
-  width: number,
-  height: number,
-  pointerXY: [number, number],
-  mode: "VERTICAL" | "HORIZONTAL",
-): FocusDirection | undefined => {
-  const [pointerX, pointerY] = pointerXY;
+const nodeIdentifierDataAttribute = "data-react-sortful-node-identifier";
 
-  if (mode === "VERTICAL") {
-    if (height / 2 >= pointerY) return "TOP";
-    if (height / 2 < pointerY) return "BOTTOM";
-  }
-  if (mode === "HORIZONTAL") {
-    if (width / 2 >= pointerX) return "LEFT";
-    if (width / 2 < pointerX) return "RIGHT";
-  }
-};
-
-const itemIdentifierDataAttribute = "data-react-sortful-identifier";
-
-type NodeIdentifier = string;
 type TreeNode = { identifier: NodeIdentifier; children: NodeIdentifier[] };
 export type Tree = TreeNode[];
 
@@ -56,31 +27,47 @@ export const ReactSortful = (props: Props) => {
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
   const ghostElementRef = React.useRef<HTMLDivElement>();
-  const overedNodeMetaRef = React.useRef<{ identifier: NodeIdentifier; element: HTMLDivElement } & ItemPosition>();
+  const overedNodeMetaRef = React.useRef<OveredNodeMeta>();
 
-  const onDragStart = React.useCallback(
-    (itemIdentifier: NodeIdentifier, itemNode: HTMLDivElement) => {
-      setDraggingNodeIdentifierState(itemIdentifier);
-
-      // Disables to select nodes in entire page.
-      document.body.style.userSelect = "none";
-
-      const itemNodeRect = itemNode.getBoundingClientRect();
-
+  const setGhostElement = React.useCallback(
+    (nodeElement: HTMLDivElement) => {
       const ghostWrapperElement = ghostWrapperElementRef.current;
       if (ghostWrapperElement == undefined) return;
-      ghostWrapperElement.style.top = `${itemNodeRect.top}px`;
-      ghostWrapperElement.style.left = `${itemNodeRect.left}px`;
-      ghostWrapperElement.style.width = `${itemNodeRect.width}px`;
-      ghostWrapperElement.style.height = `${itemNodeRect.height}px`;
+      const ghostElement = ghostWrapperElement.appendChild(nodeElement.cloneNode(true));
+      if (!(ghostElement instanceof HTMLDivElement)) return;
 
-      const ghostElement = ghostWrapperElement.appendChild(itemNode.cloneNode(true)) as HTMLDivElement;
-      if (props.ghostClassName != undefined) ghostElement.classList.add(...props.ghostClassName.split(" "));
+      const elementRect = nodeElement.getBoundingClientRect();
+      ghostWrapperElement.style.top = `${elementRect.top}px`;
+      ghostWrapperElement.style.left = `${elementRect.left}px`;
+      ghostWrapperElement.style.width = `${elementRect.width}px`;
+      ghostWrapperElement.style.height = `${elementRect.height}px`;
+
       ghostElement.style.width = "100%";
       ghostElement.style.height = "100%";
+      ghostElement.classList.add(...(props.ghostClassName ?? "").split(" "));
       ghostElementRef.current = ghostElement;
     },
     [props.ghostClassName],
+  );
+  const clearGhostElement = React.useCallback(() => {
+    const ghostWrapperElement = ghostWrapperElementRef.current;
+    if (ghostWrapperElement == undefined) return;
+    const ghostElement = ghostElementRef.current;
+    if (ghostElement == undefined) return;
+
+    ghostWrapperElement.style.width = "0";
+    ghostWrapperElement.style.height = "0";
+    ghostWrapperElement.removeChild(ghostElement);
+  }, []);
+
+  const onDragStart = React.useCallback(
+    (nodeIdentifier: NodeIdentifier, element: HTMLDivElement) => {
+      setDraggingNodeIdentifierState(nodeIdentifier);
+      setGhostElement(element);
+
+      document.body.style.userSelect = "none"; // Disables to select nodes in entire page.
+    },
+    [setGhostElement],
   );
   const onDrag = React.useCallback((movementXY: [number, number]) => {
     const ghostWrapperElement = ghostWrapperElementRef.current;
@@ -91,49 +78,23 @@ export const ReactSortful = (props: Props) => {
   }, []);
   const onDragEnd = React.useCallback(() => {
     setDraggingNodeIdentifierState(undefined);
+    clearGhostElement();
 
-    // Enables to select nodes in entire page.
-    document.body.style.userSelect = "auto";
-
-    const ghostWrapperElement = ghostWrapperElementRef.current;
-    const ghostElement = ghostElementRef.current;
-    if (ghostWrapperElement != undefined && ghostElement != undefined) {
-      ghostWrapperElement.removeChild(ghostElement);
-      ghostWrapperElement.style.width = "0";
-      ghostWrapperElement.style.height = "0";
-    }
-  }, [draggingNodeIdentifierState]);
-  const onMouseOver = React.useCallback((itemIdentifier: NodeIdentifier, itemNode: HTMLDivElement) => {
-    const itemNodeRect = itemNode.getBoundingClientRect();
-    overedNodeMetaRef.current = {
-      identifier: itemIdentifier,
-      element: itemNode,
-      width: itemNodeRect.width,
-      height: itemNodeRect.height,
-      relativePosition: { top: itemNode.offsetTop, left: itemNode.offsetLeft },
-      absolutePosition: { top: itemNodeRect.top, left: itemNodeRect.left },
-    };
+    document.body.style.userSelect = "auto"; // Enables to select nodes in entire page.
+  }, [clearGhostElement]);
+  const onMouseOver = React.useCallback((nodeIdentifier: NodeIdentifier, element: HTMLDivElement) => {
+    overedNodeMetaRef.current = getOveredNodeMeta(nodeIdentifier, element);
   }, []);
   const onMouseMove = React.useCallback(
-    (xy) => {
-      const overedItemMeta = overedNodeMetaRef.current;
-      if (overedItemMeta == undefined) return;
+    (absoluteXY) => {
+      const overedNodeMeta = overedNodeMetaRef.current;
+      if (overedNodeMeta == undefined) return;
       const dropLineElement = dropLineElementRef.current;
       if (dropLineElement == undefined) return;
 
-      const x = Math.max(xy[0] - overedItemMeta.absolutePosition.left, 0);
-      const y = Math.max(xy[1] - overedItemMeta.absolutePosition.top, 0);
-      const direction = getFocusDirection(overedItemMeta.width, overedItemMeta.height, [x, y], "VERTICAL");
-      if (direction == undefined) return;
-
-      let top = overedItemMeta.relativePosition.top;
-      if (direction === "TOP") {
-        top -= nodeSpacing / 2;
-      } else if (direction === "BOTTOM") {
-        top += nodeSpacing / 2 + overedItemMeta.height;
-      }
-      dropLineElement.style.top = `${top}px`;
-      dropLineElement.style.left = `${overedItemMeta.relativePosition.left}px`;
+      const dropLinePosition = getDropLinePosition(absoluteXY, overedNodeMeta, nodeSpacing);
+      dropLineElement.style.top = `${dropLinePosition.top}px`;
+      dropLineElement.style.left = `${dropLinePosition.left}px`;
     },
     [nodeSpacing],
   );
@@ -145,22 +106,23 @@ export const ReactSortful = (props: Props) => {
       onDrag(movement);
     },
     onDragStart: ({ event }) => {
-      const itemNode = event.currentTarget;
-      if (!(itemNode instanceof HTMLDivElement)) return;
-      const itemIdentifier = itemNode.getAttribute(itemIdentifierDataAttribute) ?? undefined;
-      if (itemIdentifier == undefined) return;
+      const element = event.currentTarget;
+      if (!(element instanceof HTMLDivElement)) return;
+      const nodeIdentifier = element.getAttribute(nodeIdentifierDataAttribute) ?? undefined;
+      if (nodeIdentifier == undefined) return;
 
-      onDragStart(itemIdentifier, itemNode);
+      onDragStart(nodeIdentifier, element);
     },
     onDragEnd,
     onHover: ({ event }) => {
       if (!isDraggingAnyNode) return;
-      const overedItemNode = event.currentTarget;
-      if (!(overedItemNode instanceof HTMLDivElement)) return;
-      const itemIdentifier = overedItemNode.getAttribute(itemIdentifierDataAttribute) ?? undefined;
-      if (itemIdentifier == undefined) return;
 
-      onMouseOver(itemIdentifier, overedItemNode);
+      const element = event.currentTarget;
+      if (!(element instanceof HTMLDivElement)) return;
+      const nodeIdentifier = element.getAttribute(nodeIdentifierDataAttribute) ?? undefined;
+      if (nodeIdentifier == undefined) return;
+
+      onMouseOver(nodeIdentifier, element);
     },
     onMove: ({ xy }) => {
       if (!isDraggingAnyNode) return;
@@ -169,21 +131,21 @@ export const ReactSortful = (props: Props) => {
     },
   });
 
-  const itemElements = React.useMemo(
+  const nodeElements = React.useMemo(
     () =>
       props.tree.map((node, index) => {
         const element = props.handleNodeIdentifier(node.identifier, index);
-        const isFirst = index === 0;
+        const isFirstNode = index === 0;
 
-        const itemElementDataAttributes = { [itemIdentifierDataAttribute]: node.identifier };
+        const nodeElementDataAttributes = { [nodeIdentifierDataAttribute]: node.identifier };
 
         return (
           <React.Fragment key={node.identifier}>
             <div
-              {...bind()}
-              {...itemElementDataAttributes}
               className={props.nodeClassName}
-              style={{ boxSizing: "border-box", marginTop: isFirst ? undefined : nodeSpacing }}
+              style={{ boxSizing: "border-box", marginTop: isFirstNode ? undefined : nodeSpacing }}
+              {...bind()}
+              {...nodeElementDataAttributes}
             >
               {element}
             </div>
@@ -193,16 +155,22 @@ export const ReactSortful = (props: Props) => {
     [props.tree, props.handleNodeIdentifier, bind, props.nodeClassName],
   );
 
+  const dropLineElementStyle: React.CSSProperties = {
+    display: isDraggingAnyNode ? "block" : "none",
+    position: "absolute",
+    transform: "translate(0, -50%)",
+  };
+  const ghostWrapperElementStyle: React.CSSProperties = {
+    position: "fixed",
+    pointerEvents: "none",
+  };
+
   return (
     <div className={props.className} style={{ position: "relative" }}>
-      {itemElements}
+      {nodeElements}
 
-      <div
-        className={props.dropLineClassName}
-        ref={dropLineElementRef}
-        style={{ display: isDraggingAnyNode ? "block" : "none", position: "absolute", transform: "translate(0, -50%)" }}
-      />
-      <span ref={ghostWrapperElementRef} style={{ position: "fixed", pointerEvents: "none" }} />
+      <div className={props.dropLineClassName} ref={dropLineElementRef} style={dropLineElementStyle} />
+      <span ref={ghostWrapperElementRef} style={ghostWrapperElementStyle} />
     </div>
   );
 };

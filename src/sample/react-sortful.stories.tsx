@@ -17,6 +17,11 @@ const dummyItems: Item[] = [
   { id: 8, name: "Pine Apple 3" },
   { id: 9, name: "Cinnamon 3" },
 ];
+const dummyItemsById = dummyItems.reduce<Record<Item["id"], Item>>((object, item) => {
+  object[item.id] = item;
+
+  return object;
+}, {});
 const dummyNodes = dummyItems.reduce<Tree>((tree, dummyItem) => {
   tree.push({ identifier: dummyItem.id.toString(), children: [] });
 
@@ -28,23 +33,11 @@ storiesOf("Sample/React Sortful", module)
   .add("Default", () => {
     const [nodesState] = React.useState(dummyNodes);
 
-    const itemsById = React.useMemo(
-      () =>
-        dummyItems.reduce<Record<Item["id"], Item>>((object, item) => {
-          object[item.id] = item;
+    const handleNodeIdentifier = React.useCallback((nodeIdentifier) => {
+      const item = dummyItemsById[nodeIdentifier];
 
-          return object;
-        }, {}),
-      [],
-    );
-    const handleNodeIdentifier = React.useCallback(
-      (nodeIdentifier) => {
-        const item = itemsById[nodeIdentifier];
-
-        return <div key={item.id}>Item - {item.name}</div>;
-      },
-      [itemsById],
-    );
+      return <div key={item.id}>Item - {item.name}</div>;
+    }, []);
 
     return (
       <ReactSortful
