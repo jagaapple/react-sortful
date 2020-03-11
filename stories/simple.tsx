@@ -1,9 +1,11 @@
+/// <reference types="./@types/global" />
+
 import * as React from "react";
 import classnames from "classnames";
 import { storiesOf } from "@storybook/react";
 
-import { ReactSortful, Tree } from "./react-sortful.component";
-import styles from "./react-sortful.stories.css";
+import { ReactSortful, Tree } from "../src";
+import styles from "./simple.css";
 
 type Item = { id: number; name: string };
 const dummyItems: Item[] = [
@@ -28,7 +30,7 @@ const dummyNodes = dummyItems.reduce<Tree>((tree, dummyItem) => {
   return tree;
 }, []);
 
-storiesOf("Sample/React Sortful", module)
+storiesOf("/Simple", module)
   .addDecorator((story) => <div style={{ boxShadow: "0 0 0 1px red inset", width: 512 }}>{story()}</div>)
   .add("Default", () => {
     const [nodesState] = React.useState(dummyNodes);

@@ -1,7 +1,7 @@
 const path = require("path");
 
 module.exports = {
-  stories: ["../src/**/*.stories.tsx"],
+  stories: ["../stories/**/*.tsx"],
   addons: ["@storybook/addon-knobs/register", "@storybook/addon-backgrounds/register", "@storybook/addon-actions/register"],
   webpackFinal: async (config) => {
     // --- TypeScript
@@ -13,7 +13,7 @@ module.exports = {
     config.module.rules.forEach((rule) => {
       if (rule.test.toString() !== "/\\.css$/") return;
 
-      rule.exclude = path.resolve(process.cwd(), "src");
+      rule.exclude = path.resolve(process.cwd(), "stories");
     });
 
     config.module.rules.push({
@@ -25,7 +25,7 @@ module.exports = {
           options: { modules: true, sourceMap: true, importLoaders: 1 },
         },
       ],
-      include: path.resolve(process.cwd(), "src"),
+      include: path.resolve(process.cwd(), "stories"),
     });
 
     return config;

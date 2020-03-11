@@ -1,1 +1,1 @@
-export const returnOne = () => 1;
+export * from "./react-sortful.component";
