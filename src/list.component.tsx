@@ -2,7 +2,7 @@ import * as React from "react";
 import { useGesture } from "react-use-gesture";
 
 import {
-  BaseNodeIdentifier,
+  BaseItemIdentifier,
   DestinationMeta,
   getDropLineDirectionFromXY,
   getDropLinePosition,
@@ -13,18 +13,18 @@ import {
   Tree,
 } from "./react-sortful";
 
-type Props<NodeIdentifier extends BaseNodeIdentifier> = {
+type Props<ItemIdentifier extends BaseItemIdentifier> = {
   className?: string;
   dropLineClassName: string;
   ghostClassName?: string;
-  nodeClassName?: string;
-  nodeSpacing?: number;
-  items: Item<NodeIdentifier>[];
-  handleNodeIdentifier: (nodeIdentifier: NodeIdentifier, index: number) => JSX.Element;
-  onDragEnd: (meta: DestinationMeta<NodeIdentifier>) => void;
+  itemClassName?: string;
+  itemSpacing?: number;
+  items: Item<ItemIdentifier>[];
+  handleItemIdentifier: (itemIdentifier: ItemIdentifier, index: number) => JSX.Element;
+  onDragEnd: (meta: DestinationMeta<ItemIdentifier>) => void;
 };
 
-export const List = <NodeIdentifier extends BaseNodeIdentifier>(props: Props<NodeIdentifier>) => {
+export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   const [isDraggingAnyNodeState, setIsDraggingAnyNodeState] = React.useState(false);
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
@@ -32,19 +32,19 @@ export const List = <NodeIdentifier extends BaseNodeIdentifier>(props: Props<Nod
   const ghostElementRef = React.useRef<HTMLDivElement>();
   const draggingNodeMetaRef = React.useRef<NodeMeta>();
   const overedNodeMetaRef = React.useRef<NodeMeta>();
-  const destinationNodeMetaRef = React.useRef<{ nodeIdentifier: NodeIdentifier; nextIndex: number }>();
+  const destinationNodeMetaRef = React.useRef<{ itemIdentifier: T; nextIndex: number }>();
 
   const tree = React.useMemo(() => new Tree(props.items), [props.items]);
-  const nodeSpacing = props.nodeSpacing ?? 8;
+  const itemSpacing = props.itemSpacing ?? 8;
 
   const setGhostElement = React.useCallback(
-    (nodeElement: HTMLDivElement) => {
+    (itemElement: HTMLDivElement) => {
       const ghostWrapperElement = ghostWrapperElementRef.current;
       if (ghostWrapperElement == undefined) return;
-      const ghostElement = ghostWrapperElement.appendChild(nodeElement.cloneNode(true));
+      const ghostElement = ghostWrapperElement.appendChild(itemElement.cloneNode(true));
       if (!(ghostElement instanceof HTMLDivElement)) return;
 
-      const elementRect = nodeElement.getBoundingClientRect();
+      const elementRect = itemElement.getBoundingClientRect();
       ghostWrapperElement.style.top = `${elementRect.top}px`;
       ghostWrapperElement.style.left = `${elementRect.left}px`;
       ghostWrapperElement.style.width = `${elementRect.width}px`;
@@ -73,13 +73,13 @@ export const List = <NodeIdentifier extends BaseNodeIdentifier>(props: Props<Nod
       const dropLineElement = dropLineElementRef.current;
       if (dropLineElement == undefined) return;
 
-      const dropLinePosition = getDropLinePosition(absoluteXY, nodeMeta, nodeSpacing);
+      const dropLinePosition = getDropLinePosition(absoluteXY, nodeMeta, itemSpacing);
       dropLineElement.style.top = `${dropLinePosition.top}px`;
       dropLineElement.style.left = `${dropLinePosition.left}px`;
       dropLineElement.style.top = `${dropLinePosition.top}px`;
       dropLineElement.style.left = `${dropLinePosition.left}px`;
     },
-    [nodeSpacing],
+    [itemSpacing],
   );
 
   const onDragStart = React.useCallback(
@@ -88,7 +88,7 @@ export const List = <NodeIdentifier extends BaseNodeIdentifier>(props: Props<Nod
       setIsDraggingAnyNodeState(true);
       setDropLinePositionElement(absoluteXY, getNodeMeta(element));
 
-      // Disables to select nodes in entire page.
+      // Disables to select elements in entire page.
       document.body.style.userSelect = "none";
 
       draggingNodeMetaRef.current = getNodeMeta(element);
@@ -106,19 +106,19 @@ export const List = <NodeIdentifier extends BaseNodeIdentifier>(props: Props<Nod
     clearGhostElement();
     setIsDraggingAnyNodeState(false);
 
-    // Enables to select nodes in entire page.
+    // Enables to select elements in entire page.
     document.body.style.userSelect = "auto";
 
     const destinationNodeMeta = destinationNodeMetaRef.current;
     if (destinationNodeMeta != undefined) {
-      const node = tree.findByNodeIdentifier(destinationNodeMeta.nodeIdentifier);
-      const index = tree.getIndexByNodeIdentifier(node.identifier);
+      const node = tree.findByItemIdentifier(destinationNodeMeta.itemIdentifier);
+      const index = tree.getIndexByItemIdentifier(node.identifier);
 
       props.onDragEnd({
-        nodeIdentifier: node.identifier,
-        parentNodeIdentifier: node.parentNodeIdentifier,
+        itemIdentifier: node.identifier,
+        parentItemIdentifier: node.parentItemIdentifier,
         index,
-        nextParentNodeIdentifier: node.parentNodeIdentifier,
+        nextParentItemIdentifier: node.parentItemIdentifier,
         nextIndex: destinationNodeMeta.nextIndex,
       });
     }
@@ -148,8 +148,8 @@ export const List = <NodeIdentifier extends BaseNodeIdentifier>(props: Props<Nod
       if (draggingNodeMeta.index < nextIndex) nextIndex -= 1;
 
       const node = tree.nodes[draggingNodeMeta.index];
-      if (node == undefined) throw new Error("Could not find a node identifier");
-      destinationNodeMetaRef.current = { nodeIdentifier: node.identifier, nextIndex };
+      if (node == undefined) throw new Error("Could not find a node");
+      destinationNodeMetaRef.current = { itemIdentifier: node.identifier, nextIndex };
     },
     [setDropLinePositionElement, tree],
   );
@@ -182,17 +182,17 @@ export const List = <NodeIdentifier extends BaseNodeIdentifier>(props: Props<Nod
     },
   });
 
-  const nodeElements = React.useMemo(
+  const itemElements = React.useMemo(
     () =>
       tree.nodes.map((node, index) => {
-        const element = props.handleNodeIdentifier(node.identifier, index);
-        const isFirstNode = index === 0;
+        const element = props.handleItemIdentifier(node.identifier, index);
+        const isFirstItem = index === 0;
 
         return (
           <React.Fragment key={node.identifier}>
             <div
-              className={props.nodeClassName}
-              style={{ boxSizing: "border-box", marginTop: isFirstNode ? undefined : nodeSpacing }}
+              className={props.itemClassName}
+              style={{ boxSizing: "border-box", marginTop: isFirstItem ? undefined : itemSpacing }}
               {...bind()}
               {...{ [nodeIndexDataAttribute]: index }}
             >
@@ -201,7 +201,7 @@ export const List = <NodeIdentifier extends BaseNodeIdentifier>(props: Props<Nod
           </React.Fragment>
         );
       }),
-    [tree, props.handleNodeIdentifier, bind, props.nodeClassName],
+    [tree, props.handleItemIdentifier, bind, props.itemClassName],
   );
 
   const dropLineElementStyle: React.CSSProperties = {
@@ -216,7 +216,7 @@ export const List = <NodeIdentifier extends BaseNodeIdentifier>(props: Props<Nod
 
   return (
     <div className={props.className} style={{ position: "relative" }}>
-      {nodeElements}
+      {itemElements}
 
       <div className={props.dropLineClassName} ref={dropLineElementRef} style={dropLineElementStyle} />
       <span ref={ghostWrapperElementRef} style={ghostWrapperElementStyle} />

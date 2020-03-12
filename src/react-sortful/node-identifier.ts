@@ -1,3 +1,3 @@
-export type BaseNodeIdentifier = number | string;
+export type BaseItemIdentifier = number | string;
 
-export type Item<NodeIdentifier extends BaseNodeIdentifier> = { identifier: NodeIdentifier; children: Item<NodeIdentifier>[] };
+export type Item<ItemIdentifier extends BaseItemIdentifier> = { identifier: ItemIdentifier; children: Item<ItemIdentifier>[] };

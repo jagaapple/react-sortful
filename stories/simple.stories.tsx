@@ -28,7 +28,7 @@ storiesOf("Simple", module)
         ]),
       [],
     );
-    const [nodesState, setNodesState] = React.useState(() =>
+    const [itemsState, setItemsState] = React.useState(() =>
       Array.from(dummyItemsMap.values()).reduce<ReactSortful.Item<number>[]>((items, dummyItem) => {
         items.push({ identifier: dummyItem.id, children: [] });
 
@@ -36,14 +36,14 @@ storiesOf("Simple", module)
       }, []),
     );
 
-    const handleNodeIdentifier = React.useCallback((nodeIdentifier: Item["id"]) => {
-      const item = dummyItemsMap.get(nodeIdentifier);
+    const handleItemIdentifier = React.useCallback((itemIdentifier: Item["id"]) => {
+      const item = dummyItemsMap.get(itemIdentifier);
 
       return <div key={item.id}>{item.name}</div>;
     }, []);
     const onDragEnd = React.useCallback(
-      (meta: ReactSortful.DestinationMeta<number>) => setNodesState(arrayMove(nodesState, meta.index, meta.nextIndex)),
-      [nodesState],
+      (meta: ReactSortful.DestinationMeta<number>) => setItemsState(arrayMove(itemsState, meta.index, meta.nextIndex)),
+      [itemsState],
     );
 
     return (
@@ -51,10 +51,10 @@ storiesOf("Simple", module)
         className={styles.wrapper}
         dropLineClassName={classnames(styles.dropLine, "bg-primary")}
         ghostClassName={classnames("shadow-sm", styles.ghost)}
-        nodeClassName={classnames("alert", "alert-light", "border", styles.item)}
-        nodeSpacing={8}
-        items={nodesState}
-        handleNodeIdentifier={handleNodeIdentifier}
+        itemClassName={classnames("alert", "alert-light", "border", styles.item)}
+        itemSpacing={8}
+        items={itemsState}
+        handleItemIdentifier={handleItemIdentifier}
         onDragEnd={onDragEnd}
       />
     );

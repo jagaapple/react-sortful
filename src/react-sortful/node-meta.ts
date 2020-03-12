@@ -1,5 +1,5 @@
 import { ElementPosition } from "./element";
-import { BaseNodeIdentifier } from "./node-identifier";
+import { BaseItemIdentifier } from "./node-identifier";
 
 export const nodeIndexDataAttribute = "data-react-sortful-node-index";
 
@@ -14,11 +14,11 @@ export type NodeMeta = {
   index: number;
   element: HTMLElement;
 } & NodeRect;
-export type DestinationMeta<NodeIdentifier extends BaseNodeIdentifier> = {
-  nodeIdentifier: NodeIdentifier;
-  parentNodeIdentifier: NodeIdentifier | undefined;
+export type DestinationMeta<ItemIdentifier extends BaseItemIdentifier> = {
+  itemIdentifier: ItemIdentifier;
+  parentItemIdentifier: ItemIdentifier | undefined;
   index: number;
-  nextParentNodeIdentifier: NodeIdentifier | undefined;
+  nextParentItemIdentifier: ItemIdentifier | undefined;
   nextIndex: number;
 };
 

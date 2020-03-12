@@ -27,7 +27,7 @@ export const getDropLineDirectionFromXY = (absoluteXY: [number, number], nodeMet
   return getDropLineDirection(nodeMeta.width, nodeMeta.height, [x, y], "VERTICAL");
 };
 
-export const getDropLinePosition = (absoluteXY: [number, number], nodeMeta: NodeMeta, nodeSpacing: number): ElementPosition => {
+export const getDropLinePosition = (absoluteXY: [number, number], nodeMeta: NodeMeta, itemSpacing: number): ElementPosition => {
   const x = Math.max(absoluteXY[0] - nodeMeta.absolutePosition.left, 0);
   const y = Math.max(absoluteXY[1] - nodeMeta.absolutePosition.top, 0);
 
@@ -38,11 +38,11 @@ export const getDropLinePosition = (absoluteXY: [number, number], nodeMeta: Node
   let top = nodeMeta.relativePosition.top;
   switch (direction) {
     case "TOP":
-      top -= nodeSpacing / 2;
+      top -= itemSpacing / 2;
 
       break;
     case "BOTTOM":
-      top += nodeSpacing / 2 + nodeMeta.height;
+      top += itemSpacing / 2 + nodeMeta.height;
 
       break;
   }

@@ -1,27 +1,27 @@
-import { BaseNodeIdentifier, Item } from "./node-identifier";
+import { BaseItemIdentifier, Item } from "./node-identifier";
 
-type TreeNode<NodeIdentifier extends BaseNodeIdentifier> = {
-  identifier: NodeIdentifier;
-  parentNodeIdentifier: NodeIdentifier | undefined;
+type TreeNode<ItemIdentifier extends BaseItemIdentifier> = {
+  identifier: ItemIdentifier;
+  parentItemIdentifier: ItemIdentifier | undefined;
 };
-type TreeNodeIndicesByIdentifier<NodeIdentifier extends BaseNodeIdentifier> = Record<NodeIdentifier, number>;
+type TreeNodeIndicesByIdentifier<ItemIdentifier extends BaseItemIdentifier> = Record<ItemIdentifier, number>;
 
-export class Tree<NodeIdentifier extends BaseNodeIdentifier> {
+export class Tree<ItemIdentifier extends BaseItemIdentifier> {
   // ---------------------------------------------------------------------------------------------------------------------------
   // Variables
   // ---------------------------------------------------------------------------------------------------------------------------
   // Private Variables
-  private _nodes: TreeNode<NodeIdentifier>[];
-  private _nodeIndicesByIdentifier: TreeNodeIndicesByIdentifier<NodeIdentifier>;
+  private _nodes: TreeNode<ItemIdentifier>[];
+  private _nodeIndicesByIdentifier: TreeNodeIndicesByIdentifier<ItemIdentifier>;
 
   // ---------------------------------------------------------------------------------------------------------------------------
   // Functions
   // ---------------------------------------------------------------------------------------------------------------------------
   // Public Functions
   // ---------------------------------------------------------------------------------------------------------------------------
-  constructor(items: Item<NodeIdentifier>[]) {
+  constructor(items: Item<ItemIdentifier>[]) {
     this._nodes = this.convertItemToTree(items);
-    this._nodeIndicesByIdentifier = this._nodes.reduce<TreeNodeIndicesByIdentifier<NodeIdentifier>>((object, node, index) => {
+    this._nodeIndicesByIdentifier = this._nodes.reduce<TreeNodeIndicesByIdentifier<ItemIdentifier>>((object, node, index) => {
       object[node.identifier] = index;
 
       return object;
@@ -32,11 +32,11 @@ export class Tree<NodeIdentifier extends BaseNodeIdentifier> {
     return this._nodes;
   }
 
-  getIndexByNodeIdentifier(identifier: NodeIdentifier) {
+  getIndexByItemIdentifier(identifier: ItemIdentifier) {
     return this._nodeIndicesByIdentifier[identifier];
   }
 
-  findByNodeIdentifier(identifier: NodeIdentifier) {
+  findByItemIdentifier(identifier: ItemIdentifier) {
     const index: number | undefined = this._nodeIndicesByIdentifier[identifier];
 
     return this._nodes[index];
@@ -44,9 +44,9 @@ export class Tree<NodeIdentifier extends BaseNodeIdentifier> {
 
   // Private Functions
   // ---------------------------------------------------------------------------------------------------------------------------
-  private convertItemToTree(items: Item<NodeIdentifier>[], newNodes: TreeNode<NodeIdentifier>[] = []) {
+  private convertItemToTree(items: Item<ItemIdentifier>[], newNodes: TreeNode<ItemIdentifier>[] = []) {
     items.forEach((item) => {
-      newNodes.push({ identifier: item.identifier, parentNodeIdentifier: undefined });
+      newNodes.push({ identifier: item.identifier, parentItemIdentifier: undefined });
 
       if (item.children?.length > 0) this.convertItemToTree(item.children, newNodes);
     });
