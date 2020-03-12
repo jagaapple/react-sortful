@@ -3,13 +3,13 @@
     "prefix": "component stories for storybook",
     "scope": "typescriptreact",
     "body": [
-      "storiesOf(\"${TM_DIRECTORY/(.*?src\\/)?\\/?(\\w+)(\\-)?/${2:/capitalize}${3:? :\/}/g}${TM_FILENAME/(^\\w+)?(\\-)?(\\w+)?(\\..+$)?/${1:/capitalize}${2:+ }${3:/capitalize}/g}\", module)",
+      "storiesOf(\"${TM_DIRECTORY/(.*?stories\\/)\\/?(\\w+)(\\-)?/${1:? :\/}${2:/capitalize}/g}${TM_FILENAME/(^\\w+)?(\\-)?(\\w+)?(\\..+$)?/${1:/capitalize}${2:+ }${3:/capitalize}/g}\", module)",
       "  .add(\"${1:Default}\", () => $0)"
     ]
   },
   "Import styles from CSS": {
     "prefix": "import styles",
     "scope": "typescript,typescriptreact",
-    "body": ["import styles from \"./${TM_FILENAME/(\\..+tsx)$//}.stories.css\";"]
+    "body": ["import styles from \"./${TM_FILENAME/(\\.tsx)$//}.css\";"]
   }
 }

@@ -2,8 +2,6 @@
   --padding: 8px;
 
   padding: var(--padding);
-  height: 256px;
-  overflow: scroll;
 }
 
 .dropLine {

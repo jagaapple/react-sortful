@@ -1,7 +1,6 @@
 import { ElementPosition } from "./element";
-import { NodeIdentifier } from "./node-identifier";
+import { BaseNodeIdentifier } from "./node-identifier";
 
-export const nodeIdentifierDataAttribute = "data-react-sortful-node-identifier";
 export const nodeIndexDataAttribute = "data-react-sortful-node-index";
 
 type NodeRect = {
@@ -12,16 +11,15 @@ type NodeRect = {
 };
 
 export type NodeMeta = {
-  nodeIdentifier: NodeIdentifier;
   index: number;
   element: HTMLElement;
 } & NodeRect;
-export type DestinationMeta = {
+export type DestinationMeta<NodeIdentifier extends BaseNodeIdentifier> = {
   nodeIdentifier: NodeIdentifier;
-  previousParentNodeIdentifier: NodeIdentifier | undefined;
-  previousIndex: number;
   parentNodeIdentifier: NodeIdentifier | undefined;
   index: number;
+  nextParentNodeIdentifier: NodeIdentifier | undefined;
+  nextIndex: number;
 };
 
 const getNodeRect = (element: HTMLElement): NodeRect => {
@@ -36,10 +34,8 @@ const getNodeRect = (element: HTMLElement): NodeRect => {
 };
 
 export const getNodeMeta = (element: HTMLElement): NodeMeta => {
-  const nodeIdentifier = element.getAttribute(nodeIdentifierDataAttribute) ?? undefined;
-  if (nodeIdentifier == undefined) throw new Error("A node identifier is not set as data attributes in the element");
   const index = Number(element.getAttribute(nodeIndexDataAttribute) ?? NaN);
   if (isNaN(index)) throw new Error("A node index is not a number");
 
-  return { nodeIdentifier, index, element, ...getNodeRect(element) };
+  return { index, element, ...getNodeRect(element) };
 };

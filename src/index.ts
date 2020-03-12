@@ -1,11 +1,5 @@
-import {
-  DestinationMeta as ImportedDestinationMeta,
-  Tree as ImportedTree,
-  TreeNode as ImportedTreeNode,
-} from "./react-sortful";
+import { BaseNodeIdentifier, DestinationMeta as ImportedDestinationMeta, Item as ImportedItem } from "./react-sortful";
 
+export type DestinationMeta<T extends BaseNodeIdentifier> = ImportedDestinationMeta<T>;
+export type Item<T extends BaseNodeIdentifier> = ImportedItem<T>;
 export * from "./react-sortful.component";
-
-export type DestinationMeta = ImportedDestinationMeta;
-export type Tree = ImportedTree;
-export type TreeNode = ImportedTreeNode;

@@ -5,55 +5,55 @@ import classnames from "classnames";
 import { storiesOf } from "@storybook/react";
 import arrayMove from "array-move";
 
-import { DestinationMeta, ReactSortful, Tree } from "../src";
+import * as ReactSortful from "../src";
 import styles from "./simple.css";
 
 type Item = { id: number; name: string };
-const dummyItems: Item[] = [
-  { id: 1, name: "Item - 0" },
-  { id: 2, name: "Item - 1" },
-  { id: 3, name: "Item - 2" },
-  { id: 4, name: "Item - 3" },
-  { id: 5, name: "Item - 4" },
-  { id: 6, name: "Item - 5" },
-  { id: 7, name: "Item - 6" },
-  { id: 8, name: "Item - 7" },
-  { id: 9, name: "Item - 8" },
-];
-const dummyItemsById = dummyItems.reduce<Record<Item["id"], Item>>((object, item) => {
-  object[item.id] = item;
 
-  return object;
-}, {});
-const dummyNodes = dummyItems.reduce<Tree>((tree, dummyItem) => {
-  tree.push({ identifier: dummyItem.id.toString(), children: [] });
-
-  return tree;
-}, []);
-
-storiesOf("/Simple", module)
-  .addDecorator((story) => <div style={{ boxShadow: "0 0 0 1px red inset", width: 512 }}>{story()}</div>)
+storiesOf("Simple", module)
+  .addDecorator((story) => <div style={{ width: 512 }}>{story()}</div>)
   .add("Default", () => {
-    const [nodesState, setNodesState] = React.useState(dummyNodes);
+    const dummyItemsMap = React.useMemo(
+      () =>
+        new Map<Item["id"], Item>([
+          [1, { id: 1, name: "Item - 0" }],
+          [2, { id: 2, name: "Item - 1" }],
+          [3, { id: 3, name: "Item - 2" }],
+          [4, { id: 4, name: "Item - 3" }],
+          [5, { id: 5, name: "Item - 4" }],
+          [6, { id: 6, name: "Item - 5" }],
+          [7, { id: 7, name: "Item - 6" }],
+          [8, { id: 8, name: "Item - 7" }],
+          [9, { id: 9, name: "Item - 8" }],
+        ]),
+      [],
+    );
+    const [nodesState, setNodesState] = React.useState(() =>
+      Array.from(dummyItemsMap.values()).reduce<ReactSortful.Item<number>[]>((items, dummyItem) => {
+        items.push({ identifier: dummyItem.id, children: [] });
 
-    const handleNodeIdentifier = React.useCallback((nodeIdentifier) => {
-      const item = dummyItemsById[nodeIdentifier];
+        return items;
+      }, []),
+    );
+
+    const handleNodeIdentifier = React.useCallback((nodeIdentifier: Item["id"]) => {
+      const item = dummyItemsMap.get(nodeIdentifier);
 
       return <div key={item.id}>{item.name}</div>;
     }, []);
     const onDragEnd = React.useCallback(
-      (meta: DestinationMeta) => setNodesState(arrayMove(nodesState, meta.previousIndex, meta.index)),
+      (meta: ReactSortful.DestinationMeta<number>) => setNodesState(arrayMove(nodesState, meta.index, meta.nextIndex)),
       [nodesState],
     );
 
     return (
-      <ReactSortful
+      <ReactSortful.ReactSortful
         className={styles.wrapper}
         dropLineClassName={classnames(styles.dropLine, "bg-primary")}
         ghostClassName={classnames("shadow-sm", styles.ghost)}
         nodeClassName={classnames("alert", "alert-light", "border", styles.item)}
         nodeSpacing={8}
-        tree={nodesState}
+        items={nodesState}
         handleNodeIdentifier={handleNodeIdentifier}
         onDragEnd={onDragEnd}
       />

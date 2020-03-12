@@ -1,0 +1,63 @@
+{
+  "Export": {
+    "prefix": "export statement",
+    "scope": "typescript,typescriptreact",
+    "body": ["export * from \"${0:module}\";"]
+  },
+  "Insert variables comment": {
+    "prefix": "comment variables",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "  // ---------------------------------------------------------------------------------------------------------------------------",
+      "  // Variables",
+      "  // ---------------------------------------------------------------------------------------------------------------------------"
+    ]
+  },
+  "Insert public variables comment": {
+    "prefix": "comment public variables",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "  // Public Variables"
+    ]
+  },
+  "Insert private variables comment": {
+    "prefix": "comment private variables",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "  // Private Variables"
+    ]
+  },
+  "Insert functions comment": {
+    "prefix": "comment functions",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "  // ---------------------------------------------------------------------------------------------------------------------------",
+      "  // Functions",
+      "  // ---------------------------------------------------------------------------------------------------------------------------"
+    ]
+  },
+  "Insert constructors comment": {
+    "prefix": "comment constructors",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "  // Constructors",
+      "  // ---------------------------------------------------------------------------------------------------------------------------"
+    ]
+  },
+  "Insert public functions comment": {
+    "prefix": "comment public functions",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "  // Public Functions",
+      "  // ---------------------------------------------------------------------------------------------------------------------------"
+    ]
+  },
+  "Insert private functions comment": {
+    "prefix": "comment private functions",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "  // Private Functions",
+      "  // ---------------------------------------------------------------------------------------------------------------------------"
+    ]
+  }
+}
