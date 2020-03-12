@@ -3,15 +3,14 @@ import { useGesture } from "react-use-gesture";
 
 import {
   DestinationMeta,
-  DraggingNodeMeta,
-  getDraggingNodeMeta,
+  getDropLineDirectionFromXY,
   getDropLinePosition,
-  getOveredNodeMeta,
+  getNodeMeta,
   NodeIdentifier,
   nodeIdentifierDataAttribute,
   nodeIndexDataAttribute,
+  NodeMeta,
   normalizeTree,
-  OveredNodeMeta,
   Tree,
 } from "./react-sortful";
 
@@ -32,8 +31,8 @@ export const ReactSortful = (props: Props) => {
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
   const ghostElementRef = React.useRef<HTMLDivElement>();
-  const draggingNodeMetaRef = React.useRef<DraggingNodeMeta>();
-  const overedNodeMetaRef = React.useRef<OveredNodeMeta>();
+  const draggingNodeMetaRef = React.useRef<NodeMeta>();
+  const overedNodeMetaRef = React.useRef<NodeMeta>();
   const destinationMetaRef = React.useRef<DestinationMeta>();
 
   const normalizedTree = React.useMemo(() => normalizeTree(props.tree), [props.tree]);
@@ -70,18 +69,32 @@ export const ReactSortful = (props: Props) => {
     ghostWrapperElement.style.height = "0";
     ghostWrapperElement.removeChild(ghostElement);
   }, []);
+  const setDropLinePositionElement = React.useCallback(
+    (absoluteXY: [number, number], nodeMeta: NodeMeta) => {
+      const dropLineElement = dropLineElementRef.current;
+      if (dropLineElement == undefined) return;
+
+      const dropLinePosition = getDropLinePosition(absoluteXY, nodeMeta, nodeSpacing);
+      dropLineElement.style.top = `${dropLinePosition.top}px`;
+      dropLineElement.style.left = `${dropLinePosition.left}px`;
+      dropLineElement.style.top = `${dropLinePosition.top}px`;
+      dropLineElement.style.left = `${dropLinePosition.left}px`;
+    },
+    [nodeSpacing],
+  );
 
   const onDragStart = React.useCallback(
-    (nodeIdentifier: NodeIdentifier, element: HTMLDivElement) => {
+    (element: HTMLDivElement, absoluteXY: [number, number]) => {
       setGhostElement(element);
       setIsDraggingAnyNodeState(true);
+      setDropLinePositionElement(absoluteXY, getNodeMeta(element));
 
       // Disables to select nodes in entire page.
       document.body.style.userSelect = "none";
 
-      draggingNodeMetaRef.current = getDraggingNodeMeta(nodeIdentifier, element);
+      draggingNodeMetaRef.current = getNodeMeta(element);
     },
-    [setGhostElement],
+    [setGhostElement, setDropLinePositionElement],
   );
   const onDrag = React.useCallback((movementXY: [number, number]) => {
     const ghostWrapperElement = ghostWrapperElementRef.current;
@@ -105,10 +118,10 @@ export const ReactSortful = (props: Props) => {
     destinationMetaRef.current = undefined;
   }, [clearGhostElement, props.onDragEnd]);
   const onMouseOver = React.useCallback((element: HTMLDivElement) => {
-    overedNodeMetaRef.current = getOveredNodeMeta(element);
+    overedNodeMetaRef.current = getNodeMeta(element);
   }, []);
   const onMouseMove = React.useCallback(
-    (absoluteXY) => {
+    (absoluteXY: [number, number]) => {
       const draggingNodeMeta = draggingNodeMetaRef.current;
       if (draggingNodeMeta == undefined) return;
       const overedNodeMeta = overedNodeMetaRef.current;
@@ -116,10 +129,9 @@ export const ReactSortful = (props: Props) => {
       const dropLineElement = dropLineElementRef.current;
       if (dropLineElement == undefined) return;
 
-      const [dropLinePosition, dropLineDirection] = getDropLinePosition(absoluteXY, overedNodeMeta, nodeSpacing);
-      dropLineElement.style.top = `${dropLinePosition.top}px`;
-      dropLineElement.style.left = `${dropLinePosition.left}px`;
+      setDropLinePositionElement(absoluteXY, overedNodeMeta);
 
+      const dropLineDirection = getDropLineDirectionFromXY(absoluteXY, overedNodeMeta);
       const { parentIdentifier } = normalizedTree[overedNodeMeta.index];
       let nextIndex = draggingNodeMeta.index;
       if (dropLineDirection === "TOP") nextIndex = overedNodeMeta.index;
@@ -133,7 +145,7 @@ export const ReactSortful = (props: Props) => {
         index: nextIndex,
       };
     },
-    [nodeSpacing, normalizedTree],
+    [setDropLinePositionElement, normalizedTree],
   );
 
   const bind = useGesture({
@@ -142,13 +154,11 @@ export const ReactSortful = (props: Props) => {
 
       onDrag(movement);
     },
-    onDragStart: ({ event }) => {
+    onDragStart: ({ event, xy }) => {
       const element = event.currentTarget;
       if (!(element instanceof HTMLDivElement)) return;
-      const nodeIdentifier = element.getAttribute(nodeIdentifierDataAttribute) ?? undefined;
-      if (nodeIdentifier == undefined) return;
 
-      onDragStart(nodeIdentifier, element);
+      onDragStart(element, xy);
     },
     onDragEnd,
     onHover: ({ event }) => {

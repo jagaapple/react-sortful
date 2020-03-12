@@ -1,5 +1,5 @@
 import { ElementPosition } from "./element";
-import { OveredNodeMeta } from "./node-meta";
+import { NodeMeta } from "./node-meta";
 
 type DropLineDirection = "TOP" | "RIGHT" | "BOTTOM" | "LEFT";
 const getDropLineDirection = (
@@ -20,29 +20,32 @@ const getDropLineDirection = (
   }
 };
 
-export const getDropLinePosition = (
-  absoluteXY: [number, number],
-  overedNodeMeta: OveredNodeMeta,
-  nodeSpacing: number,
-): [ElementPosition, DropLineDirection] => {
-  const x = Math.max(absoluteXY[0] - overedNodeMeta.absolutePosition.left, 0);
-  const y = Math.max(absoluteXY[1] - overedNodeMeta.absolutePosition.top, 0);
+export const getDropLineDirectionFromXY = (absoluteXY: [number, number], nodeMeta: NodeMeta) => {
+  const x = Math.max(absoluteXY[0] - nodeMeta.absolutePosition.left, 0);
+  const y = Math.max(absoluteXY[1] - nodeMeta.absolutePosition.top, 0);
 
-  const direction = getDropLineDirection(overedNodeMeta.width, overedNodeMeta.height, [x, y], "VERTICAL");
+  return getDropLineDirection(nodeMeta.width, nodeMeta.height, [x, y], "VERTICAL");
+};
+
+export const getDropLinePosition = (absoluteXY: [number, number], nodeMeta: NodeMeta, nodeSpacing: number): ElementPosition => {
+  const x = Math.max(absoluteXY[0] - nodeMeta.absolutePosition.left, 0);
+  const y = Math.max(absoluteXY[1] - nodeMeta.absolutePosition.top, 0);
+
+  const direction = getDropLineDirection(nodeMeta.width, nodeMeta.height, [x, y], "VERTICAL");
   if (direction == undefined) throw new Error("A drop line direction is undefined");
 
-  const left = overedNodeMeta.relativePosition.left;
-  let top = overedNodeMeta.relativePosition.top;
+  const left = nodeMeta.relativePosition.left;
+  let top = nodeMeta.relativePosition.top;
   switch (direction) {
     case "TOP":
       top -= nodeSpacing / 2;
 
       break;
     case "BOTTOM":
-      top += nodeSpacing / 2 + overedNodeMeta.height;
+      top += nodeSpacing / 2 + nodeMeta.height;
 
       break;
   }
 
-  return [{ top, left }, direction];
+  return { top, left };
 };
