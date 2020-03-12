@@ -2,4 +2,4 @@ import { BaseNodeIdentifier, DestinationMeta as ImportedDestinationMeta, Item as
 
 export type DestinationMeta<T extends BaseNodeIdentifier> = ImportedDestinationMeta<T>;
 export type Item<T extends BaseNodeIdentifier> = ImportedItem<T>;
-export * from "./react-sortful.component";
+export * from "./list.component";

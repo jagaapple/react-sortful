@@ -24,7 +24,7 @@ type Props<NodeIdentifier extends BaseNodeIdentifier> = {
   onDragEnd: (meta: DestinationMeta<NodeIdentifier>) => void;
 };
 
-export const ReactSortful = <NodeIdentifier extends BaseNodeIdentifier>(props: Props<NodeIdentifier>) => {
+export const List = <NodeIdentifier extends BaseNodeIdentifier>(props: Props<NodeIdentifier>) => {
   const [isDraggingAnyNodeState, setIsDraggingAnyNodeState] = React.useState(false);
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);

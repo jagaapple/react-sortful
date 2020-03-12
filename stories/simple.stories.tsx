@@ -47,7 +47,7 @@ storiesOf("Simple", module)
     );
 
     return (
-      <ReactSortful.ReactSortful
+      <ReactSortful.List
         className={styles.wrapper}
         dropLineClassName={classnames(styles.dropLine, "bg-primary")}
         ghostClassName={classnames("shadow-sm", styles.ghost)}
