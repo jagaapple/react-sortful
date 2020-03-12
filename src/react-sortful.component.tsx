@@ -52,6 +52,7 @@ export const ReactSortful = (props: Props) => {
       ghostWrapperElement.style.width = `${elementRect.width}px`;
       ghostWrapperElement.style.height = `${elementRect.height}px`;
 
+      ghostElement.removeAttribute("style");
       ghostElement.style.width = "100%";
       ghostElement.style.height = "100%";
       ghostElement.classList.add(...(props.ghostClassName ?? "").split(" "));
@@ -97,10 +98,11 @@ export const ReactSortful = (props: Props) => {
     document.body.style.userSelect = "auto";
 
     const destinationMeta = destinationMetaRef.current;
-    if (destinationMeta == undefined) throw new Error("A destination meta is undefined");
-    props.onDragEnd(destinationMeta);
+    if (destinationMeta != undefined) props.onDragEnd(destinationMeta);
 
     draggingNodeMetaRef.current = undefined;
+    overedNodeMetaRef.current = undefined;
+    destinationMetaRef.current = undefined;
   }, [clearGhostElement, props.onDragEnd]);
   const onMouseOver = React.useCallback((element: HTMLDivElement) => {
     overedNodeMetaRef.current = getOveredNodeMeta(element);

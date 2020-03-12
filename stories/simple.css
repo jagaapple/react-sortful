@@ -28,10 +28,13 @@
   right: calc(var(--size) / 2 * -1);
 }
 
-.ghost {
-  opacity: 0.6;
-}
 
 .item {
   margin: 0;
+  transition-property: transform;
+  transition-duration: 200ms;
+}
+.item.ghost {
+  opacity: 0.6;
+  transform: scale(0.8);
 }
