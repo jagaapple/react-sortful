@@ -22,6 +22,7 @@ type Props<ItemIdentifier extends BaseItemIdentifier> = {
   items: Item<ItemIdentifier>[];
   handleItemIdentifier: (itemIdentifier: ItemIdentifier, index: number) => JSX.Element;
   onDragEnd: (meta: DestinationMeta<ItemIdentifier>) => void;
+  isDisabled?: boolean;
 };
 
 export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
@@ -161,6 +162,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
       onDrag(movement);
     },
     onDragStart: ({ event, xy }) => {
+      if (props.isDisabled) return;
       const element = event.currentTarget;
       if (!(element instanceof HTMLDivElement)) return;
 
