@@ -21,6 +21,11 @@ export type DestinationMeta<ItemIdentifier extends BaseItemIdentifier> = {
   nextParentItemIdentifier: ItemIdentifier | undefined;
   nextIndex: number;
 };
+export type ItemIdentifierHandlerMeta<ItemIdentifier extends BaseItemIdentifier> = {
+  identifier: ItemIdentifier;
+  index: number;
+  isDragging: boolean;
+};
 
 const getNodeRect = (element: HTMLElement): NodeRect => {
   const elementRect = element.getBoundingClientRect();

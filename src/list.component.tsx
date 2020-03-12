@@ -8,6 +8,7 @@ import {
   getDropLinePosition,
   getNodeMeta,
   Item,
+  ItemIdentifierHandlerMeta,
   nodeIndexDataAttribute,
   NodeMeta,
   Tree,
@@ -20,13 +21,13 @@ type Props<ItemIdentifier extends BaseItemIdentifier> = {
   itemClassName?: string;
   itemSpacing?: number;
   items: Item<ItemIdentifier>[];
-  handleItemIdentifier: (itemIdentifier: ItemIdentifier, index: number) => JSX.Element;
+  handleItemIdentifier: (meta: ItemIdentifierHandlerMeta<ItemIdentifier>) => JSX.Element;
   onDragEnd: (meta: DestinationMeta<ItemIdentifier>) => void;
   isDisabled?: boolean;
 };
 
 export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
-  const [isDraggingAnyNodeState, setIsDraggingAnyNodeState] = React.useState(false);
+  const [draggingItemIdentifierState, setDraggingItemIdentifierState] = React.useState<T>();
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
@@ -86,15 +87,17 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   const onDragStart = React.useCallback(
     (element: HTMLDivElement, absoluteXY: [number, number]) => {
       setGhostElement(element);
-      setIsDraggingAnyNodeState(true);
       setDropLinePositionElement(absoluteXY, getNodeMeta(element));
 
       // Disables to select elements in entire page.
       document.body.style.userSelect = "none";
 
       draggingNodeMetaRef.current = getNodeMeta(element);
+
+      const node = tree.nodes[draggingNodeMetaRef.current.index];
+      setDraggingItemIdentifierState(node.identifier);
     },
-    [setGhostElement, setDropLinePositionElement],
+    [setGhostElement, setDropLinePositionElement, tree],
   );
   const onDrag = React.useCallback((movementXY: [number, number]) => {
     const ghostWrapperElement = ghostWrapperElementRef.current;
@@ -105,7 +108,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   }, []);
   const onDragEnd = React.useCallback(() => {
     clearGhostElement();
-    setIsDraggingAnyNodeState(false);
+    setDraggingItemIdentifierState(undefined);
 
     // Enables to select elements in entire page.
     document.body.style.userSelect = "auto";
@@ -170,7 +173,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
     },
     onDragEnd,
     onHover: ({ event }) => {
-      if (!isDraggingAnyNodeState) return;
+      if (draggingItemIdentifierState == undefined) return;
 
       const element = event.currentTarget;
       if (!(element instanceof HTMLDivElement)) return;
@@ -178,7 +181,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
       onMouseOver(element);
     },
     onMove: ({ xy }) => {
-      if (!isDraggingAnyNodeState) return;
+      if (draggingItemIdentifierState == undefined) return;
 
       onMouseMove(xy);
     },
@@ -187,7 +190,11 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   const itemElements = React.useMemo(
     () =>
       tree.nodes.map((node, index) => {
-        const element = props.handleItemIdentifier(node.identifier, index);
+        const element = props.handleItemIdentifier({
+          identifier: node.identifier,
+          index,
+          isDragging: draggingItemIdentifierState === node.identifier,
+        });
         const isFirstItem = index === 0;
 
         return (
@@ -203,11 +210,11 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
           </React.Fragment>
         );
       }),
-    [tree, props.handleItemIdentifier, bind, props.itemClassName],
+    [tree, props.handleItemIdentifier, bind, props.itemClassName, draggingItemIdentifierState],
   );
 
   const dropLineElementStyle: React.CSSProperties = {
-    display: isDraggingAnyNodeState ? "block" : "none",
+    display: draggingItemIdentifierState != undefined ? "block" : "none",
     position: "absolute",
     transform: "translate(0, -50%)",
   };
