@@ -6,7 +6,7 @@ import { storiesOf } from "@storybook/react";
 import arrayMove from "array-move";
 
 import * as ReactSortful from "../src";
-import styles from "./simple.css";
+import styles from "./simple.stories.css";
 
 type Item = { id: number; name: string };
 

@@ -10,6 +10,6 @@
   "Import styles from CSS": {
     "prefix": "import styles",
     "scope": "typescript,typescriptreact",
-    "body": ["import styles from \"./${TM_FILENAME/(\\.tsx)$//}.css\";"]
+    "body": ["import styles from \"./${TM_FILENAME/(\\.stories\\.tsx)$//}.stories.css\";"]
   }
 }

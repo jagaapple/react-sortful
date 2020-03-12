@@ -1,12 +1,19 @@
 const path = require("path");
 
 module.exports = {
-  stories: ["../stories/**/*.tsx"],
-  addons: ["@storybook/addon-knobs/register", "@storybook/addon-backgrounds/register", "@storybook/addon-actions/register"],
+  stories: ["../stories/**/*.stories.tsx"],
+  addons: ["@storybook/addon-backgrounds", "@storybook/addon-storysource"],
   webpackFinal: async (config) => {
     // --- TypeScript
     config.resolve.extensions.push(".ts", ".tsx");
     config.module.rules.push({ test: /\.tsx?$/, exclude: /node_modules/, loader: "babel-loader" });
+    config.module.rules.push({
+      test: /\.stories\.tsx?$/,
+      exclude: /node_modules/,
+      loader: "@storybook/source-loader",
+      options: { parser: "typescript" },
+      enforce: "pre",
+    });
 
     // --- CSS
     // Appends "exclude" option to the existing CSS rule in order to ignore default rules for application styles.
