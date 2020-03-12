@@ -60,6 +60,7 @@
     "@types/react-dom": "^16.9.5",
     "@typescript-eslint/eslint-plugin": "^2.22.0",
     "@typescript-eslint/parser": "^2.22.0",
+    "array-move": "^2.2.1",
     "babel-loader": "^8.0.6",
     "classnames": "^2.2.6",
     "codecov": "^3.6.5",

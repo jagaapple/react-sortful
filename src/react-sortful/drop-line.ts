@@ -24,11 +24,13 @@ export const getDropLinePosition = (
   absoluteXY: [number, number],
   overedNodeMeta: OveredNodeMeta,
   nodeSpacing: number,
-): ElementPosition => {
+): [ElementPosition, DropLineDirection] => {
   const x = Math.max(absoluteXY[0] - overedNodeMeta.absolutePosition.left, 0);
   const y = Math.max(absoluteXY[1] - overedNodeMeta.absolutePosition.top, 0);
 
   const direction = getDropLineDirection(overedNodeMeta.width, overedNodeMeta.height, [x, y], "VERTICAL");
+  if (direction == undefined) throw new Error("A drop line direction is undefined");
+
   const left = overedNodeMeta.relativePosition.left;
   let top = overedNodeMeta.relativePosition.top;
   switch (direction) {
@@ -42,5 +44,5 @@ export const getDropLinePosition = (
       break;
   }
 
-  return { top, left };
+  return [{ top, left }, direction];
 };
