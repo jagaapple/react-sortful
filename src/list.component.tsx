@@ -97,6 +97,8 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
 
       // Disables to select elements in entire page.
       document.body.style.userSelect = "none";
+      // Changes a cursor form.
+      document.body.style.cursor = "grabbing";
 
       draggingNodeMetaRef.current = getNodeMeta(element);
 
@@ -118,6 +120,8 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
 
     // Enables to select elements in entire page.
     document.body.style.userSelect = "auto";
+    // Changes a cursor form.
+    document.body.style.cursor = "auto";
 
     const destinationNodeMeta = destinationNodeMetaRef.current;
     if (destinationNodeMeta != undefined) {
