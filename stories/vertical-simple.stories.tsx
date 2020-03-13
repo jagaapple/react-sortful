@@ -50,6 +50,7 @@ storiesOf("Vertical Simple", module)
         className={styles.wrapper}
         dropLineClassName={classnames(commonStyles.dropLine, styles.dropLine)}
         ghostClassName={styles.ghost}
+        ghostSize="same-item"
         itemSpacing={8}
         items={items}
         handleItemIdentifier={handleItemIdentifier}
@@ -87,6 +88,7 @@ storiesOf("Vertical Simple", module)
         className={styles.wrapper}
         dropLineClassName={classnames(commonStyles.dropLine, styles.dropLine)}
         ghostClassName={styles.ghost}
+        ghostSize="same-item"
         itemSpacing={8}
         items={items}
         handleItemIdentifier={handleItemIdentifier}
@@ -124,6 +126,7 @@ storiesOf("Vertical Simple", module)
         className={styles.wrapper}
         dropLineClassName={classnames(commonStyles.dropLine, styles.dropLine)}
         ghostClassName={styles.ghost}
+        ghostSize="same-item"
         itemSpacing={8}
         items={items}
         handleItemIdentifier={handleItemIdentifier}
@@ -171,6 +174,7 @@ storiesOf("Vertical Simple", module)
         className={styles.wrapper}
         dropLineClassName={classnames(commonStyles.dropLine, styles.dropLine)}
         ghostClassName={styles.ghost}
+        ghostSize="same-item"
         draggingCursorStyle="grabbing"
         itemSpacing={8}
         items={items}
@@ -209,6 +213,7 @@ storiesOf("Vertical Simple", module)
         className={styles.wrapper}
         dropLineClassName={classnames(commonStyles.dropLine, styles.dropLine)}
         ghostClassName={styles.ghost}
+        ghostSize="same-item"
         itemSpacing={8}
         items={items}
         handleItemIdentifier={handleItemIdentifier}
