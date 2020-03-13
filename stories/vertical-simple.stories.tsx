@@ -171,6 +171,7 @@ storiesOf("Vertical Simple", module)
         className={styles.wrapper}
         dropLineClassName={classnames(commonStyles.dropLine, styles.dropLine)}
         ghostClassName={styles.ghost}
+        draggingCursorStyle="grabbing"
         itemSpacing={8}
         items={items}
         handleItemIdentifier={handleItemIdentifier}

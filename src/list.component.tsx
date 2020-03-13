@@ -21,6 +21,7 @@ type Props<ItemIdentifier extends BaseItemIdentifier> = {
   className?: string;
   dropLineClassName: string;
   ghostClassName?: string;
+  draggingCursorStyle?: React.CSSProperties["cursor"];
   itemSpacing?: number;
   items: Item<ItemIdentifier>[];
   handleItemIdentifier: (
@@ -98,14 +99,14 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
       // Disables to select elements in entire page.
       document.body.style.userSelect = "none";
       // Changes a cursor form.
-      document.body.style.cursor = "grabbing";
+      if (props.draggingCursorStyle != undefined) document.body.style.cursor = props.draggingCursorStyle;
 
       draggingNodeMetaRef.current = getNodeMeta(element);
 
       const node = tree.nodes[draggingNodeMetaRef.current.index];
       setDraggingItemIdentifierState(node.identifier);
     },
-    [setGhostElement, tree],
+    [setGhostElement, props.draggingCursorStyle, tree],
   );
   const onDrag = React.useCallback((movementXY: [number, number]) => {
     const ghostWrapperElement = ghostWrapperElementRef.current;
@@ -120,9 +121,9 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
     setIsVisibleDropLineState(false);
 
     // Enables to select elements in entire page.
-    document.body.style.userSelect = "auto";
+    document.body.style.removeProperty("user-select");
     // Changes a cursor form.
-    document.body.style.cursor = "auto";
+    document.body.style.removeProperty("cursor");
 
     const destinationNodeMeta = destinationNodeMetaRef.current;
     if (destinationNodeMeta != undefined) {
