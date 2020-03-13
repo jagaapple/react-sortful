@@ -14,24 +14,31 @@ import {
   Tree,
 } from "./react-sortful";
 
+export type ItemElementInjectedProps = Record<string, any>;
+export type ItemElementDraggable = () => Record<any, any>;
+
 type Props<ItemIdentifier extends BaseItemIdentifier> = {
   className?: string;
   dropLineClassName: string;
   ghostClassName?: string;
-  itemClassName?: string;
   itemSpacing?: number;
   items: Item<ItemIdentifier>[];
-  handleItemIdentifier: (meta: ItemIdentifierHandlerMeta<ItemIdentifier>) => JSX.Element;
+  handleItemIdentifier: (
+    meta: ItemIdentifierHandlerMeta<ItemIdentifier>,
+    props: ItemElementInjectedProps,
+    draggable: ItemElementDraggable,
+  ) => JSX.Element;
   onDragEnd: (meta: DestinationMeta<ItemIdentifier>) => void;
   isDisabled?: boolean;
 };
 
 export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   const [draggingItemIdentifierState, setDraggingItemIdentifierState] = React.useState<T>();
+  const [isVisibleDropLineState, setIsVisibleDropLineState] = React.useState(false);
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
-  const ghostElementRef = React.useRef<HTMLDivElement>();
+  const ghostElementRef = React.useRef<HTMLElement>();
   const draggingNodeMetaRef = React.useRef<NodeMeta>();
   const overedNodeMetaRef = React.useRef<NodeMeta>();
   const destinationNodeMetaRef = React.useRef<{ itemIdentifier: T; nextIndex: number }>();
@@ -40,11 +47,11 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   const itemSpacing = props.itemSpacing ?? 8;
 
   const setGhostElement = React.useCallback(
-    (itemElement: HTMLDivElement) => {
+    (itemElement: HTMLElement) => {
       const ghostWrapperElement = ghostWrapperElementRef.current;
       if (ghostWrapperElement == undefined) return;
       const ghostElement = ghostWrapperElement.appendChild(itemElement.cloneNode(true));
-      if (!(ghostElement instanceof HTMLDivElement)) return;
+      if (!(ghostElement instanceof HTMLElement)) return;
 
       const elementRect = itemElement.getBoundingClientRect();
       ghostWrapperElement.style.top = `${elementRect.top}px`;
@@ -85,19 +92,20 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   );
 
   const onDragStart = React.useCallback(
-    (element: HTMLDivElement, absoluteXY: [number, number]) => {
+    (element: HTMLElement) => {
       setGhostElement(element);
-      setDropLinePositionElement(absoluteXY, getNodeMeta(element));
 
       // Disables to select elements in entire page.
       document.body.style.userSelect = "none";
+      // Changes a cursor form.
+      document.body.style.cursor = "grabbing";
 
       draggingNodeMetaRef.current = getNodeMeta(element);
 
       const node = tree.nodes[draggingNodeMetaRef.current.index];
       setDraggingItemIdentifierState(node.identifier);
     },
-    [setGhostElement, setDropLinePositionElement, tree],
+    [setGhostElement, tree],
   );
   const onDrag = React.useCallback((movementXY: [number, number]) => {
     const ghostWrapperElement = ghostWrapperElementRef.current;
@@ -109,9 +117,12 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   const onDragEnd = React.useCallback(() => {
     clearGhostElement();
     setDraggingItemIdentifierState(undefined);
+    setIsVisibleDropLineState(false);
 
     // Enables to select elements in entire page.
     document.body.style.userSelect = "auto";
+    // Changes a cursor form.
+    document.body.style.cursor = "auto";
 
     const destinationNodeMeta = destinationNodeMetaRef.current;
     if (destinationNodeMeta != undefined) {
@@ -131,7 +142,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
     overedNodeMetaRef.current = undefined;
     destinationNodeMetaRef.current = undefined;
   }, [clearGhostElement, tree, props.onDragEnd]);
-  const onMouseOver = React.useCallback((element: HTMLDivElement) => {
+  const onMouseOver = React.useCallback((element: HTMLElement) => {
     overedNodeMetaRef.current = getNodeMeta(element);
   }, []);
   const onMouseMove = React.useCallback(
@@ -142,6 +153,8 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
       if (overedNodeMeta == undefined) return;
       const dropLineElement = dropLineElementRef.current;
       if (dropLineElement == undefined) return;
+
+      if (draggingNodeMeta.index !== overedNodeMeta.index) setIsVisibleDropLineState(true);
 
       setDropLinePositionElement(absoluteXY, overedNodeMeta);
 
@@ -158,25 +171,12 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
     [setDropLinePositionElement, tree],
   );
 
-  const bind = useGesture({
-    onDrag: ({ down, movement }) => {
-      if (!down) return;
-
-      onDrag(movement);
-    },
-    onDragStart: ({ event, xy }) => {
-      if (props.isDisabled) return;
-      const element = event.currentTarget;
-      if (!(element instanceof HTMLDivElement)) return;
-
-      onDragStart(element, xy);
-    },
-    onDragEnd,
+  const binder = useGesture({
     onHover: ({ event }) => {
       if (draggingItemIdentifierState == undefined) return;
 
       const element = event.currentTarget;
-      if (!(element instanceof HTMLDivElement)) return;
+      if (!(element instanceof HTMLElement)) return;
 
       onMouseOver(element);
     },
@@ -186,35 +186,57 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
       onMouseMove(xy);
     },
   });
+  const draggableBinder = useGesture({
+    onDragStart: ({ event }) => {
+      if (props.isDisabled) return;
+
+      let element: HTMLElement | SVGElement | undefined = event.currentTarget;
+      if (!(element instanceof HTMLElement) && !(element instanceof SVGElement)) return;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        if (element == undefined) break;
+        if (element.getAttribute(nodeIndexDataAttribute) != undefined) break;
+
+        element = element.parentElement ?? undefined;
+      }
+      if (element == undefined) return;
+      if (!(element instanceof HTMLElement)) return;
+
+      onDragStart(element);
+    },
+    onDrag: ({ down, movement }) => {
+      if (!down) return;
+
+      onDrag(movement);
+    },
+    onDragEnd,
+  });
 
   const itemElements = React.useMemo(
     () =>
       tree.nodes.map((node, index) => {
-        const element = props.handleItemIdentifier({
-          identifier: node.identifier,
-          index,
-          isDragging: draggingItemIdentifierState === node.identifier,
-        });
         const isFirstItem = index === 0;
-
-        return (
-          <React.Fragment key={node.identifier}>
-            <div
-              className={props.itemClassName}
-              style={{ boxSizing: "border-box", marginTop: isFirstItem ? undefined : itemSpacing }}
-              {...bind()}
-              {...{ [nodeIndexDataAttribute]: index }}
-            >
-              {element}
-            </div>
-          </React.Fragment>
+        const element = props.handleItemIdentifier(
+          {
+            identifier: node.identifier,
+            index,
+            isDragging: draggingItemIdentifierState === node.identifier,
+          },
+          {
+            ...binder(),
+            ...{ [nodeIndexDataAttribute]: index },
+            style: { boxSizing: "border-box", marginTop: isFirstItem ? undefined : itemSpacing },
+          },
+          draggableBinder,
         );
+
+        return <React.Fragment key={node.identifier}>{element}</React.Fragment>;
       }),
-    [tree, props.handleItemIdentifier, bind, props.itemClassName, draggingItemIdentifierState],
+    [tree, props.handleItemIdentifier, binder, draggingItemIdentifierState, draggableBinder],
   );
 
   const dropLineElementStyle: React.CSSProperties = {
-    display: draggingItemIdentifierState != undefined ? "block" : "none",
+    display: isVisibleDropLineState ? "block" : "none",
     position: "absolute",
     transform: "translate(0, -50%)",
   };
