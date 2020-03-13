@@ -1,0 +1,51 @@
+.wrapper {
+  --padding: 8px;
+
+  padding: var(--padding);
+}
+
+.dropLine {
+  width: calc(100% - var(--padding) * 2);
+  height: 2px;
+}
+.dropLine::before, .dropLine::after {
+  --size: 6px;
+
+  position: absolute;
+  top: calc(var(--size) / 2 * -1 + 1px);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background-color: inherit;
+  content: "";
+}
+.dropLine::before {
+  left: calc(var(--size) / 2 * -1);
+}
+.dropLine::after {
+  right: calc(var(--size) / 2 * -1);
+}
+
+
+.item {
+  margin: 0;
+  padding: 0;
+  transition-property: transform;
+  transition-duration: 200ms;
+}
+.item.ghost {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  opacity: 0.8;
+  transform: scale(0.8);
+}
+.item .itemContent {
+  padding: 12px 16px;
+  color: #6c757d;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  background-color: white;
+}
+.item .itemContent.dragging {
+  color: transparent;
+  background-color: transparent;
+}

@@ -20,9 +20,9 @@ jobs:
       - run:
           name: "Execute linters"
           command: "npm run lint"
-      - run:
-          name: "Execute tests"
-          command: "npm test && npm run coverage"
+      # - run:
+      #     name: "Execute tests"
+      #     command: "npm test && npm run coverage"
       - run:
           name: "Build"
           command: "npm run build"
@@ -47,9 +47,9 @@ jobs:
       - run:
           name: "Execute linters"
           command: "npm run lint"
-      - run:
-          name: "Execute tests"
-          command: "npm test"
+      # - run:
+      #     name: "Execute tests"
+      #     command: "npm test"
       - run:
           name: "Build"
           command: "npm run build"

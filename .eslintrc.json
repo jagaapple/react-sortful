@@ -16,6 +16,9 @@
     "sourceType": "module",
     "ecmaFeatures": { "jsx": true }
   },
+  "settings": {
+    "react": { "pragma": "React", "version": "16.9" }
+  },
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unused-vars": [

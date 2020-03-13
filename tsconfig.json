@@ -2,9 +2,9 @@
   "compileOnSave": true,
   "compilerOptions": {
     "allowJs": false,
-    "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
     "declaration": true,
+    "isolatedModules": true,
     "jsx": "react",
     "lib": [
       "es2020",
@@ -26,6 +26,6 @@
   "exclude": [
     "node_modules",
     "./src/**/*.spec.ts",
-    "./src/**/*.stories.ts"
+    "./stories/**/*"
   ]
 }
