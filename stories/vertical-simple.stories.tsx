@@ -26,10 +26,17 @@ storiesOf("Vertical Simple", module)
     const [items, setItems] = React.useState(() => createItemsById(Array.from(dummyItemsMap.values())));
 
     const handleItemIdentifier = React.useCallback(
-      ({ identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>) => {
+      (
+        { identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>,
+        props: ReactSortful.ItemElementInjectedProps,
+      ) => {
         const item = dummyItemsMap.get(identifier);
 
-        return <div className={classnames(styles.itemContent, { [styles.dragging]: isDragging })}>{item.name}</div>;
+        return (
+          <div {...props} className={classnames(styles.item, { [styles.dragging]: isDragging })}>
+            {item.name}
+          </div>
+        );
       },
       [dummyItemsMap],
     );
@@ -43,7 +50,6 @@ storiesOf("Vertical Simple", module)
         className={styles.wrapper}
         dropLineClassName={classnames(styles.dropLine, "bg-primary")}
         ghostClassName={styles.ghost}
-        itemClassName={styles.item}
         itemSpacing={8}
         items={items}
         handleItemIdentifier={handleItemIdentifier}
@@ -56,10 +62,17 @@ storiesOf("Vertical Simple", module)
     const [items, setItems] = React.useState(() => createItemsById(Array.from(dummyItemsMap.values())));
 
     const handleItemIdentifier = React.useCallback(
-      ({ identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>) => {
+      (
+        { identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>,
+        props: ReactSortful.ItemElementInjectedProps,
+      ) => {
         const item = dummyItemsMap.get(identifier);
 
-        return <div className={classnames(styles.itemContent, { [styles.dragging]: isDragging })}>{item.name}</div>;
+        return (
+          <div {...props} className={classnames(styles.item, { [styles.dragging]: isDragging })}>
+            {item.name}
+          </div>
+        );
       },
       [dummyItemsMap],
     );
@@ -73,7 +86,6 @@ storiesOf("Vertical Simple", module)
         className={styles.wrapper}
         dropLineClassName={classnames(styles.dropLine, "bg-primary")}
         ghostClassName={styles.ghost}
-        itemClassName={styles.item}
         itemSpacing={8}
         items={items}
         handleItemIdentifier={handleItemIdentifier}
@@ -86,10 +98,17 @@ storiesOf("Vertical Simple", module)
     const [items, setItems] = React.useState(() => createItemsById(Array.from(dummyItemsMap.values())));
 
     const handleItemIdentifier = React.useCallback(
-      ({ identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>) => {
+      (
+        { identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>,
+        props: ReactSortful.ItemElementInjectedProps,
+      ) => {
         const item = dummyItemsMap.get(identifier);
 
-        return <div className={classnames(styles.itemContent, { [styles.dragging]: isDragging })}>{item.name}</div>;
+        return (
+          <div {...props} className={classnames(styles.item, { [styles.dragging]: isDragging })}>
+            {item.name}
+          </div>
+        );
       },
       [dummyItemsMap],
     );
@@ -103,7 +122,6 @@ storiesOf("Vertical Simple", module)
         className={styles.wrapper}
         dropLineClassName={classnames(styles.dropLine, "bg-primary")}
         ghostClassName={styles.ghost}
-        itemClassName={styles.item}
         itemSpacing={8}
         items={items}
         handleItemIdentifier={handleItemIdentifier}
@@ -116,10 +134,17 @@ storiesOf("Vertical Simple", module)
     const [items, setItems] = React.useState(() => createItemsById(Array.from(dummyItemsMap.values())));
 
     const handleItemIdentifier = React.useCallback(
-      ({ identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>) => {
+      (
+        { identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>,
+        props: ReactSortful.ItemElementInjectedProps,
+      ) => {
         const item = dummyItemsMap.get(identifier);
 
-        return <div className={classnames(styles.itemContent, { [styles.dragging]: isDragging })}>{item.name}</div>;
+        return (
+          <div {...props} className={classnames(styles.item, { [styles.dragging]: isDragging })}>
+            {item.name}
+          </div>
+        );
       },
       [dummyItemsMap],
     );
@@ -133,7 +158,6 @@ storiesOf("Vertical Simple", module)
         className={styles.wrapper}
         dropLineClassName={classnames(styles.dropLine, "bg-primary")}
         ghostClassName={styles.ghost}
-        itemClassName={styles.item}
         itemSpacing={8}
         items={items}
         handleItemIdentifier={handleItemIdentifier}

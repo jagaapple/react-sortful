@@ -14,14 +14,15 @@ import {
   Tree,
 } from "./react-sortful";
 
+export type ItemElementInjectedProps = Record<string, any>;
+
 type Props<ItemIdentifier extends BaseItemIdentifier> = {
   className?: string;
   dropLineClassName: string;
   ghostClassName?: string;
-  itemClassName?: string;
   itemSpacing?: number;
   items: Item<ItemIdentifier>[];
-  handleItemIdentifier: (meta: ItemIdentifierHandlerMeta<ItemIdentifier>) => JSX.Element;
+  handleItemIdentifier: (meta: ItemIdentifierHandlerMeta<ItemIdentifier>, props: ItemElementInjectedProps) => JSX.Element;
   onDragEnd: (meta: DestinationMeta<ItemIdentifier>) => void;
   isDisabled?: boolean;
 };
@@ -158,7 +159,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
     [setDropLinePositionElement, tree],
   );
 
-  const bind = useGesture({
+  const binder = useGesture({
     onDrag: ({ down, movement }) => {
       if (!down) return;
 
@@ -190,27 +191,23 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   const itemElements = React.useMemo(
     () =>
       tree.nodes.map((node, index) => {
-        const element = props.handleItemIdentifier({
-          identifier: node.identifier,
-          index,
-          isDragging: draggingItemIdentifierState === node.identifier,
-        });
         const isFirstItem = index === 0;
-
-        return (
-          <React.Fragment key={node.identifier}>
-            <div
-              className={props.itemClassName}
-              style={{ boxSizing: "border-box", marginTop: isFirstItem ? undefined : itemSpacing }}
-              {...bind()}
-              {...{ [nodeIndexDataAttribute]: index }}
-            >
-              {element}
-            </div>
-          </React.Fragment>
+        const element = props.handleItemIdentifier(
+          {
+            identifier: node.identifier,
+            index,
+            isDragging: draggingItemIdentifierState === node.identifier,
+          },
+          {
+            ...binder(),
+            ...{ [nodeIndexDataAttribute]: index },
+            style: { boxSizing: "border-box", marginTop: isFirstItem ? undefined : itemSpacing },
+          },
         );
+
+        return <React.Fragment key={node.identifier}>{element}</React.Fragment>;
       }),
-    [tree, props.handleItemIdentifier, bind, props.itemClassName, draggingItemIdentifierState],
+    [tree, props.handleItemIdentifier, binder, draggingItemIdentifierState],
   );
 
   const dropLineElementStyle: React.CSSProperties = {
