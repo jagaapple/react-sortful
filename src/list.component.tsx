@@ -34,6 +34,7 @@ type Props<ItemIdentifier extends BaseItemIdentifier> = {
 
 export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   const [draggingItemIdentifierState, setDraggingItemIdentifierState] = React.useState<T>();
+  const [isVisibleDropLineState, setIsVisibleDropLineState] = React.useState(false);
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
@@ -91,9 +92,8 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   );
 
   const onDragStart = React.useCallback(
-    (element: HTMLElement, absoluteXY: [number, number]) => {
+    (element: HTMLElement) => {
       setGhostElement(element);
-      setDropLinePositionElement(absoluteXY, getNodeMeta(element));
 
       // Disables to select elements in entire page.
       document.body.style.userSelect = "none";
@@ -105,7 +105,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
       const node = tree.nodes[draggingNodeMetaRef.current.index];
       setDraggingItemIdentifierState(node.identifier);
     },
-    [setGhostElement, setDropLinePositionElement, tree],
+    [setGhostElement, tree],
   );
   const onDrag = React.useCallback((movementXY: [number, number]) => {
     const ghostWrapperElement = ghostWrapperElementRef.current;
@@ -117,6 +117,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   const onDragEnd = React.useCallback(() => {
     clearGhostElement();
     setDraggingItemIdentifierState(undefined);
+    setIsVisibleDropLineState(false);
 
     // Enables to select elements in entire page.
     document.body.style.userSelect = "auto";
@@ -153,6 +154,8 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
       const dropLineElement = dropLineElementRef.current;
       if (dropLineElement == undefined) return;
 
+      if (draggingNodeMeta.index !== overedNodeMeta.index) setIsVisibleDropLineState(true);
+
       setDropLinePositionElement(absoluteXY, overedNodeMeta);
 
       const dropLineDirection = getDropLineDirectionFromXY(absoluteXY, overedNodeMeta);
@@ -184,7 +187,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
     },
   });
   const draggableBinder = useGesture({
-    onDragStart: ({ event, xy }) => {
+    onDragStart: ({ event }) => {
       if (props.isDisabled) return;
 
       let element: HTMLElement | SVGElement | undefined = event.currentTarget;
@@ -199,7 +202,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
       if (element == undefined) return;
       if (!(element instanceof HTMLElement)) return;
 
-      onDragStart(element, xy);
+      onDragStart(element);
     },
     onDrag: ({ down, movement }) => {
       if (!down) return;
@@ -233,7 +236,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   );
 
   const dropLineElementStyle: React.CSSProperties = {
-    display: draggingItemIdentifierState != undefined ? "block" : "none",
+    display: isVisibleDropLineState ? "block" : "none",
     position: "absolute",
     transform: "translate(0, -50%)",
   };
