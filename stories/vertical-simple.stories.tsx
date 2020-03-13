@@ -1,11 +1,10 @@
-/// <reference types="./@types/global" />
-
 import * as React from "react";
 import classnames from "classnames";
 import { storiesOf } from "@storybook/react";
 import arrayMove from "array-move";
 
 import * as ReactSortful from "../src";
+import { commonStyles } from "./shared";
 import styles from "./vertical-simple.stories.css";
 
 type Item = { id: number; name: string };
@@ -49,7 +48,7 @@ storiesOf("Vertical Simple", module)
     return (
       <ReactSortful.List
         className={styles.wrapper}
-        dropLineClassName={classnames(styles.dropLine, "bg-primary")}
+        dropLineClassName={classnames(commonStyles.dropLine, styles.dropLine)}
         ghostClassName={styles.ghost}
         itemSpacing={8}
         items={items}
@@ -86,7 +85,7 @@ storiesOf("Vertical Simple", module)
     return (
       <ReactSortful.List
         className={styles.wrapper}
-        dropLineClassName={classnames(styles.dropLine, "bg-primary")}
+        dropLineClassName={classnames(commonStyles.dropLine, styles.dropLine)}
         ghostClassName={styles.ghost}
         itemSpacing={8}
         items={items}
@@ -123,7 +122,7 @@ storiesOf("Vertical Simple", module)
     return (
       <ReactSortful.List
         className={styles.wrapper}
-        dropLineClassName={classnames(styles.dropLine, "bg-primary")}
+        dropLineClassName={classnames(commonStyles.dropLine, styles.dropLine)}
         ghostClassName={styles.ghost}
         itemSpacing={8}
         items={items}
@@ -170,7 +169,7 @@ storiesOf("Vertical Simple", module)
     return (
       <ReactSortful.List
         className={styles.wrapper}
-        dropLineClassName={classnames(styles.dropLine, "bg-primary")}
+        dropLineClassName={classnames(commonStyles.dropLine, styles.dropLine)}
         ghostClassName={styles.ghost}
         itemSpacing={8}
         items={items}
@@ -207,7 +206,7 @@ storiesOf("Vertical Simple", module)
     return (
       <ReactSortful.List
         className={styles.wrapper}
-        dropLineClassName={classnames(styles.dropLine, "bg-primary")}
+        dropLineClassName={classnames(commonStyles.dropLine, styles.dropLine)}
         ghostClassName={styles.ghost}
         itemSpacing={8}
         items={items}

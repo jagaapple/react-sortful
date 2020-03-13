@@ -21,11 +21,11 @@
     "target": "es2015"
   },
   "include": [
+    "./@types/**/*",
     "./src/**/*"
   ],
   "exclude": [
     "node_modules",
-    "./src/**/*.spec.ts",
-    "./stories/**/*"
+    "./src/**/*.spec.ts"
   ]
 }
