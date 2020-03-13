@@ -29,11 +29,12 @@ storiesOf("Vertical Simple", module)
       (
         { identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>,
         props: ReactSortful.ItemElementInjectedProps,
+        draggable: ReactSortful.ItemElementDraggable,
       ) => {
         const item = dummyItemsMap.get(identifier);
 
         return (
-          <div {...props} className={classnames(styles.item, { [styles.dragging]: isDragging })}>
+          <div {...props} {...draggable()} className={classnames(styles.item, { [styles.dragging]: isDragging })}>
             {item.name}
           </div>
         );
@@ -65,11 +66,12 @@ storiesOf("Vertical Simple", module)
       (
         { identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>,
         props: ReactSortful.ItemElementInjectedProps,
+        draggable: ReactSortful.ItemElementDraggable,
       ) => {
         const item = dummyItemsMap.get(identifier);
 
         return (
-          <div {...props} className={classnames(styles.item, { [styles.dragging]: isDragging })}>
+          <div {...props} {...draggable()} className={classnames(styles.item, { [styles.dragging]: isDragging })}>
             {item.name}
           </div>
         );
@@ -93,7 +95,7 @@ storiesOf("Vertical Simple", module)
       />
     );
   })
-  .add("Many times", () => {
+  .add("Many items", () => {
     const dummyItemsMap = React.useMemo(() => new Map<Item["id"], Item>(createDummyItems(100)), []);
     const [items, setItems] = React.useState(() => createItemsById(Array.from(dummyItemsMap.values())));
 
@@ -101,11 +103,59 @@ storiesOf("Vertical Simple", module)
       (
         { identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>,
         props: ReactSortful.ItemElementInjectedProps,
+        draggable: ReactSortful.ItemElementDraggable,
       ) => {
         const item = dummyItemsMap.get(identifier);
 
         return (
-          <div {...props} className={classnames(styles.item, { [styles.dragging]: isDragging })}>
+          <div {...props} {...draggable()} className={classnames(styles.item, { [styles.dragging]: isDragging })}>
+            {item.name}
+          </div>
+        );
+      },
+      [dummyItemsMap],
+    );
+    const onDragEnd = React.useCallback(
+      ({ index, nextIndex }: ReactSortful.DestinationMeta<number>) => setItems(arrayMove(items, index, nextIndex)),
+      [items],
+    );
+
+    return (
+      <ReactSortful.List
+        className={styles.wrapper}
+        dropLineClassName={classnames(styles.dropLine, "bg-primary")}
+        ghostClassName={styles.ghost}
+        itemSpacing={8}
+        items={items}
+        handleItemIdentifier={handleItemIdentifier}
+        onDragEnd={onDragEnd}
+      />
+    );
+  })
+  .add("Custom drag handle", () => {
+    const dummyItemsMap = React.useMemo(() => new Map<Item["id"], Item>(createDummyItems(10)), []);
+    const [items, setItems] = React.useState(() => createItemsById(Array.from(dummyItemsMap.values())));
+
+    const handleItemIdentifier = React.useCallback(
+      (
+        { identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>,
+        props: ReactSortful.ItemElementInjectedProps,
+        draggable: ReactSortful.ItemElementDraggable,
+      ) => {
+        const item = dummyItemsMap.get(identifier);
+
+        return (
+          <div {...props} className={classnames(styles.item, styles.withCustomDragHandle, { [styles.dragging]: isDragging })}>
+            <svg
+              {...draggable()}
+              className={classnames(styles.customDragHandle, { [styles.dragging]: isDragging })}
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 48 48"
+            >
+              <rect x="4" y="5" height="6" width="40" />
+              <rect x="4" y="21" height="6" width="40" />
+              <rect x="4" y="37" height="6" width="40" />
+            </svg>
             {item.name}
           </div>
         );
@@ -137,11 +187,12 @@ storiesOf("Vertical Simple", module)
       (
         { identifier, isDragging }: ReactSortful.ItemIdentifierHandlerMeta<number>,
         props: ReactSortful.ItemElementInjectedProps,
+        draggable: ReactSortful.ItemElementDraggable,
       ) => {
         const item = dummyItemsMap.get(identifier);
 
         return (
-          <div {...props} className={classnames(styles.item, { [styles.dragging]: isDragging })}>
+          <div {...props} {...draggable()} className={classnames(styles.item, { [styles.dragging]: isDragging })}>
             {item.name}
           </div>
         );

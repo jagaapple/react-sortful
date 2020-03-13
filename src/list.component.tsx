@@ -15,6 +15,7 @@ import {
 } from "./react-sortful";
 
 export type ItemElementInjectedProps = Record<string, any>;
+export type ItemElementDraggable = () => Record<any, any>;
 
 type Props<ItemIdentifier extends BaseItemIdentifier> = {
   className?: string;
@@ -22,7 +23,11 @@ type Props<ItemIdentifier extends BaseItemIdentifier> = {
   ghostClassName?: string;
   itemSpacing?: number;
   items: Item<ItemIdentifier>[];
-  handleItemIdentifier: (meta: ItemIdentifierHandlerMeta<ItemIdentifier>, props: ItemElementInjectedProps) => JSX.Element;
+  handleItemIdentifier: (
+    meta: ItemIdentifierHandlerMeta<ItemIdentifier>,
+    props: ItemElementInjectedProps,
+    draggable: ItemElementDraggable,
+  ) => JSX.Element;
   onDragEnd: (meta: DestinationMeta<ItemIdentifier>) => void;
   isDisabled?: boolean;
 };
@@ -32,7 +37,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
-  const ghostElementRef = React.useRef<HTMLDivElement>();
+  const ghostElementRef = React.useRef<HTMLElement>();
   const draggingNodeMetaRef = React.useRef<NodeMeta>();
   const overedNodeMetaRef = React.useRef<NodeMeta>();
   const destinationNodeMetaRef = React.useRef<{ itemIdentifier: T; nextIndex: number }>();
@@ -41,11 +46,11 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   const itemSpacing = props.itemSpacing ?? 8;
 
   const setGhostElement = React.useCallback(
-    (itemElement: HTMLDivElement) => {
+    (itemElement: HTMLElement) => {
       const ghostWrapperElement = ghostWrapperElementRef.current;
       if (ghostWrapperElement == undefined) return;
       const ghostElement = ghostWrapperElement.appendChild(itemElement.cloneNode(true));
-      if (!(ghostElement instanceof HTMLDivElement)) return;
+      if (!(ghostElement instanceof HTMLElement)) return;
 
       const elementRect = itemElement.getBoundingClientRect();
       ghostWrapperElement.style.top = `${elementRect.top}px`;
@@ -86,7 +91,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   );
 
   const onDragStart = React.useCallback(
-    (element: HTMLDivElement, absoluteXY: [number, number]) => {
+    (element: HTMLElement, absoluteXY: [number, number]) => {
       setGhostElement(element);
       setDropLinePositionElement(absoluteXY, getNodeMeta(element));
 
@@ -132,7 +137,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
     overedNodeMetaRef.current = undefined;
     destinationNodeMetaRef.current = undefined;
   }, [clearGhostElement, tree, props.onDragEnd]);
-  const onMouseOver = React.useCallback((element: HTMLDivElement) => {
+  const onMouseOver = React.useCallback((element: HTMLElement) => {
     overedNodeMetaRef.current = getNodeMeta(element);
   }, []);
   const onMouseMove = React.useCallback(
@@ -160,24 +165,11 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   );
 
   const binder = useGesture({
-    onDrag: ({ down, movement }) => {
-      if (!down) return;
-
-      onDrag(movement);
-    },
-    onDragStart: ({ event, xy }) => {
-      if (props.isDisabled) return;
-      const element = event.currentTarget;
-      if (!(element instanceof HTMLDivElement)) return;
-
-      onDragStart(element, xy);
-    },
-    onDragEnd,
     onHover: ({ event }) => {
       if (draggingItemIdentifierState == undefined) return;
 
       const element = event.currentTarget;
-      if (!(element instanceof HTMLDivElement)) return;
+      if (!(element instanceof HTMLElement)) return;
 
       onMouseOver(element);
     },
@@ -186,6 +178,31 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
 
       onMouseMove(xy);
     },
+  });
+  const draggableBinder = useGesture({
+    onDragStart: ({ event, xy }) => {
+      if (props.isDisabled) return;
+
+      let element: HTMLElement | SVGElement | undefined = event.currentTarget;
+      if (!(element instanceof HTMLElement) && !(element instanceof SVGElement)) return;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        if (element == undefined) break;
+        if (element.getAttribute(nodeIndexDataAttribute) != undefined) break;
+
+        element = element.parentElement ?? undefined;
+      }
+      if (element == undefined) return;
+      if (!(element instanceof HTMLElement)) return;
+
+      onDragStart(element, xy);
+    },
+    onDrag: ({ down, movement }) => {
+      if (!down) return;
+
+      onDrag(movement);
+    },
+    onDragEnd,
   });
 
   const itemElements = React.useMemo(
@@ -203,11 +220,12 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
             ...{ [nodeIndexDataAttribute]: index },
             style: { boxSizing: "border-box", marginTop: isFirstItem ? undefined : itemSpacing },
           },
+          draggableBinder,
         );
 
         return <React.Fragment key={node.identifier}>{element}</React.Fragment>;
       }),
-    [tree, props.handleItemIdentifier, binder, draggingItemIdentifierState],
+    [tree, props.handleItemIdentifier, binder, draggingItemIdentifierState, draggableBinder],
   );
 
   const dropLineElementStyle: React.CSSProperties = {
