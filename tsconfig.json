@@ -25,7 +25,6 @@
   ],
   "exclude": [
     "node_modules",
-    "./src/**/*.spec.ts",
-    "./stories/**/*"
+    "./src/**/*.spec.ts"
   ]
 }

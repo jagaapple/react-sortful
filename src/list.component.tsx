@@ -21,6 +21,8 @@ type Props<ItemIdentifier extends BaseItemIdentifier> = {
   className?: string;
   dropLineClassName: string;
   ghostClassName?: string;
+  ghostSize?: "same-item" | "none";
+  draggingCursorStyle?: React.CSSProperties["cursor"];
   itemSpacing?: number;
   items: Item<ItemIdentifier>[];
   handleItemIdentifier: (
@@ -44,6 +46,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
   const destinationNodeMetaRef = React.useRef<{ itemIdentifier: T; nextIndex: number }>();
 
   const tree = React.useMemo(() => new Tree(props.items), [props.items]);
+  const ghostSize = props.ghostSize ?? "none";
   const itemSpacing = props.itemSpacing ?? 8;
 
   const setGhostElement = React.useCallback(
@@ -56,8 +59,10 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
       const elementRect = itemElement.getBoundingClientRect();
       ghostWrapperElement.style.top = `${elementRect.top}px`;
       ghostWrapperElement.style.left = `${elementRect.left}px`;
-      ghostWrapperElement.style.width = `${elementRect.width}px`;
-      ghostWrapperElement.style.height = `${elementRect.height}px`;
+      if (ghostSize === "same-item") {
+        ghostWrapperElement.style.width = `${elementRect.width}px`;
+        ghostWrapperElement.style.height = `${elementRect.height}px`;
+      }
 
       ghostElement.removeAttribute("style");
       ghostElement.style.width = "100%";
@@ -65,7 +70,7 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
       ghostElement.classList.add(...(props.ghostClassName ?? "").split(" "));
       ghostElementRef.current = ghostElement;
     },
-    [props.ghostClassName],
+    [ghostSize, props.ghostClassName],
   );
   const clearGhostElement = React.useCallback(() => {
     const ghostWrapperElement = ghostWrapperElementRef.current;
@@ -73,8 +78,8 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
     const ghostElement = ghostElementRef.current;
     if (ghostElement == undefined) return;
 
-    ghostWrapperElement.style.width = "0";
-    ghostWrapperElement.style.height = "0";
+    ghostWrapperElement.style.removeProperty("width");
+    ghostWrapperElement.style.removeProperty("height");
     ghostWrapperElement.removeChild(ghostElement);
   }, []);
   const setDropLinePositionElement = React.useCallback(
@@ -98,14 +103,14 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
       // Disables to select elements in entire page.
       document.body.style.userSelect = "none";
       // Changes a cursor form.
-      document.body.style.cursor = "grabbing";
+      if (props.draggingCursorStyle != undefined) document.body.style.cursor = props.draggingCursorStyle;
 
       draggingNodeMetaRef.current = getNodeMeta(element);
 
       const node = tree.nodes[draggingNodeMetaRef.current.index];
       setDraggingItemIdentifierState(node.identifier);
     },
-    [setGhostElement, tree],
+    [setGhostElement, props.draggingCursorStyle, tree],
   );
   const onDrag = React.useCallback((movementXY: [number, number]) => {
     const ghostWrapperElement = ghostWrapperElementRef.current;
@@ -120,9 +125,9 @@ export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
     setIsVisibleDropLineState(false);
 
     // Enables to select elements in entire page.
-    document.body.style.userSelect = "auto";
+    document.body.style.removeProperty("user-select");
     // Changes a cursor form.
-    document.body.style.cursor = "auto";
+    document.body.style.removeProperty("cursor");
 
     const destinationNodeMeta = destinationNodeMetaRef.current;
     if (destinationNodeMeta != undefined) {

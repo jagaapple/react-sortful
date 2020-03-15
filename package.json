@@ -30,8 +30,10 @@
   "scripts": {
     "prebuild": "rm -rf ./lib",
     "build": "tsc",
-    "lint": "tsc --noEmit && eslint ./src/**/*.ts",
-    "fix": "eslint --fix ./src/**/*.ts",
+    "lint": "tsc --noEmit && eslint \"./**/*.ts\" \"./**/*.tsx\" && stylelint \"./stories/**/*.css\"",
+    "fix:ts": "eslint --fix \"./**/*.ts\" \"./**/*.tsx\"",
+    "fix:css": "stylelint \"./stories/**/*.css\" --fix",
+    "tcm": "tcm \"./stories\"",
     "prepublishOnly": "npm run build",
     "test": "jest --coverage",
     "coverage": "codecov",
@@ -74,7 +76,11 @@
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "storybook-chromatic": "^3.5.2",
+    "stylelint": "^13.2.1",
+    "stylelint-order": "^4.0.0",
+    "stylelint-prettier": "^1.1.2",
     "ts-jest": "^25.2.1",
+    "typed-css-modules": "^0.6.3",
     "typescript": "^3.8.3"
   },
   "peerDependencies": {
