@@ -52,6 +52,11 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.suggest.autoImports": false,
 
+  // Disables built-in validations.
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+
   "[javascript]": {
     "editor.formatOnSave": true
   },
@@ -62,6 +67,9 @@
     "editor.formatOnSave": true
   },
   "[typescriptreact]": {
+    "editor.formatOnSave": true
+  },
+  "[css]": {
     "editor.formatOnSave": true
   }
 
