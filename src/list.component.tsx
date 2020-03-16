@@ -27,7 +27,6 @@ type DestinationMeta<T extends ItemIdentifier> = {
 };
 
 export const ListContext = React.createContext<{
-  groupSpacing: number;
   itemSpacing: number;
   draggingNodeMeta: NodeMeta<any> | undefined;
   setDraggingNodeMeta: (meta: NodeMeta<any> | undefined) => void;
@@ -46,7 +45,6 @@ type Props<T extends ItemIdentifier> = {
   children?: React.ReactNode;
   renderDropLine: (injectedProps: DropLineRendererInjectedProps) => React.ReactNode;
   renderGhost: (meta: GhostRendererMeta<T>) => React.ReactNode;
-  groupSpacing?: number;
   itemSpacing?: number;
   onDragStart?: (meta: DragStartMeta<T>) => void;
   onDragEnd: (meta: DragEndMeta<T>) => void;
@@ -56,7 +54,6 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
   const [draggingNodeMetaState, setDraggingNodeMetaState] = React.useState<NodeMeta<T>>();
   const [isVisibleDropLineElementState, setIsVisibleDropLineElementState] = React.useState(false);
 
-  const groupSpacing = props.groupSpacing ?? 12;
   const itemSpacing = props.itemSpacing ?? 8;
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
@@ -86,7 +83,6 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
   return (
     <ListContext.Provider
       value={{
-        groupSpacing,
         itemSpacing,
         draggingNodeMeta: draggingNodeMetaState,
         setDraggingNodeMeta: setDraggingNodeMetaState,

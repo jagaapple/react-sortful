@@ -19,7 +19,7 @@ export const Group = <T extends ItemIdentifier>(props: Props<T>) => {
 
   return (
     <GroupContext.Provider value={{ identifier: props.identifier }}>
-      <div className={props.className} style={{ boxSizing: "border-box", margin: `${listContext.groupSpacing}px 0` }}>
+      <div className={props.className} style={{ boxSizing: "border-box", margin: `${listContext.itemSpacing}px 0` }}>
         {props.children}
       </div>
     </GroupContext.Provider>
