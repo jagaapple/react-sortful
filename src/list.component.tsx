@@ -3,20 +3,10 @@ import * as React from "react";
 import { ItemIdentifier } from "./item";
 import { NodeMeta } from "./node";
 
-export type GhostRendererMeta = {
-  identifier: ItemIdentifier;
-  isGroup: boolean;
-};
-export type DragStartMeta = {
-  identifier: ItemIdentifier;
-  index: number;
-  isGroup: boolean;
-};
-export type DragEndMeta = {
-  identifier: ItemIdentifier;
-  index: number;
-  isGroup: boolean;
-  nextGroupIdentifier: ItemIdentifier | undefined;
+export type GhostRendererMeta<T extends ItemIdentifier> = Pick<NodeMeta<T>, "identifier" | "index" | "isGroup">;
+export type DragStartMeta<T extends ItemIdentifier> = Pick<NodeMeta<T>, "identifier" | "index" | "isGroup">;
+export type DragEndMeta<T extends ItemIdentifier> = Pick<NodeMeta<T>, "identifier" | "index" | "isGroup"> & {
+  nextGroupIdentifier: T | undefined;
   nextIndex: number;
 };
 
@@ -25,39 +15,39 @@ export type DropLineRendererInjectedProps = {
   style: React.CSSProperties;
 };
 
-type DestinationMeta = {
-  groupIdentifier: ItemIdentifier | undefined;
+type DestinationMeta<T extends ItemIdentifier> = {
+  groupIdentifier: T | undefined;
   index: number;
 };
 
 export const ListContext = React.createContext<{
   groupSpacing: number;
   itemSpacing: number;
-  draggingNodeMeta: NodeMeta | undefined;
-  setDraggingNodeMeta: (meta: NodeMeta | undefined) => void;
+  draggingNodeMeta: NodeMeta<any> | undefined;
+  setDraggingNodeMeta: (meta: NodeMeta<any> | undefined) => void;
   dropLineElementRef: React.RefObject<HTMLDivElement>;
   ghostWrapperElementRef: React.RefObject<HTMLDivElement>;
   isVisibleDropLineElement: boolean;
   setIsVisibleDropLineElement: (isVisible: boolean) => void;
-  overedNodeMetaRef: React.MutableRefObject<NodeMeta | undefined>;
-  destinationMetaRef: React.MutableRefObject<DestinationMeta | undefined>;
-  onDragStart: ((meta: DragStartMeta) => void) | undefined;
-  onDragEnd: (meta: DragEndMeta) => void;
+  overedNodeMetaRef: React.MutableRefObject<NodeMeta<any> | undefined>;
+  destinationMetaRef: React.MutableRefObject<DestinationMeta<any> | undefined>;
+  onDragStart: ((meta: DragStartMeta<any>) => void) | undefined;
+  onDragEnd: (meta: DragEndMeta<any>) => void;
 }>(undefined as any);
 
-type Props = {
+type Props<T extends ItemIdentifier> = {
   className?: string;
   children?: React.ReactNode;
   renderDropLine: (injectedProps: DropLineRendererInjectedProps) => React.ReactNode;
-  renderGhost: (meta: GhostRendererMeta) => React.ReactNode;
+  renderGhost: (meta: GhostRendererMeta<T>) => React.ReactNode;
   groupSpacing?: number;
   itemSpacing?: number;
-  onDragStart?: (meta: DragStartMeta) => void;
-  onDragEnd: (meta: DragEndMeta) => void;
+  onDragStart?: (meta: DragStartMeta<T>) => void;
+  onDragEnd: (meta: DragEndMeta<T>) => void;
 };
 
-export const List = (props: Props) => {
-  const [draggingNodeMetaState, setDraggingNodeMetaState] = React.useState<NodeMeta>();
+export const List = <T extends ItemIdentifier>(props: Props<T>) => {
+  const [draggingNodeMetaState, setDraggingNodeMetaState] = React.useState<NodeMeta<T>>();
   const [isVisibleDropLineElementState, setIsVisibleDropLineElementState] = React.useState(false);
 
   const groupSpacing = props.groupSpacing ?? 12;
@@ -65,8 +55,8 @@ export const List = (props: Props) => {
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
-  const overedNodeMetaRef = React.useRef<NodeMeta>();
-  const destinationMetaRef = React.useRef<DestinationMeta>();
+  const overedNodeMetaRef = React.useRef<NodeMeta<T>>();
+  const destinationMetaRef = React.useRef<DestinationMeta<T>>();
 
   const dropLineElement = React.useMemo(() => {
     const style: React.CSSProperties = {
@@ -82,7 +72,9 @@ export const List = (props: Props) => {
   const ghostElement = React.useMemo(() => {
     if (draggingNodeMetaState == undefined) return;
 
-    return props.renderGhost({ identifier: draggingNodeMetaState.identifier, isGroup: draggingNodeMetaState.isGroup });
+    const { identifier, index, isGroup } = draggingNodeMetaState;
+
+    return props.renderGhost({ identifier, index, isGroup });
   }, [draggingNodeMetaState, props.renderGhost]);
 
   return (

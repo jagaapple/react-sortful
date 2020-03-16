@@ -74,7 +74,7 @@ storiesOf("0 Vertical Simple", module)
       [itemsState],
     );
     const renderGhostElement = React.useCallback(
-      (meta: GhostRendererMeta) => {
+      (meta: GhostRendererMeta<DummyItem["id"]>) => {
         const item = itemsById[meta.identifier];
 
         return <div className={classnames(styles.item, styles.ghost)}>{item.title}</div>;
@@ -83,7 +83,7 @@ storiesOf("0 Vertical Simple", module)
     );
 
     const onDragEnd = React.useCallback(
-      (meta: DragEndMeta) => {
+      (meta: DragEndMeta<DummyItem["id"]>) => {
         setItemsState(arrayMove(itemsState, meta.index, meta.nextIndex));
       },
       [itemsState],

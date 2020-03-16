@@ -1,7 +1,12 @@
+import { ItemIdentifier } from "../item";
 import { ElementPosition, NodeMeta } from "../node";
 import { getDropLineDirection } from "./direciton";
 
-export const getDropLinePosition = (absoluteXY: [number, number], nodeMeta: NodeMeta, itemSpacing: number): ElementPosition => {
+export const getDropLinePosition = <T extends ItemIdentifier>(
+  absoluteXY: [number, number],
+  nodeMeta: NodeMeta<T>,
+  itemSpacing: number,
+): ElementPosition => {
   const x = Math.max(absoluteXY[0] - nodeMeta.absolutePosition.left, 0);
   const y = Math.max(absoluteXY[1] - nodeMeta.absolutePosition.top, 0);
 

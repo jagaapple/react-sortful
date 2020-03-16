@@ -7,14 +7,14 @@ export const GroupContext = React.createContext<{
   identifier: ItemIdentifier | undefined;
 }>({ identifier: undefined });
 
-type Props = {
+type Props<T extends ItemIdentifier> = {
   className?: string;
-  identifier: ItemIdentifier;
+  identifier: T;
   index: number;
   children?: React.ReactNode;
 };
 
-export const Group = (props: Props) => {
+export const Group = <T extends ItemIdentifier>(props: Props<T>) => {
   const listContext = React.useContext(ListContext);
 
   return (

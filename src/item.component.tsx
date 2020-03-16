@@ -7,14 +7,14 @@ import { getDropLineDirectionFromXY, getDropLinePosition } from "./drop-line";
 import { ListContext } from "./list.component";
 import { GroupContext } from "./group.component";
 
-type Props = {
+type Props<T extends ItemIdentifier> = {
   className?: string;
-  identifier: ItemIdentifier;
+  identifier: T;
   index: number;
   children?: React.ReactNode;
 };
 
-export const Item = (props: Props) => {
+export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   const listContext = React.useContext(ListContext);
   const groupContext = React.useContext(GroupContext);
 
@@ -36,7 +36,7 @@ export const Item = (props: Props) => {
     ghostWrapperElement.style.removeProperty("height");
   }, []);
   const setDropLinePositionElement = React.useCallback(
-    (absoluteXY: [number, number], nodeMeta: NodeMeta) => {
+    (absoluteXY: [number, number], nodeMeta: NodeMeta<T>) => {
       const dropLineElement = listContext.dropLineElementRef.current;
       if (dropLineElement == undefined) return;
 
@@ -55,7 +55,7 @@ export const Item = (props: Props) => {
       // Disables to select elements in entire page.
       document.body.style.userSelect = "none";
 
-      const nodeMeta = getNodeMeta(element, props.identifier, false, props.index);
+      const nodeMeta = getNodeMeta(element, props.identifier, props.index, false);
       listContext.setDraggingNodeMeta(nodeMeta);
       listContext.onDragStart?.({
         identifier: nodeMeta.identifier,
@@ -94,11 +94,11 @@ export const Item = (props: Props) => {
     listContext.setDraggingNodeMeta(undefined);
     listContext.overedNodeMetaRef.current = undefined;
     listContext.destinationMetaRef.current = undefined;
-  }, [clearGhostElement, listContext.onDragEnd, props.identifier]);
+  }, [clearGhostElement, listContext.onDragEnd, props.identifier, groupContext.identifier]);
 
   const onMouseOver = React.useCallback(
     (element: HTMLElement) => {
-      listContext.overedNodeMetaRef.current = getNodeMeta(element, props.identifier, false, props.index);
+      listContext.overedNodeMetaRef.current = getNodeMeta(element, props.identifier, props.index, false);
     },
     [props.identifier, props.index],
   );

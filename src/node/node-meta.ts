@@ -7,10 +7,10 @@ type NodeRect = {
   relativePosition: ElementPosition;
   absolutePosition: ElementPosition;
 };
-export type NodeMeta = {
-  identifier: ItemIdentifier;
-  isGroup: boolean;
+export type NodeMeta<T extends ItemIdentifier> = {
+  identifier: T;
   index: number;
+  isGroup: boolean;
   element: HTMLElement;
 } & NodeRect;
 
@@ -25,10 +25,15 @@ const getNodeRect = (element: HTMLElement): NodeRect => {
   };
 };
 
-export const getNodeMeta = (element: HTMLElement, identifier: ItemIdentifier, isGroup: boolean, index: number): NodeMeta => ({
+export const getNodeMeta = <T extends ItemIdentifier>(
+  element: HTMLElement,
+  identifier: T,
+  index: number,
+  isGroup: boolean,
+): NodeMeta<T> => ({
   identifier,
-  isGroup,
   index,
+  isGroup,
   element,
   ...getNodeRect(element),
 });

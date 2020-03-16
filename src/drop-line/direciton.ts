@@ -1,3 +1,4 @@
+import { ItemIdentifier } from "../item";
 import { NodeMeta } from "../node";
 
 type DropLineDirection = "TOP" | "RIGHT" | "BOTTOM" | "LEFT";
@@ -19,7 +20,7 @@ export const getDropLineDirection = (
   }
 };
 
-export const getDropLineDirectionFromXY = (absoluteXY: [number, number], nodeMeta: NodeMeta) => {
+export const getDropLineDirectionFromXY = <T extends ItemIdentifier>(absoluteXY: [number, number], nodeMeta: NodeMeta<T>) => {
   const x = Math.max(absoluteXY[0] - nodeMeta.absolutePosition.left, 0);
   const y = Math.max(absoluteXY[1] - nodeMeta.absolutePosition.top, 0);
 
