@@ -87,8 +87,8 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       groupIdentifier: groupContext.identifier,
       index: props.index,
       isGroup: false,
-      nextGroupIdentifier: destinationMeta?.groupIdentifier ?? groupContext.identifier,
-      nextIndex: destinationMeta?.index ?? props.index,
+      nextGroupIdentifier: destinationMeta != undefined ? destinationMeta.groupIdentifier : groupContext.identifier,
+      nextIndex: destinationMeta != undefined ? destinationMeta.index : props.index,
     });
 
     listContext.setDraggingNodeMeta(undefined);
@@ -125,7 +125,8 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       let nextIndex = draggingNodeMeta.index;
       if (dropLineDirection === "TOP") nextIndex = overedNodeMeta.index;
       if (dropLineDirection === "BOTTOM") nextIndex = overedNodeMeta.index + 1;
-      if (draggingNodeMeta.index < nextIndex) nextIndex -= 1;
+      const isInSameGroup = draggingNodeMeta.groupIdentifier === overedNodeMeta.groupIdentifier;
+      if (isInSameGroup && draggingNodeMeta.index < nextIndex) nextIndex -= 1;
 
       listContext.destinationMetaRef.current = {
         groupIdentifier: groupContext.identifier,
