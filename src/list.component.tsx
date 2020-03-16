@@ -74,14 +74,14 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
     };
 
     return props.renderDropLine({ ref: dropLineElementRef, style });
-  }, [isVisibleDropLineElementState, props.renderDropLine]);
+  }, [props.renderDropLine, isVisibleDropLineElementState]);
   const ghostElement = React.useMemo(() => {
     if (draggingNodeMetaState == undefined) return;
 
     const { identifier, groupIdentifier, index, isGroup } = draggingNodeMetaState;
 
     return props.renderGhost({ identifier, groupIdentifier, index, isGroup });
-  }, [draggingNodeMetaState, props.renderGhost]);
+  }, [props.renderGhost, draggingNodeMetaState]);
 
   return (
     <ListContext.Provider

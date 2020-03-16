@@ -64,7 +64,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         isGroup: nodeMeta.isGroup,
       });
     },
-    [setGhostElement, props.identifier, groupContext.identifier, props.index, listContext.onDragStart],
+    [listContext.onDragStart, groupContext.identifier, props.identifier, props.index, setGhostElement],
   );
   const onDrag = React.useCallback((movementXY: [number, number]) => {
     const ghostWrapperElement = listContext.ghostWrapperElementRef.current;
@@ -82,21 +82,19 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     document.body.style.removeProperty("user-select");
 
     const destinationMeta = listContext.destinationMetaRef.current;
-    if (destinationMeta != undefined) {
-      listContext.onDragEnd?.({
-        identifier: props.identifier,
-        groupIdentifier: groupContext.identifier,
-        index: props.index,
-        isGroup: false,
-        nextGroupIdentifier: destinationMeta.groupIdentifier,
-        nextIndex: destinationMeta.index,
-      });
-    }
+    listContext.onDragEnd({
+      identifier: props.identifier,
+      groupIdentifier: groupContext.identifier,
+      index: props.index,
+      isGroup: false,
+      nextGroupIdentifier: destinationMeta?.groupIdentifier ?? groupContext.identifier,
+      nextIndex: destinationMeta?.index ?? props.index,
+    });
 
     listContext.setDraggingNodeMeta(undefined);
     listContext.overedNodeMetaRef.current = undefined;
     listContext.destinationMetaRef.current = undefined;
-  }, [clearGhostElement, listContext.onDragEnd, props.identifier, groupContext.identifier, props.index]);
+  }, [listContext.onDragEnd, groupContext.identifier, props.identifier, props.index, clearGhostElement]);
 
   const onMouseOver = React.useCallback(
     (element: HTMLElement) => {
@@ -108,7 +106,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         false,
       );
     },
-    [props.identifier, groupContext.identifier, props.index],
+    [groupContext.identifier, props.identifier, props.index],
   );
   const onMouseMove = React.useCallback(
     (absoluteXY: [number, number]) => {

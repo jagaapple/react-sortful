@@ -13,6 +13,11 @@
   border-radius: 4px;
   background-color: white;
 }
+.item.dragging {
+  color: #cfd4db;
+  border-style: dashed;
+  background-color: transparent;
+}
 .item.ghost {
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
   opacity: 0.8;

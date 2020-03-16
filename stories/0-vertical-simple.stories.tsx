@@ -3,7 +3,7 @@ import { storiesOf } from "@storybook/react";
 import classnames from "classnames";
 import arrayMove from "array-move";
 
-import { DragEndMeta, DropLineRendererInjectedProps, GhostRendererMeta, Item, List } from "../src";
+import { DragEndMeta, DragStartMeta, DropLineRendererInjectedProps, GhostRendererMeta, Item, List } from "../src";
 
 import { commonStyles } from "./shared";
 import styles from "./0-vertical-simple.stories.css";
@@ -54,6 +54,7 @@ storiesOf("0 Vertical Simple", module)
       { id: "d", title: "Item D" },
       { id: "e", title: "Item E" },
     ]);
+    const [draggingItemIdentifierState, setDraggingItemIdentifierState] = React.useState<DummyItem["id"]>();
     const itemsById = React.useMemo(
       () =>
         itemsState.reduce<Record<DummyItem["id"], DummyItem>>((object, item) => {
@@ -67,11 +68,16 @@ storiesOf("0 Vertical Simple", module)
     const itemElements = React.useMemo(
       () =>
         itemsState.map((item, index) => (
-          <Item key={item.id} className={styles.item} identifier={item.id} index={index}>
+          <Item
+            key={item.id}
+            className={classnames(styles.item, { [styles.dragging]: draggingItemIdentifierState === item.id })}
+            identifier={item.id}
+            index={index}
+          >
             {item.title}
           </Item>
         )),
-      [itemsState],
+      [itemsState, draggingItemIdentifierState],
     );
     const renderGhostElement = React.useCallback(
       (meta: GhostRendererMeta<DummyItem["id"]>) => {
@@ -82,8 +88,12 @@ storiesOf("0 Vertical Simple", module)
       [itemsById],
     );
 
+    const onDragStart = React.useCallback((meta: DragStartMeta<DummyItem["id"]>) => {
+      setDraggingItemIdentifierState(meta.identifier);
+    }, []);
     const onDragEnd = React.useCallback(
       (meta: DragEndMeta<DummyItem["id"]>) => {
+        setDraggingItemIdentifierState(undefined);
         setItemsState(arrayMove(itemsState, meta.index, meta.nextIndex));
       },
       [itemsState],
@@ -94,6 +104,7 @@ storiesOf("0 Vertical Simple", module)
         className={styles.wrapper}
         renderDropLine={renderDropLineElement}
         renderGhost={renderGhostElement}
+        onDragStart={onDragStart}
         onDragEnd={onDragEnd}
       >
         {itemElements}
