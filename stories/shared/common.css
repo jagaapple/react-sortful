@@ -1,22 +1,16 @@
 .dropLine {
-  width: 100%;
   height: 2px;
   background-color: #007bff;
 }
-.dropLine::before, .dropLine::after {
+.dropLine::before {
   --size: 6px;
 
   position: absolute;
   top: calc(var(--size) / 2 * -1 + 1px);
+  left: calc(var(--size) / 2 * -1);
   width: var(--size);
   height: var(--size);
   border-radius: 50%;
   background-color: inherit;
   content: "";
-}
-.dropLine::before {
-  left: calc(var(--size) / 2 * -1);
-}
-.dropLine::after {
-  right: calc(var(--size) / 2 * -1);
 }

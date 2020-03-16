@@ -1,0 +1,33 @@
+.wrapper {
+  padding: 8px;
+  width: 512px;
+}
+
+.item {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 8px 16px;
+  min-height: 48px;
+  border: 1px solid #cfd4db;
+  border-radius: 4px;
+  background-color: white;
+}
+.item.ghost {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  opacity: 0.8;
+  animation-name: ghostItemVisible;
+  animation-duration: 200ms;
+  animation-fill-mode: forwards;
+}
+.item.ghost.static {
+  background-color: #f6f9fc;
+}
+@keyframes ghostItemVisible {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.8);
+  }
+}
