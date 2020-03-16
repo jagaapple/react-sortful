@@ -3,9 +3,15 @@ import * as React from "react";
 import { ItemIdentifier } from "./item";
 import { NodeMeta } from "./node";
 
-export type GhostRendererMeta<T extends ItemIdentifier> = Pick<NodeMeta<T>, "identifier" | "index" | "isGroup">;
-export type DragStartMeta<T extends ItemIdentifier> = Pick<NodeMeta<T>, "identifier" | "index" | "isGroup">;
-export type DragEndMeta<T extends ItemIdentifier> = Pick<NodeMeta<T>, "identifier" | "index" | "isGroup"> & {
+export type GhostRendererMeta<T extends ItemIdentifier> = Pick<
+  NodeMeta<T>,
+  "identifier" | "groupIdentifier" | "index" | "isGroup"
+>;
+export type DragStartMeta<T extends ItemIdentifier> = Pick<NodeMeta<T>, "identifier" | "groupIdentifier" | "index" | "isGroup">;
+export type DragEndMeta<T extends ItemIdentifier> = Pick<
+  NodeMeta<T>,
+  "identifier" | "groupIdentifier" | "index" | "isGroup"
+> & {
   nextGroupIdentifier: T | undefined;
   nextIndex: number;
 };
@@ -72,9 +78,9 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
   const ghostElement = React.useMemo(() => {
     if (draggingNodeMetaState == undefined) return;
 
-    const { identifier, index, isGroup } = draggingNodeMetaState;
+    const { identifier, groupIdentifier, index, isGroup } = draggingNodeMetaState;
 
-    return props.renderGhost({ identifier, index, isGroup });
+    return props.renderGhost({ identifier, groupIdentifier, index, isGroup });
   }, [draggingNodeMetaState, props.renderGhost]);
 
   return (

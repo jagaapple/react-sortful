@@ -55,15 +55,16 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       // Disables to select elements in entire page.
       document.body.style.userSelect = "none";
 
-      const nodeMeta = getNodeMeta(element, props.identifier, props.index, false);
+      const nodeMeta = getNodeMeta(element, props.identifier, groupContext.identifier, props.index, false);
       listContext.setDraggingNodeMeta(nodeMeta);
       listContext.onDragStart?.({
         identifier: nodeMeta.identifier,
+        groupIdentifier: nodeMeta.groupIdentifier,
         index: nodeMeta.index,
         isGroup: nodeMeta.isGroup,
       });
     },
-    [setGhostElement, props.identifier, props.index, listContext.onDragStart],
+    [setGhostElement, props.identifier, groupContext.identifier, props.index, listContext.onDragStart],
   );
   const onDrag = React.useCallback((movementXY: [number, number]) => {
     const ghostWrapperElement = listContext.ghostWrapperElementRef.current;
@@ -84,6 +85,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     if (destinationMeta != undefined) {
       listContext.onDragEnd?.({
         identifier: props.identifier,
+        groupIdentifier: groupContext.identifier,
         index: props.index,
         isGroup: false,
         nextGroupIdentifier: destinationMeta.groupIdentifier,
@@ -94,13 +96,19 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     listContext.setDraggingNodeMeta(undefined);
     listContext.overedNodeMetaRef.current = undefined;
     listContext.destinationMetaRef.current = undefined;
-  }, [clearGhostElement, listContext.onDragEnd, props.identifier, groupContext.identifier]);
+  }, [clearGhostElement, listContext.onDragEnd, props.identifier, groupContext.identifier, props.index]);
 
   const onMouseOver = React.useCallback(
     (element: HTMLElement) => {
-      listContext.overedNodeMetaRef.current = getNodeMeta(element, props.identifier, props.index, false);
+      listContext.overedNodeMetaRef.current = getNodeMeta(
+        element,
+        props.identifier,
+        groupContext.identifier,
+        props.index,
+        false,
+      );
     },
-    [props.identifier, props.index],
+    [props.identifier, groupContext.identifier, props.index],
   );
   const onMouseMove = React.useCallback(
     (absoluteXY: [number, number]) => {
