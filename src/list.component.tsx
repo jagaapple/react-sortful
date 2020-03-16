@@ -68,6 +68,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
       top: 0,
       left: 0,
       transform: "translate(0, -50%)",
+      pointerEvents: "none",
     };
 
     return props.renderDropLine({ ref: dropLineElementRef, style });
