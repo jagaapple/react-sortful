@@ -1,261 +1,112 @@
 import * as React from "react";
-import { useGesture } from "react-use-gesture";
 
+import { ItemIdentifier, NodeMeta } from "./shared";
 import {
-  BaseItemIdentifier,
   DestinationMeta,
-  getDropLineDirectionFromXY,
-  getDropLinePosition,
-  getNodeMeta,
-  Item,
-  ItemIdentifierHandlerMeta,
-  nodeIndexDataAttribute,
-  NodeMeta,
-  Tree,
-} from "./react-sortful";
+  DragEndMeta,
+  DragStartMeta,
+  DropLineRendererInjectedProps,
+  GhostRendererMeta,
+  ListContext,
+  PlaceholderRendererInjectedProps,
+  PlaceholderRendererMeta,
+  StackedGroupRendererInjectedProps,
+  StackedGroupRendererMeta,
+  StackGroupMeta,
+} from "./list";
 
-export type ItemElementInjectedProps = Record<string, any>;
-export type ItemElementDraggable = () => Record<any, any>;
-
-type Props<ItemIdentifier extends BaseItemIdentifier> = {
-  className?: string;
-  dropLineClassName: string;
-  ghostClassName?: string;
-  ghostSize?: "same-item" | "none";
-  draggingCursorStyle?: React.CSSProperties["cursor"];
+type Props<T extends ItemIdentifier> = {
+  /** A function to render a drop line element in dragging any item. */
+  renderDropLine: (injectedProps: DropLineRendererInjectedProps) => React.ReactNode;
+  /** A function to render a ghost element in dragging any item. */
+  renderGhost: (meta: GhostRendererMeta<T>) => React.ReactNode;
+  /** A function to render a placeholder element instead of a dragging item element. */
+  renderPlaceholder?: (injectedProps: PlaceholderRendererInjectedProps, meta: PlaceholderRendererMeta<T>) => JSX.Element;
+  /** A function to render an item element when an empty group item is hovered by a dragging item. */
+  renderStackedGroup?: (injectedProps: StackedGroupRendererInjectedProps, meta: StackedGroupRendererMeta<T>) => JSX.Element;
+  /**
+   * A spacing size (px) between items.
+   * @default 8
+   */
   itemSpacing?: number;
-  items: Item<ItemIdentifier>[];
-  handleItemIdentifier: (
-    meta: ItemIdentifierHandlerMeta<ItemIdentifier>,
-    props: ItemElementInjectedProps,
-    draggable: ItemElementDraggable,
-  ) => JSX.Element;
-  onDragEnd: (meta: DestinationMeta<ItemIdentifier>) => void;
-  isDisabled?: boolean;
+  /**
+   * A threshold size (px) of stackable area for groups.
+   * @default 8
+   */
+  stackableAreaThreshold?: number;
+  /** A callback function after starting of dragging. */
+  onDragStart?: (meta: DragStartMeta<T>) => void;
+  /** A callback function after end of dragging. */
+  onDragEnd: (meta: DragEndMeta<T>) => void;
+  /** A callback function while an empty group item is hovered by a dragging item. */
+  onStackGroup?: (meta: StackGroupMeta<T>) => void;
+  className?: string;
+  children?: React.ReactNode;
 };
 
-export const List = <T extends BaseItemIdentifier>(props: Props<T>) => {
-  const [draggingItemIdentifierState, setDraggingItemIdentifierState] = React.useState<T>();
-  const [isVisibleDropLineState, setIsVisibleDropLineState] = React.useState(false);
+export const List = <T extends ItemIdentifier>(props: Props<T>) => {
+  const [draggingNodeMetaState, setDraggingNodeMetaState] = React.useState<NodeMeta<T>>();
+  const [isVisibleDropLineElementState, setIsVisibleDropLineElementState] = React.useState(false);
+  const [stackedGroupIdentifierState, setStackedGroupIdentifierState] = React.useState<T>();
+
+  const itemSpacing = props.itemSpacing ?? 8;
+  const stackableAreaThreshold = props.stackableAreaThreshold ?? 8;
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
-  const ghostElementRef = React.useRef<HTMLElement>();
-  const draggingNodeMetaRef = React.useRef<NodeMeta>();
-  const overedNodeMetaRef = React.useRef<NodeMeta>();
-  const destinationNodeMetaRef = React.useRef<{ itemIdentifier: T; nextIndex: number }>();
+  const hoveredNodeMetaRef = React.useRef<NodeMeta<T>>();
+  const destinationMetaRef = React.useRef<DestinationMeta<T>>();
 
-  const tree = React.useMemo(() => new Tree(props.items), [props.items]);
-  const ghostSize = props.ghostSize ?? "none";
-  const itemSpacing = props.itemSpacing ?? 8;
+  const dropLineElement = React.useMemo(() => {
+    const style: React.CSSProperties = {
+      display: isVisibleDropLineElementState ? "block" : "none",
+      position: "absolute",
+      top: 0,
+      left: 0,
+      transform: "translate(0, -50%)",
+      pointerEvents: "none",
+    };
 
-  const setGhostElement = React.useCallback(
-    (itemElement: HTMLElement) => {
-      const ghostWrapperElement = ghostWrapperElementRef.current;
-      if (ghostWrapperElement == undefined) return;
-      const ghostElement = ghostWrapperElement.appendChild(itemElement.cloneNode(true));
-      if (!(ghostElement instanceof HTMLElement)) return;
+    return props.renderDropLine({ ref: dropLineElementRef, style });
+  }, [props.renderDropLine, isVisibleDropLineElementState]);
+  const ghostElement = React.useMemo(() => {
+    if (draggingNodeMetaState == undefined) return;
 
-      const elementRect = itemElement.getBoundingClientRect();
-      ghostWrapperElement.style.top = `${elementRect.top}px`;
-      ghostWrapperElement.style.left = `${elementRect.left}px`;
-      if (ghostSize === "same-item") {
-        ghostWrapperElement.style.width = `${elementRect.width}px`;
-        ghostWrapperElement.style.height = `${elementRect.height}px`;
-      }
+    const { identifier, groupIdentifier, index, isGroup } = draggingNodeMetaState;
 
-      ghostElement.removeAttribute("style");
-      ghostElement.style.width = "100%";
-      ghostElement.style.height = "100%";
-      ghostElement.classList.add(...(props.ghostClassName ?? "").split(" "));
-      ghostElementRef.current = ghostElement;
-    },
-    [ghostSize, props.ghostClassName],
-  );
-  const clearGhostElement = React.useCallback(() => {
-    const ghostWrapperElement = ghostWrapperElementRef.current;
-    if (ghostWrapperElement == undefined) return;
-    const ghostElement = ghostElementRef.current;
-    if (ghostElement == undefined) return;
-
-    ghostWrapperElement.style.removeProperty("width");
-    ghostWrapperElement.style.removeProperty("height");
-    ghostWrapperElement.removeChild(ghostElement);
-  }, []);
-  const setDropLinePositionElement = React.useCallback(
-    (absoluteXY: [number, number], nodeMeta: NodeMeta) => {
-      const dropLineElement = dropLineElementRef.current;
-      if (dropLineElement == undefined) return;
-
-      const dropLinePosition = getDropLinePosition(absoluteXY, nodeMeta, itemSpacing);
-      dropLineElement.style.top = `${dropLinePosition.top}px`;
-      dropLineElement.style.left = `${dropLinePosition.left}px`;
-      dropLineElement.style.top = `${dropLinePosition.top}px`;
-      dropLineElement.style.left = `${dropLinePosition.left}px`;
-    },
-    [itemSpacing],
-  );
-
-  const onDragStart = React.useCallback(
-    (element: HTMLElement) => {
-      setGhostElement(element);
-
-      // Disables to select elements in entire page.
-      document.body.style.userSelect = "none";
-      // Changes a cursor form.
-      if (props.draggingCursorStyle != undefined) document.body.style.cursor = props.draggingCursorStyle;
-
-      draggingNodeMetaRef.current = getNodeMeta(element);
-
-      const node = tree.nodes[draggingNodeMetaRef.current.index];
-      setDraggingItemIdentifierState(node.identifier);
-    },
-    [setGhostElement, props.draggingCursorStyle, tree],
-  );
-  const onDrag = React.useCallback((movementXY: [number, number]) => {
-    const ghostWrapperElement = ghostWrapperElementRef.current;
-    if (ghostWrapperElement == undefined) return;
-
-    const [x, y] = movementXY;
-    ghostWrapperElement.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-  }, []);
-  const onDragEnd = React.useCallback(() => {
-    clearGhostElement();
-    setDraggingItemIdentifierState(undefined);
-    setIsVisibleDropLineState(false);
-
-    // Enables to select elements in entire page.
-    document.body.style.removeProperty("user-select");
-    // Changes a cursor form.
-    document.body.style.removeProperty("cursor");
-
-    const destinationNodeMeta = destinationNodeMetaRef.current;
-    if (destinationNodeMeta != undefined) {
-      const node = tree.findByItemIdentifier(destinationNodeMeta.itemIdentifier);
-      const index = tree.getIndexByItemIdentifier(node.identifier);
-
-      props.onDragEnd({
-        itemIdentifier: node.identifier,
-        parentItemIdentifier: node.parentItemIdentifier,
-        index,
-        nextParentItemIdentifier: node.parentItemIdentifier,
-        nextIndex: destinationNodeMeta.nextIndex,
-      });
-    }
-
-    draggingNodeMetaRef.current = undefined;
-    overedNodeMetaRef.current = undefined;
-    destinationNodeMetaRef.current = undefined;
-  }, [clearGhostElement, tree, props.onDragEnd]);
-  const onMouseOver = React.useCallback((element: HTMLElement) => {
-    overedNodeMetaRef.current = getNodeMeta(element);
-  }, []);
-  const onMouseMove = React.useCallback(
-    (absoluteXY: [number, number]) => {
-      const draggingNodeMeta = draggingNodeMetaRef.current;
-      if (draggingNodeMeta == undefined) return;
-      const overedNodeMeta = overedNodeMetaRef.current;
-      if (overedNodeMeta == undefined) return;
-      const dropLineElement = dropLineElementRef.current;
-      if (dropLineElement == undefined) return;
-
-      if (draggingNodeMeta.index !== overedNodeMeta.index) setIsVisibleDropLineState(true);
-
-      setDropLinePositionElement(absoluteXY, overedNodeMeta);
-
-      const dropLineDirection = getDropLineDirectionFromXY(absoluteXY, overedNodeMeta);
-      let nextIndex = draggingNodeMeta.index;
-      if (dropLineDirection === "TOP") nextIndex = overedNodeMeta.index;
-      if (dropLineDirection === "BOTTOM") nextIndex = overedNodeMeta.index + 1;
-      if (draggingNodeMeta.index < nextIndex) nextIndex -= 1;
-
-      const node = tree.nodes[draggingNodeMeta.index];
-      if (node == undefined) throw new Error("Could not find a node");
-      destinationNodeMetaRef.current = { itemIdentifier: node.identifier, nextIndex };
-    },
-    [setDropLinePositionElement, tree],
-  );
-
-  const binder = useGesture({
-    onHover: ({ event }) => {
-      if (draggingItemIdentifierState == undefined) return;
-
-      const element = event.currentTarget;
-      if (!(element instanceof HTMLElement)) return;
-
-      onMouseOver(element);
-    },
-    onMove: ({ xy }) => {
-      if (draggingItemIdentifierState == undefined) return;
-
-      onMouseMove(xy);
-    },
-  });
-  const draggableBinder = useGesture({
-    onDragStart: ({ event }) => {
-      if (props.isDisabled) return;
-
-      let element: HTMLElement | SVGElement | undefined = event.currentTarget;
-      if (!(element instanceof HTMLElement) && !(element instanceof SVGElement)) return;
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        if (element == undefined) break;
-        if (element.getAttribute(nodeIndexDataAttribute) != undefined) break;
-
-        element = element.parentElement ?? undefined;
-      }
-      if (element == undefined) return;
-      if (!(element instanceof HTMLElement)) return;
-
-      onDragStart(element);
-    },
-    onDrag: ({ down, movement }) => {
-      if (!down) return;
-
-      onDrag(movement);
-    },
-    onDragEnd,
-  });
-
-  const itemElements = React.useMemo(
-    () =>
-      tree.nodes.map((node, index) => {
-        const isFirstItem = index === 0;
-        const element = props.handleItemIdentifier(
-          {
-            identifier: node.identifier,
-            index,
-            isDragging: draggingItemIdentifierState === node.identifier,
-          },
-          {
-            ...binder(),
-            ...{ [nodeIndexDataAttribute]: index },
-            style: { boxSizing: "border-box", marginTop: isFirstItem ? undefined : itemSpacing },
-          },
-          draggableBinder,
-        );
-
-        return <React.Fragment key={node.identifier}>{element}</React.Fragment>;
-      }),
-    [tree, props.handleItemIdentifier, binder, draggingItemIdentifierState, draggableBinder],
-  );
-
-  const dropLineElementStyle: React.CSSProperties = {
-    display: isVisibleDropLineState ? "block" : "none",
-    position: "absolute",
-    transform: "translate(0, -50%)",
-  };
-  const ghostWrapperElementStyle: React.CSSProperties = {
-    position: "fixed",
-    pointerEvents: "none",
-  };
+    return props.renderGhost({ identifier, groupIdentifier, index, isGroup });
+  }, [props.renderGhost, draggingNodeMetaState]);
 
   return (
-    <div className={props.className} style={{ position: "relative" }}>
-      {itemElements}
+    <ListContext.Provider
+      value={{
+        itemSpacing,
+        stackableAreaThreshold,
+        draggingNodeMeta: draggingNodeMetaState,
+        setDraggingNodeMeta: setDraggingNodeMetaState,
+        dropLineElementRef,
+        ghostWrapperElementRef,
+        isVisibleDropLineElement: isVisibleDropLineElementState,
+        setIsVisibleDropLineElement: setIsVisibleDropLineElementState,
+        renderPlaceholder: props.renderPlaceholder,
+        stackedGroupIdentifier: stackedGroupIdentifierState,
+        setStackedGroupIdentifier: setStackedGroupIdentifierState,
+        renderStackedGroup: props.renderStackedGroup,
+        hoveredNodeMetaRef: hoveredNodeMetaRef,
+        destinationMetaRef,
+        onDragStart: props.onDragStart,
+        onDragEnd: props.onDragEnd,
+        onStackGroup: props.onStackGroup,
+      }}
+    >
+      <div className={props.className} style={{ position: "relative" }}>
+        {props.children}
 
-      <div className={props.dropLineClassName} ref={dropLineElementRef} style={dropLineElementStyle} />
-      <span ref={ghostWrapperElementRef} style={ghostWrapperElementStyle} />
-    </div>
+        {dropLineElement}
+        <div ref={ghostWrapperElementRef} style={{ position: "fixed", pointerEvents: "none" }}>
+          {ghostElement}
+        </div>
+      </div>
+    </ListContext.Provider>
   );
 };

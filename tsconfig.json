@@ -4,7 +4,7 @@
     "allowJs": false,
     "baseUrl": "./",
     "declaration": true,
-    "isolatedModules": true,
+    "esModuleInterop": true,
     "jsx": "react",
     "lib": [
       "es2020",
@@ -13,18 +13,11 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "./lib",
-    "rootDir": "./src",
+    "rootDir": "./",
     "removeComments": false,
     "sourceMap": false,
     "skipLibCheck": true,
     "strict": true,
     "target": "es2015"
-  },
-  "include": [
-    "./src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "./src/**/*.spec.ts"
-  ]
+  }
 }
