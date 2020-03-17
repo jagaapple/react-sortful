@@ -8,6 +8,8 @@ import {
   DropLineRendererInjectedProps,
   GhostRendererMeta,
   ListContext,
+  PlaceholderRendererInjectedProps,
+  PlaceholderRendererMeta,
   StackMeta,
 } from "./list";
 
@@ -16,6 +18,8 @@ type Props<T extends ItemIdentifier> = {
   renderDropLine: (injectedProps: DropLineRendererInjectedProps) => React.ReactNode;
   /** A function to render a ghost element in dragging any item. */
   renderGhost: (meta: GhostRendererMeta<T>) => React.ReactNode;
+  /** A function to render a placeholder element instead of a dragging item element. */
+  renderPlaceholder?: (injectedProps: PlaceholderRendererInjectedProps, meta: PlaceholderRendererMeta<T>) => JSX.Element;
   /**
    * A spacing size (px) between items.
    * @default 8
@@ -79,6 +83,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
         ghostWrapperElementRef,
         isVisibleDropLineElement: isVisibleDropLineElementState,
         setIsVisibleDropLineElement: setIsVisibleDropLineElementState,
+        renderPlaceholder: props.renderPlaceholder,
         overedNodeMetaRef,
         destinationMetaRef,
         onDragStart: props.onDragStart,

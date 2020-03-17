@@ -3,7 +3,15 @@ import { storiesOf } from "@storybook/react";
 import classnames from "classnames";
 import arrayMove from "array-move";
 
-import { DragEndMeta, DragStartMeta, DropLineRendererInjectedProps, GhostRendererMeta, Item, List } from "../src";
+import {
+  DragEndMeta,
+  DropLineRendererInjectedProps,
+  GhostRendererMeta,
+  Item,
+  List,
+  PlaceholderRendererInjectedProps,
+  PlaceholderRendererMeta,
+} from "../src";
 
 import { commonStyles } from "./shared";
 import styles from "./1-vertical-nested.stories.css";
@@ -23,12 +31,22 @@ storiesOf("1 Vertical Nested", module)
       ),
       [],
     );
+    const renderPlaceholderElement = React.useCallback(
+      (injectedProps: PlaceholderRendererInjectedProps, { isGroup }: PlaceholderRendererMeta<DummyItem["id"]>) => (
+        <div
+          className={classnames({ [styles.item]: !isGroup, [styles.group]: isGroup }, styles.dragging)}
+          style={injectedProps.style}
+        />
+      ),
+      [],
+    );
 
     return (
       <List
         className={styles.wrapper}
         renderDropLine={renderDropLineElement}
         renderGhost={renderGhostElement}
+        renderPlaceholder={renderPlaceholderElement}
         onDragEnd={() => false}
       >
         <Item className={styles.item} identifier="a" index={0}>
@@ -98,7 +116,6 @@ storiesOf("1 Vertical Nested", module)
           ["f", { id: "f", title: "Item F", children: undefined }],
         ]),
     );
-    const [draggingItemIdentifierState, setDraggingItemIdentifierState] = React.useState<DummyItem["id"]>();
 
     const itemElements = React.useMemo(() => {
       const topLevelNormalizedItems = itemEntitiesMapState
@@ -108,10 +125,9 @@ storiesOf("1 Vertical Nested", module)
         if (normalizedItem.children != undefined) {
           const childNormalizedItems = normalizedItem.children.map((itemId) => itemEntitiesMapState.get(itemId)!);
           const childItemElements = childNormalizedItems.map(createItemElement);
-          const className = classnames(styles.group, { [styles.dragging]: draggingItemIdentifierState === normalizedItem.id });
 
           return (
-            <Item key={normalizedItem.id} className={className} identifier={normalizedItem.id} index={index} isGroup>
+            <Item key={normalizedItem.id} className={styles.group} identifier={normalizedItem.id} index={index} isGroup>
               <div className={styles.heading}>{normalizedItem.title}</div>
               {childItemElements}
             </Item>
@@ -119,25 +135,20 @@ storiesOf("1 Vertical Nested", module)
         }
 
         return (
-          <Item
-            key={normalizedItem.id}
-            className={classnames(styles.item, { [styles.dragging]: draggingItemIdentifierState === normalizedItem.id })}
-            identifier={normalizedItem.id}
-            index={index}
-          >
+          <Item key={normalizedItem.id} className={styles.item} identifier={normalizedItem.id} index={index}>
             {normalizedItem.title}
           </Item>
         );
       };
 
       return topLevelNormalizedItems.map(createItemElement);
-    }, [itemEntitiesMapState, draggingItemIdentifierState]);
+    }, [itemEntitiesMapState]);
     const renderGhostElement = React.useCallback(
-      (meta: GhostRendererMeta<DummyItem["id"]>) => {
-        const normalizedItem = itemEntitiesMapState.get(meta.identifier);
+      ({ identifier, isGroup }: GhostRendererMeta<DummyItem["id"]>) => {
+        const normalizedItem = itemEntitiesMapState.get(identifier);
         if (normalizedItem == undefined) return;
 
-        if (meta.isGroup) {
+        if (isGroup) {
           return (
             <div className={classnames(styles.group, styles.ghost)}>
               <div className={styles.heading}>{normalizedItem.title}</div>
@@ -149,13 +160,23 @@ storiesOf("1 Vertical Nested", module)
       },
       [itemEntitiesMapState],
     );
+    const renderPlaceholderElement = React.useCallback(
+      (injectedProps: PlaceholderRendererInjectedProps, { identifier, isGroup }: PlaceholderRendererMeta<DummyItem["id"]>) => {
+        const normalizedItem = itemEntitiesMapState.get(identifier)!;
+        const className = classnames({ [styles.group]: isGroup, [styles.item]: !isGroup }, styles.dragging);
+        const children = isGroup ? <div className={styles.heading}>{normalizedItem.title}</div> : normalizedItem.title;
 
-    const onDragStart = React.useCallback((meta: DragStartMeta<DummyItem["id"]>) => {
-      setDraggingItemIdentifierState(meta.identifier);
-    }, []);
+        return (
+          <div {...injectedProps.binder()} className={className} style={injectedProps.style}>
+            {children}
+          </div>
+        );
+      },
+      [itemEntitiesMapState],
+    );
+
     const onDragEnd = React.useCallback(
       (meta: DragEndMeta<DummyItem["id"]>) => {
-        setDraggingItemIdentifierState(undefined);
         if (meta.groupIdentifier === meta.nextGroupIdentifier && meta.index === meta.nextIndex) return;
 
         const newMap = new Map(itemEntitiesMapState.entries());
@@ -193,7 +214,7 @@ storiesOf("1 Vertical Nested", module)
         className={styles.wrapper}
         renderDropLine={renderDropLineElement}
         renderGhost={renderGhostElement}
-        onDragStart={onDragStart}
+        renderPlaceholder={renderPlaceholderElement}
         onDragEnd={onDragEnd}
       >
         {itemElements}

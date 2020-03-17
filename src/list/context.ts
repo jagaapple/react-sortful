@@ -1,7 +1,14 @@
 import * as React from "react";
 
 import { NodeMeta } from "../shared";
-import { DestinationMeta, DragEndMeta, DragStartMeta, StackMeta } from "./meta";
+import {
+  DestinationMeta,
+  DragEndMeta,
+  DragStartMeta,
+  PlaceholderRendererInjectedProps,
+  PlaceholderRendererMeta,
+  StackMeta,
+} from "./meta";
 
 export const Context = React.createContext<{
   itemSpacing: number;
@@ -12,6 +19,9 @@ export const Context = React.createContext<{
   ghostWrapperElementRef: React.RefObject<HTMLDivElement>;
   isVisibleDropLineElement: boolean;
   setIsVisibleDropLineElement: (isVisible: boolean) => void;
+  renderPlaceholder:
+    | ((injectedProps: PlaceholderRendererInjectedProps, meta: PlaceholderRendererMeta<any>) => JSX.Element)
+    | undefined;
   overedNodeMetaRef: React.MutableRefObject<NodeMeta<any> | undefined>;
   destinationMetaRef: React.MutableRefObject<DestinationMeta<any> | undefined>;
   onDragStart: ((meta: DragStartMeta<any>) => void) | undefined;

@@ -231,16 +231,50 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     onDragEnd,
   });
 
-  const contentElement = (
-    <div
-      className={props.className}
-      style={{ boxSizing: "border-box", position: "static", margin: `${listContext.itemSpacing}px 0` }}
-      {...binder()}
-      {...draggableBinder()}
-    >
-      {props.children}
-    </div>
-  );
+  const contentElement = React.useMemo((): JSX.Element => {
+    const draggingNodeMeta = listContext.draggingNodeMeta;
+    const isDragging = draggingNodeMeta != undefined && props.identifier === draggingNodeMeta.identifier;
+    const placeholderRenderer = listContext.renderPlaceholder;
+
+    const style: React.CSSProperties = {
+      boxSizing: "border-box",
+      position: "static",
+      margin: `${listContext.itemSpacing}px 0`,
+    };
+
+    if (isDragging && placeholderRenderer != undefined) {
+      return placeholderRenderer(
+        {
+          binder,
+          style: { ...style, width: draggingNodeMeta?.width, height: draggingNodeMeta?.height },
+        },
+        {
+          identifier: props.identifier,
+          groupIdentifier: groupContext.identifier,
+          index: props.index,
+          isGroup,
+        },
+      );
+    }
+
+    return (
+      <div className={props.className} style={style} {...binder()} {...draggableBinder()}>
+        {props.children}
+      </div>
+    );
+  }, [
+    listContext.draggingNodeMeta,
+    listContext.itemSpacing,
+    listContext.renderPlaceholder,
+    groupContext.identifier,
+    props.className,
+    props.identifier,
+    props.children,
+    props.index,
+    isGroup,
+    binder,
+    draggableBinder,
+  ]);
   if (!isGroup) return contentElement;
 
   return (

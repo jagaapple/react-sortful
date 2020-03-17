@@ -3,7 +3,15 @@ import { storiesOf } from "@storybook/react";
 import classnames from "classnames";
 import arrayMove from "array-move";
 
-import { DragEndMeta, DragStartMeta, DropLineRendererInjectedProps, GhostRendererMeta, Item, List } from "../src";
+import {
+  DragEndMeta,
+  DropLineRendererInjectedProps,
+  GhostRendererMeta,
+  Item,
+  List,
+  PlaceholderRendererInjectedProps,
+  PlaceholderRendererMeta,
+} from "../src";
 
 import { commonStyles } from "./shared";
 import styles from "./0-vertical-simple.stories.css";
@@ -20,12 +28,23 @@ storiesOf("0 Vertical Simple", module)
       () => <div className={classnames(styles.item, styles.ghost, styles.static)} />,
       [],
     );
+    const renderPlaceholderElement = React.useCallback(
+      (injectedProps: PlaceholderRendererInjectedProps) => (
+        <div
+          {...injectedProps.binder()}
+          className={classnames(styles.item, styles.dragging, styles.static)}
+          style={injectedProps.style}
+        />
+      ),
+      [],
+    );
 
     return (
       <List
         className={styles.wrapper}
         renderDropLine={renderDropLineElement}
         renderGhost={renderGhostElement}
+        renderPlaceholder={renderPlaceholderElement}
         onDragEnd={() => false}
       >
         <Item className={styles.item} identifier="a" index={0}>
@@ -54,7 +73,6 @@ storiesOf("0 Vertical Simple", module)
       { id: "d", title: "Item D" },
       { id: "e", title: "Item E" },
     ]);
-    const [draggingItemIdentifierState, setDraggingItemIdentifierState] = React.useState<DummyItem["id"]>();
     const itemsById = React.useMemo(
       () =>
         itemsState.reduce<Record<DummyItem["id"], DummyItem>>((object, item) => {
@@ -68,35 +86,37 @@ storiesOf("0 Vertical Simple", module)
     const itemElements = React.useMemo(
       () =>
         itemsState.map((item, index) => (
-          <Item
-            key={item.id}
-            className={classnames(styles.item, { [styles.dragging]: draggingItemIdentifierState === item.id })}
-            identifier={item.id}
-            index={index}
-          >
+          <Item key={item.id} className={styles.item} identifier={item.id} index={index}>
             {item.title}
           </Item>
         )),
-      [itemsState, draggingItemIdentifierState],
+      [itemsState],
     );
     const renderGhostElement = React.useCallback(
-      (meta: GhostRendererMeta<DummyItem["id"]>) => {
-        const item = itemsById[meta.identifier];
+      ({ identifier }: GhostRendererMeta<DummyItem["id"]>) => {
+        const item = itemsById[identifier];
 
         return <div className={classnames(styles.item, styles.ghost)}>{item.title}</div>;
       },
       [itemsById],
     );
+    const renderPlaceholderElement = React.useCallback(
+      (injectedProps: PlaceholderRendererInjectedProps, { identifier }: PlaceholderRendererMeta<DummyItem["id"]>) => {
+        const item = itemsById[identifier];
 
-    const onDragStart = React.useCallback(
-      (meta: DragStartMeta<DummyItem["id"]>) => setDraggingItemIdentifierState(meta.identifier),
+        return (
+          <div {...injectedProps.binder()} className={classnames(styles.item, styles.dragging)} style={injectedProps.style}>
+            {item.title}
+          </div>
+        );
+      },
       [],
     );
+
     const onDragEnd = React.useCallback(
       (meta: DragEndMeta<DummyItem["id"]>) => {
         if (meta.nextIndex == undefined) return;
 
-        setDraggingItemIdentifierState(undefined);
         setItemsState(arrayMove(itemsState, meta.index, meta.nextIndex));
       },
       [itemsState],
@@ -107,7 +127,7 @@ storiesOf("0 Vertical Simple", module)
         className={styles.wrapper}
         renderDropLine={renderDropLineElement}
         renderGhost={renderGhostElement}
-        onDragStart={onDragStart}
+        renderPlaceholder={renderPlaceholderElement}
         onDragEnd={onDragEnd}
       >
         {itemElements}
