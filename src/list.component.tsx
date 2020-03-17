@@ -3,19 +3,22 @@ import * as React from "react";
 import { ItemIdentifier } from "./item";
 import { NodeMeta } from "./node";
 
-export type GhostRendererMeta<T extends ItemIdentifier> = Pick<
-  NodeMeta<T>,
-  "identifier" | "groupIdentifier" | "index" | "isGroup"
->;
 export type DragStartMeta<T extends ItemIdentifier> = Pick<NodeMeta<T>, "identifier" | "groupIdentifier" | "index" | "isGroup">;
 export type DragEndMeta<T extends ItemIdentifier> = Pick<
   NodeMeta<T>,
   "identifier" | "groupIdentifier" | "index" | "isGroup"
 > & {
   nextGroupIdentifier: T | undefined;
-  nextIndex: number;
+  nextIndex: number | undefined;
+};
+export type StackMeta<T extends ItemIdentifier> = Pick<NodeMeta<T>, "identifier" | "groupIdentifier" | "index" | "isGroup"> & {
+  nextGroupIdentifier: T | undefined;
 };
 
+export type GhostRendererMeta<T extends ItemIdentifier> = Pick<
+  NodeMeta<T>,
+  "identifier" | "groupIdentifier" | "index" | "isGroup"
+>;
 export type DropLineRendererInjectedProps = {
   ref: React.RefObject<HTMLDivElement>;
   style: React.CSSProperties;
@@ -23,11 +26,12 @@ export type DropLineRendererInjectedProps = {
 
 type DestinationMeta<T extends ItemIdentifier> = {
   groupIdentifier: T | undefined;
-  index: number;
+  index: number | undefined;
 };
 
 export const ListContext = React.createContext<{
   itemSpacing: number;
+  stackableAreaThreshold: number;
   draggingNodeMeta: NodeMeta<any> | undefined;
   setDraggingNodeMeta: (meta: NodeMeta<any> | undefined) => void;
   dropLineElementRef: React.RefObject<HTMLDivElement>;
@@ -38,6 +42,7 @@ export const ListContext = React.createContext<{
   destinationMetaRef: React.MutableRefObject<DestinationMeta<any> | undefined>;
   onDragStart: ((meta: DragStartMeta<any>) => void) | undefined;
   onDragEnd: (meta: DragEndMeta<any>) => void;
+  onStack: ((meta: StackMeta<any>) => void) | undefined;
 }>(undefined as any);
 
 type Props<T extends ItemIdentifier> = {
@@ -46,8 +51,10 @@ type Props<T extends ItemIdentifier> = {
   renderDropLine: (injectedProps: DropLineRendererInjectedProps) => React.ReactNode;
   renderGhost: (meta: GhostRendererMeta<T>) => React.ReactNode;
   itemSpacing?: number;
+  stackableAreaThreshold?: number;
   onDragStart?: (meta: DragStartMeta<T>) => void;
   onDragEnd: (meta: DragEndMeta<T>) => void;
+  onStack?: (meta: StackMeta<T>) => void;
 };
 
 export const List = <T extends ItemIdentifier>(props: Props<T>) => {
@@ -55,6 +62,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
   const [isVisibleDropLineElementState, setIsVisibleDropLineElementState] = React.useState(false);
 
   const itemSpacing = props.itemSpacing ?? 8;
+  const stackableAreaThreshold = props.stackableAreaThreshold ?? 8;
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
@@ -85,6 +93,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
     <ListContext.Provider
       value={{
         itemSpacing,
+        stackableAreaThreshold,
         draggingNodeMeta: draggingNodeMetaState,
         setDraggingNodeMeta: setDraggingNodeMetaState,
         dropLineElementRef,
@@ -95,6 +104,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
         destinationMetaRef,
         onDragStart: props.onDragStart,
         onDragEnd: props.onDragEnd,
+        onStack: props.onStack,
       }}
     >
       <div className={props.className} style={{ position: "relative" }}>

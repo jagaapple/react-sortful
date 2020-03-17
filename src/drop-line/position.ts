@@ -20,3 +20,17 @@ export const getDropLinePosition = <T extends ItemIdentifier>(
 
   return { top, left };
 };
+
+export const checkIsInStackableArea = <T extends ItemIdentifier>(
+  absoluteXY: [number, number],
+  nodeMeta: NodeMeta<T>,
+  stackableAreaThreshold: number,
+) => {
+  const y = Math.max(absoluteXY[1] - nodeMeta.absolutePosition.top, 0);
+
+  const nodeTop = 0;
+  const nodeBottom = nodeMeta.height;
+  const isInStackableAreaY = nodeTop + stackableAreaThreshold < y && y < nodeBottom - stackableAreaThreshold;
+
+  return isInStackableAreaY;
+};

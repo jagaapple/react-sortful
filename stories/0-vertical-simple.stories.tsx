@@ -93,6 +93,8 @@ storiesOf("0 Vertical Simple", module)
     }, []);
     const onDragEnd = React.useCallback(
       (meta: DragEndMeta<DummyItem["id"]>) => {
+        if (meta.nextIndex == undefined) return;
+
         setDraggingItemIdentifierState(undefined);
         setItemsState(arrayMove(itemsState, meta.index, meta.nextIndex));
       },

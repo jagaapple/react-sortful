@@ -1,2 +1,2 @@
 export { getDropLineDirectionFromXY } from "./direciton";
-export { getDropLinePosition } from "./position";
+export { getDropLinePosition, checkIsInStackableArea } from "./position";

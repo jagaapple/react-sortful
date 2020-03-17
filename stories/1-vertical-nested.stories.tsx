@@ -108,15 +108,10 @@ storiesOf("1 Vertical Nested", module)
         if (normalizedItem.children != undefined) {
           const childNormalizedItems = normalizedItem.children.map((itemId) => itemEntitiesMapState.get(itemId)!);
           const childItemElements = childNormalizedItems.map(createItemElement);
+          const className = classnames(styles.group, { [styles.dragging]: draggingItemIdentifierState === normalizedItem.id });
 
           return (
-            <Item
-              key={normalizedItem.id}
-              className={classnames(styles.group, { [styles.dragging]: draggingItemIdentifierState === normalizedItem.id })}
-              identifier={normalizedItem.id}
-              index={index}
-              isGroup
-            >
+            <Item key={normalizedItem.id} className={className} identifier={normalizedItem.id} index={index} isGroup>
               <div className={styles.heading}>{normalizedItem.title}</div>
               {childItemElements}
             </Item>
@@ -170,13 +165,19 @@ storiesOf("1 Vertical Nested", module)
         if (normalizedGroupItem == undefined) return;
 
         if (meta.groupIdentifier === meta.nextGroupIdentifier) {
-          normalizedGroupItem.children = arrayMove(normalizedGroupItem.children!, meta.index, meta.nextIndex);
+          const nextIndex = meta.nextIndex ?? normalizedGroupItem.children?.length ?? 0;
+          normalizedGroupItem.children = arrayMove(normalizedGroupItem.children!, meta.index, nextIndex);
         } else {
           const nextNormalizedGroupItem = newMap.get(meta.nextGroupIdentifier ?? rootItemId);
           if (nextNormalizedGroupItem == undefined) return;
+          if (nextNormalizedGroupItem.children == undefined) return;
 
           normalizedGroupItem.children!.splice(meta.index, 1);
-          nextNormalizedGroupItem.children!.splice(meta.nextIndex, 0, normalizedItem.id);
+          if (meta.nextIndex == undefined) {
+            nextNormalizedGroupItem.children.push(meta.identifier);
+          } else {
+            nextNormalizedGroupItem.children.splice(meta.nextIndex, 0, normalizedItem.id);
+          }
         }
 
         setItemEntitiesMapState(newMap);

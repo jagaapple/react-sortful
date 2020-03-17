@@ -3,7 +3,7 @@ import { useGesture } from "react-use-gesture";
 
 import { ItemIdentifier } from "./item";
 import { getNodeMeta, NodeMeta } from "./node";
-import { getDropLineDirectionFromXY, getDropLinePosition } from "./drop-line";
+import { checkIsInStackableArea, getDropLineDirectionFromXY, getDropLinePosition } from "./drop-line";
 import { ListContext } from "./list.component";
 
 type Props<T extends ItemIdentifier> = {
@@ -17,7 +17,8 @@ type Props<T extends ItemIdentifier> = {
 const GroupContext = React.createContext<{
   identifier: ItemIdentifier | undefined;
   ancestorIdentifiers: ItemIdentifier[];
-}>({ identifier: undefined, ancestorIdentifiers: [] });
+  hasNoItems: boolean;
+}>({ identifier: undefined, ancestorIdentifiers: [], hasNoItems: false });
 
 export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   const listContext = React.useContext(ListContext);
@@ -25,6 +26,11 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
 
   const ancestorIdentifiers = [...groupContext.ancestorIdentifiers, props.identifier];
   const isGroup = props.isGroup ?? false;
+  const hasNoItems =
+    isGroup &&
+    React.useMemo(() => React.Children.toArray(props.children).filter((child: any) => child.type === Item).length === 0, [
+      props.children,
+    ]);
 
   const setGhostElement = React.useCallback((itemElement: HTMLElement) => {
     const ghostWrapperElement = listContext.ghostWrapperElementRef.current;
@@ -141,6 +147,27 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       const dropLineElement = listContext.dropLineElementRef.current;
       if (dropLineElement == undefined) return;
 
+      if (hasNoItems) {
+        const isInStackableArea = checkIsInStackableArea(absoluteXY, overedNodeMeta, listContext.stackableAreaThreshold);
+        if (isInStackableArea) {
+          listContext.setIsVisibleDropLineElement(false);
+
+          listContext.onStack?.({
+            identifier: props.identifier,
+            groupIdentifier: groupContext.identifier,
+            index: props.index,
+            isGroup,
+            nextGroupIdentifier: overedNodeMeta.identifier,
+          });
+          listContext.destinationMetaRef.current = {
+            groupIdentifier: props.identifier,
+            index: undefined,
+          };
+
+          return;
+        }
+      }
+
       if (draggingNodeMeta.index !== overedNodeMeta.index) listContext.setIsVisibleDropLineElement(true);
 
       setDropLinePositionElement(absoluteXY, overedNodeMeta);
@@ -152,12 +179,35 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       const isInSameGroup = draggingNodeMeta.groupIdentifier === overedNodeMeta.groupIdentifier;
       if (isInSameGroup && draggingNodeMeta.index < nextIndex) nextIndex -= 1;
 
+      if (
+        listContext.destinationMetaRef.current != undefined &&
+        listContext.destinationMetaRef.current.groupIdentifier != undefined &&
+        listContext.destinationMetaRef.current.index == undefined
+      ) {
+        listContext.onStack?.({
+          identifier: props.identifier,
+          groupIdentifier: groupContext.identifier,
+          index: props.index,
+          isGroup,
+          nextGroupIdentifier: undefined,
+        });
+      }
+
       listContext.destinationMetaRef.current = {
         groupIdentifier: groupContext.identifier,
         index: nextIndex,
       };
     },
-    [listContext.draggingNodeMeta, groupContext.identifier],
+    [
+      listContext.draggingNodeMeta,
+      listContext.onStack,
+      listContext.stackableAreaThreshold,
+      groupContext.identifier,
+      props.identifier,
+      props.index,
+      isGroup,
+      hasNoItems,
+    ],
   );
 
   const binder = useGesture({
@@ -172,7 +222,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     },
     onMove: ({ xy }) => {
       if (listContext.draggingNodeMeta == undefined) return;
-      if (isGroup) {
+      if (isGroup && !hasNoItems) {
         const overedNodeAncestorIdentifiers = listContext.overedNodeMetaRef.current?.ancestorIdentifiers ?? [];
         const ancestorIdentifiersWithoutOveredNode = [...overedNodeAncestorIdentifiers];
         ancestorIdentifiersWithoutOveredNode.pop();
@@ -202,16 +252,21 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     onDragEnd,
   });
 
+  const element = (
+    <div
+      className={props.className}
+      style={{ boxSizing: "border-box", position: "static", margin: `${listContext.itemSpacing}px 0` }}
+      {...binder()}
+      {...draggableBinder()}
+    >
+      {props.children}
+    </div>
+  );
+  if (!isGroup) return element;
+
   return (
-    <GroupContext.Provider value={{ identifier: props.identifier, ancestorIdentifiers }}>
-      <div
-        className={props.className}
-        style={{ boxSizing: "border-box", margin: `${listContext.itemSpacing}px 0` }}
-        {...binder()}
-        {...draggableBinder()}
-      >
-        {props.children}
-      </div>
+    <GroupContext.Provider value={{ identifier: props.identifier, ancestorIdentifiers, hasNoItems }}>
+      {element}
     </GroupContext.Provider>
   );
 };
