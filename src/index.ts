@@ -4,7 +4,7 @@ export {
   GhostRendererMeta,
   PlaceholderRendererInjectedProps,
   PlaceholderRendererMeta,
-  StackMeta,
+  StackGroupMeta,
   DropLineRendererInjectedProps,
 } from "./list";
 export { List } from "./list.component";

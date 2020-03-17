@@ -6,4 +6,4 @@ export {
   PlaceholderRendererInjectedProps,
   PlaceholderRendererMeta,
 } from "./renderers";
-export { StackMeta } from "./stacks";
+export { StackGroupMeta } from "./stacks";

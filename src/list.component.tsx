@@ -10,7 +10,7 @@ import {
   ListContext,
   PlaceholderRendererInjectedProps,
   PlaceholderRendererMeta,
-  StackMeta,
+  StackGroupMeta,
 } from "./list";
 
 type Props<T extends ItemIdentifier> = {
@@ -35,7 +35,7 @@ type Props<T extends ItemIdentifier> = {
   /** A callback function after end of dragging. */
   onDragEnd: (meta: DragEndMeta<T>) => void;
   /** A callback function after stacking an item on any group. */
-  onStack?: (meta: StackMeta<T>) => void;
+  onStackGroup?: (meta: StackGroupMeta<T>) => void;
   className?: string;
   children?: React.ReactNode;
 };
@@ -88,7 +88,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
         destinationMetaRef,
         onDragStart: props.onDragStart,
         onDragEnd: props.onDragEnd,
-        onStack: props.onStack,
+        onStackGroup: props.onStackGroup,
       }}
     >
       <div className={props.className} style={{ position: "relative" }}>

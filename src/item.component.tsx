@@ -127,7 +127,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       };
 
       // Calls callbacks.
-      listContext.onStack?.({
+      listContext.onStackGroup?.({
         identifier: props.identifier,
         groupIdentifier: groupContext.identifier,
         index: props.index,
@@ -135,7 +135,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         nextGroupIdentifier: hoveredNodeMeta.identifier,
       });
     },
-    [listContext.stackableAreaThreshold, listContext.onStack, groupContext.identifier, props.identifier, props.index],
+    [listContext.stackableAreaThreshold, listContext.onStackGroup, groupContext.identifier, props.identifier, props.index],
   );
   const onMoveForItems = React.useCallback(
     (draggingNodeMeta: NodeMeta<T>, hoveredNodeMeta: NodeMeta<T>, absoluteXY: [number, number]) => {
@@ -159,7 +159,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       const isComeFromStackedGroup =
         destinationMeta != undefined && destinationMeta.groupIdentifier != undefined && destinationMeta.index == undefined;
       if (isComeFromStackedGroup) {
-        listContext.onStack?.({
+        listContext.onStackGroup?.({
           identifier: props.identifier,
           groupIdentifier: groupContext.identifier,
           index: props.index,
@@ -171,7 +171,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       // Sets contexts to values.
       listContext.destinationMetaRef.current = { groupIdentifier: groupContext.identifier, index: nextIndex };
     },
-    [listContext.itemSpacing, listContext.onStack, groupContext.identifier, props.identifier, props.index, isGroup],
+    [listContext.itemSpacing, listContext.onStackGroup, groupContext.identifier, props.identifier, props.index, isGroup],
   );
   const onMove = React.useCallback(
     (absoluteXY: [number, number]) => {

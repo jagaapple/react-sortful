@@ -7,7 +7,7 @@ import {
   DragStartMeta,
   PlaceholderRendererInjectedProps,
   PlaceholderRendererMeta,
-  StackMeta,
+  StackGroupMeta,
 } from "./meta";
 
 export const Context = React.createContext<{
@@ -26,5 +26,5 @@ export const Context = React.createContext<{
   destinationMetaRef: React.MutableRefObject<DestinationMeta<any> | undefined>;
   onDragStart: ((meta: DragStartMeta<any>) => void) | undefined;
   onDragEnd: (meta: DragEndMeta<any>) => void;
-  onStack: ((meta: StackMeta<any>) => void) | undefined;
+  onStackGroup: ((meta: StackGroupMeta<any>) => void) | undefined;
 }>(undefined as any);
