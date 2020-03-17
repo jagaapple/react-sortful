@@ -36,6 +36,7 @@ storiesOf("1 Vertical Nested", module)
     const renderPlaceholderElement = React.useCallback(
       (injectedProps: PlaceholderRendererInjectedProps, { isGroup }: PlaceholderRendererMeta<DummyItem["id"]>) => (
         <div
+          {...injectedProps.binder()}
           className={classnames({ [styles.item]: !isGroup, [styles.group]: isGroup }, styles.dragging)}
           style={injectedProps.style}
         />

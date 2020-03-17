@@ -29,7 +29,7 @@
   },
   "scripts": {
     "prebuild": "rm -rf ./lib",
-    "build": "tsc",
+    "build": "tsc --project \"./tsconfig.build.json\"",
     "lint": "tsc --noEmit && eslint \"./**/*.ts\" \"./**/*.tsx\" && stylelint \"./stories/**/*.css\"",
     "fix:ts": "eslint --fix \"./**/*.ts\" \"./**/*.tsx\"",
     "fix:css": "stylelint \"./stories/**/*.css\" --fix",

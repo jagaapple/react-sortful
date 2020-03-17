@@ -1,0 +1,87 @@
+.wrapper {
+  --padding: 8px;
+  --icon-width: 14px;
+
+  padding: var(--padding);
+}
+
+.withIcon::before {
+  display: block;
+  margin-right: 0.3em;
+  width: var(--icon-width);
+  font-family: "FontAwesome";
+  font-size: 14px;
+  text-align: center;
+}
+
+.group {
+  padding: 2px 8px 2px 16px;
+  border: 1px dashed transparent;
+  border-radius: 4px;
+}
+.group.dragging {
+  border-color: #cfd4db;
+  background-color: #f6f9fc;
+}
+.group.stacked {
+  --color: #007bff;
+
+  box-shadow: 0 0 0 1px var(--color);
+  border-style: solid;
+  border-color: var(--color);
+  background-color: rgba(0, 123, 255, 0.1);
+}
+.group .heading {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-left: -12px;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1.4;
+}
+.group .heading::before {
+  content: "\f07b";
+}
+.group .heading.opened::before {
+  content: "\f07c";
+}
+
+.item {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 2px 8px 2px 4px;
+  font-size: 12px;
+  line-height: 1.4;
+  border: 1px dashed transparent;
+  border-radius: 4px;
+}
+.item::before {
+  content: "\f016";
+}
+.item.dragging {
+  border-color: #cfd4db;
+  background-color: #f6f9fc;
+}
+
+.ghost {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  border-radius: 50px;
+  animation-name: ghostItemVisible;
+  animation-duration: 200ms;
+  animation-fill-mode: forwards;
+}
+.ghost.static {
+  background-color: #e2e6eb;
+}
+@keyframes ghostItemVisible {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(0.8) translate(16px, 16px);
+  }
+}
