@@ -1,60 +1,39 @@
 import * as React from "react";
 
-import { ItemIdentifier } from "./item";
-import { NodeMeta } from "./node";
-
-export type DragStartMeta<T extends ItemIdentifier> = Pick<NodeMeta<T>, "identifier" | "groupIdentifier" | "index" | "isGroup">;
-export type DragEndMeta<T extends ItemIdentifier> = Pick<
-  NodeMeta<T>,
-  "identifier" | "groupIdentifier" | "index" | "isGroup"
-> & {
-  nextGroupIdentifier: T | undefined;
-  nextIndex: number | undefined;
-};
-export type StackMeta<T extends ItemIdentifier> = Pick<NodeMeta<T>, "identifier" | "groupIdentifier" | "index" | "isGroup"> & {
-  nextGroupIdentifier: T | undefined;
-};
-
-export type GhostRendererMeta<T extends ItemIdentifier> = Pick<
-  NodeMeta<T>,
-  "identifier" | "groupIdentifier" | "index" | "isGroup"
->;
-export type DropLineRendererInjectedProps = {
-  ref: React.RefObject<HTMLDivElement>;
-  style: React.CSSProperties;
-};
-
-type DestinationMeta<T extends ItemIdentifier> = {
-  groupIdentifier: T | undefined;
-  index: number | undefined;
-};
-
-export const ListContext = React.createContext<{
-  itemSpacing: number;
-  stackableAreaThreshold: number;
-  draggingNodeMeta: NodeMeta<any> | undefined;
-  setDraggingNodeMeta: (meta: NodeMeta<any> | undefined) => void;
-  dropLineElementRef: React.RefObject<HTMLDivElement>;
-  ghostWrapperElementRef: React.RefObject<HTMLDivElement>;
-  isVisibleDropLineElement: boolean;
-  setIsVisibleDropLineElement: (isVisible: boolean) => void;
-  overedNodeMetaRef: React.MutableRefObject<NodeMeta<any> | undefined>;
-  destinationMetaRef: React.MutableRefObject<DestinationMeta<any> | undefined>;
-  onDragStart: ((meta: DragStartMeta<any>) => void) | undefined;
-  onDragEnd: (meta: DragEndMeta<any>) => void;
-  onStack: ((meta: StackMeta<any>) => void) | undefined;
-}>(undefined as any);
+import { ItemIdentifier, NodeMeta } from "./shared";
+import {
+  DestinationMeta,
+  DragEndMeta,
+  DragStartMeta,
+  DropLineRendererInjectedProps,
+  GhostRendererMeta,
+  ListContext,
+  StackMeta,
+} from "./list";
 
 type Props<T extends ItemIdentifier> = {
+  /** A function to render a drop line element in dragging any item. */
+  renderDropLine: (injectedProps: DropLineRendererInjectedProps) => React.ReactNode;
+  /** A function to render a ghost element in dragging any item. */
+  renderGhost: (meta: GhostRendererMeta<T>) => React.ReactNode;
+  /**
+   * A spacing size (px) between items.
+   * @default 8
+   */
+  itemSpacing?: number;
+  /**
+   * A threshold size (px) of stackable area for groups.
+   * @default 8
+   */
+  stackableAreaThreshold?: number;
+  /** A callback function after starting of dragging. */
+  onDragStart?: (meta: DragStartMeta<T>) => void;
+  /** A callback function after end of dragging. */
+  onDragEnd: (meta: DragEndMeta<T>) => void;
+  /** A callback function after stacking an item on any group. */
+  onStack?: (meta: StackMeta<T>) => void;
   className?: string;
   children?: React.ReactNode;
-  renderDropLine: (injectedProps: DropLineRendererInjectedProps) => React.ReactNode;
-  renderGhost: (meta: GhostRendererMeta<T>) => React.ReactNode;
-  itemSpacing?: number;
-  stackableAreaThreshold?: number;
-  onDragStart?: (meta: DragStartMeta<T>) => void;
-  onDragEnd: (meta: DragEndMeta<T>) => void;
-  onStack?: (meta: StackMeta<T>) => void;
 };
 
 export const List = <T extends ItemIdentifier>(props: Props<T>) => {

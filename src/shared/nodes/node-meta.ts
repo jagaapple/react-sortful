@@ -1,5 +1,5 @@
-import { ItemIdentifier } from "../item";
-import { ElementPosition } from "./element";
+import { ItemIdentifier } from "../items";
+import { ElementPosition } from "./elements";
 
 type NodeRect = {
   width: number;

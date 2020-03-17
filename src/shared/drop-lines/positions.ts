@@ -1,6 +1,6 @@
-import { ItemIdentifier } from "../item";
-import { ElementPosition, NodeMeta } from "../node";
-import { getDropLineDirection } from "./direciton";
+import { ItemIdentifier } from "../items";
+import { ElementPosition, NodeMeta } from "../nodes";
+import { getDropLineDirection } from "./direcitons";
 
 export const getDropLinePosition = <T extends ItemIdentifier>(
   absoluteXY: [number, number],

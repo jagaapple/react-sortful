@@ -1,24 +1,30 @@
 import * as React from "react";
 import { useGesture } from "react-use-gesture";
 
-import { ItemIdentifier } from "./item";
-import { getNodeMeta, NodeMeta } from "./node";
-import { checkIsInStackableArea, getDropLineDirectionFromXY, getDropLinePosition } from "./drop-line";
-import { ListContext } from "./list.component";
+import {
+  checkIsInStackableArea,
+  getDropLineDirectionFromXY,
+  getDropLinePosition,
+  getNodeMeta,
+  ItemIdentifier,
+  NodeMeta,
+} from "./shared";
+import { ListContext } from "./list";
+import { GroupContext } from "./groups";
 
 type Props<T extends ItemIdentifier> = {
-  className?: string;
+  /** A unique identifier in all items in a root list. */
   identifier: T;
+  /** A unique and sequential index number in a parent group. */
   index: number;
-  children?: React.ReactNode;
+  /**
+   * Whether this item contains child items.
+   * @default false
+   */
   isGroup?: boolean;
+  className?: string;
+  children?: React.ReactNode;
 };
-
-const GroupContext = React.createContext<{
-  identifier: ItemIdentifier | undefined;
-  ancestorIdentifiers: ItemIdentifier[];
-  hasNoItems: boolean;
-}>({ identifier: undefined, ancestorIdentifiers: [], hasNoItems: false });
 
 export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   const listContext = React.useContext(ListContext);
