@@ -7,6 +7,8 @@ import {
   DragStartMeta,
   PlaceholderRendererInjectedProps,
   PlaceholderRendererMeta,
+  StackedGroupRendererInjectedProps,
+  StackedGroupRendererMeta,
   StackGroupMeta,
 } from "./meta";
 
@@ -21,6 +23,11 @@ export const Context = React.createContext<{
   setIsVisibleDropLineElement: (isVisible: boolean) => void;
   renderPlaceholder:
     | ((injectedProps: PlaceholderRendererInjectedProps, meta: PlaceholderRendererMeta<any>) => JSX.Element)
+    | undefined;
+  stackedGroupIdentifier: any;
+  setStackedGroupIdentifier: (identifier: any) => void;
+  renderStackedGroup:
+    | ((injectedProps: StackedGroupRendererInjectedProps, meta: StackedGroupRendererMeta<any>) => JSX.Element)
     | undefined;
   hoveredNodeMetaRef: React.MutableRefObject<NodeMeta<any> | undefined>;
   destinationMetaRef: React.MutableRefObject<DestinationMeta<any> | undefined>;

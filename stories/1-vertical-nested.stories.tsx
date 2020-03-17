@@ -11,6 +11,8 @@ import {
   List,
   PlaceholderRendererInjectedProps,
   PlaceholderRendererMeta,
+  StackedGroupRendererInjectedProps,
+  StackedGroupRendererMeta,
 } from "../src";
 
 import { commonStyles } from "./shared";
@@ -40,6 +42,12 @@ storiesOf("1 Vertical Nested", module)
       ),
       [],
     );
+    const renderStackedGroupElement = React.useCallback(
+      (injectedProps: StackedGroupRendererInjectedProps) => (
+        <div {...injectedProps.binder()} className={classnames(styles.group, styles.stacked)} style={injectedProps.style} />
+      ),
+      [],
+    );
 
     return (
       <List
@@ -47,6 +55,7 @@ storiesOf("1 Vertical Nested", module)
         renderDropLine={renderDropLineElement}
         renderGhost={renderGhostElement}
         renderPlaceholder={renderPlaceholderElement}
+        renderStackedGroup={renderStackedGroupElement}
         onDragEnd={() => false}
       >
         <Item className={styles.item} identifier="a" index={0}>
@@ -174,6 +183,18 @@ storiesOf("1 Vertical Nested", module)
       },
       [itemEntitiesMapState],
     );
+    const renderStackedGroupElement = React.useCallback(
+      (injectedProps: StackedGroupRendererInjectedProps, { identifier }: StackedGroupRendererMeta<DummyItem["id"]>) => {
+        const normalizedItem = itemEntitiesMapState.get(identifier)!;
+
+        return (
+          <div {...injectedProps.binder()} className={classnames(styles.group, styles.stacked)} style={injectedProps.style}>
+            <div className={styles.heading}>{normalizedItem.title}</div>
+          </div>
+        );
+      },
+      [],
+    );
 
     const onDragEnd = React.useCallback(
       (meta: DragEndMeta<DummyItem["id"]>) => {
@@ -215,6 +236,7 @@ storiesOf("1 Vertical Nested", module)
         renderDropLine={renderDropLineElement}
         renderGhost={renderGhostElement}
         renderPlaceholder={renderPlaceholderElement}
+        renderStackedGroup={renderStackedGroupElement}
         onDragEnd={onDragEnd}
       >
         {itemElements}

@@ -2,7 +2,7 @@ import * as React from "react";
 import { useGesture } from "react-use-gesture";
 
 import { checkIsInStackableArea, getDropLineDirectionFromXY, getNodeMeta, ItemIdentifier, NodeMeta } from "./shared";
-import { ListContext } from "./list";
+import { ListContext, PlaceholderRendererMeta, StackedGroupRendererMeta } from "./list";
 import { GroupContext } from "./groups";
 import {
   checkIsAncestorItem,
@@ -85,6 +85,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     // Resets context values.
     listContext.setDraggingNodeMeta(undefined);
     listContext.setIsVisibleDropLineElement(false);
+    listContext.setStackedGroupIdentifier(undefined);
     listContext.hoveredNodeMetaRef.current = undefined;
     listContext.destinationMetaRef.current = undefined;
   }, [listContext.onDragEnd, groupContext.identifier, props.identifier, props.index, isGroup]);
@@ -121,6 +122,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     <T extends ItemIdentifier>(hoveredNodeMeta: NodeMeta<T>) => {
       // Sets contexts to values.
       listContext.setIsVisibleDropLineElement(false);
+      listContext.setStackedGroupIdentifier(props.identifier);
       listContext.destinationMetaRef.current = {
         groupIdentifier: props.identifier,
         index: undefined,
@@ -169,6 +171,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       }
 
       // Sets contexts to values.
+      listContext.setStackedGroupIdentifier(undefined);
       listContext.destinationMetaRef.current = { groupIdentifier: groupContext.identifier, index: nextIndex };
     },
     [listContext.itemSpacing, listContext.onStackGroup, groupContext.identifier, props.identifier, props.index, isGroup],
@@ -235,25 +238,30 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     const draggingNodeMeta = listContext.draggingNodeMeta;
     const isDragging = draggingNodeMeta != undefined && props.identifier === draggingNodeMeta.identifier;
     const placeholderRenderer = listContext.renderPlaceholder;
+    const stackedGroupRenderer = listContext.renderStackedGroup;
 
     const style: React.CSSProperties = {
       boxSizing: "border-box",
       position: "static",
       margin: `${listContext.itemSpacing}px 0`,
     };
+    const rendererMeta: Omit<PlaceholderRendererMeta<any>, "isGroup"> | StackedGroupRendererMeta<any> = {
+      identifier: props.identifier,
+      groupIdentifier: groupContext.identifier,
+      index: props.index,
+    };
+    if (listContext.stackedGroupIdentifier === props.identifier && stackedGroupRenderer != undefined) {
+      const hoveredNodeMeta = listContext.hoveredNodeMetaRef.current;
 
+      return stackedGroupRenderer(
+        { binder, style: { ...style, width: hoveredNodeMeta?.width, height: hoveredNodeMeta?.height } },
+        rendererMeta,
+      );
+    }
     if (isDragging && placeholderRenderer != undefined) {
       return placeholderRenderer(
-        {
-          binder,
-          style: { ...style, width: draggingNodeMeta?.width, height: draggingNodeMeta?.height },
-        },
-        {
-          identifier: props.identifier,
-          groupIdentifier: groupContext.identifier,
-          index: props.index,
-          isGroup,
-        },
+        { binder, style: { ...style, width: draggingNodeMeta?.width, height: draggingNodeMeta?.height } },
+        { ...rendererMeta, isGroup },
       );
     }
 
@@ -265,6 +273,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   }, [
     listContext.draggingNodeMeta,
     listContext.itemSpacing,
+    listContext.stackedGroupIdentifier,
     listContext.renderPlaceholder,
     groupContext.identifier,
     props.className,

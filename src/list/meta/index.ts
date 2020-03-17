@@ -5,5 +5,7 @@ export {
   DropLineRendererInjectedProps,
   PlaceholderRendererInjectedProps,
   PlaceholderRendererMeta,
+  StackedGroupRendererInjectedProps,
+  StackedGroupRendererMeta,
 } from "./renderers";
 export { StackGroupMeta } from "./stacks";

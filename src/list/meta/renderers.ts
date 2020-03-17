@@ -16,3 +16,8 @@ export type PlaceholderRendererMeta<T extends ItemIdentifier> = Pick<
   NodeMeta<T>,
   "identifier" | "groupIdentifier" | "index" | "isGroup"
 >;
+export type StackedGroupRendererInjectedProps = {
+  binder: () => Record<string, any>;
+  style: React.CSSProperties;
+};
+export type StackedGroupRendererMeta<T extends ItemIdentifier> = Pick<NodeMeta<T>, "identifier" | "groupIdentifier" | "index">;

@@ -4,6 +4,8 @@ export {
   GhostRendererMeta,
   PlaceholderRendererInjectedProps,
   PlaceholderRendererMeta,
+  StackedGroupRendererInjectedProps,
+  StackedGroupRendererMeta,
   StackGroupMeta,
   DropLineRendererInjectedProps,
 } from "./list";

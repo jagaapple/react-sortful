@@ -11,6 +11,12 @@
   border-radius: 4px;
   background-color: rgba(113, 189, 69, 0.1);
 }
+.group.stacked {
+  --color: #71bd45;
+
+  box-shadow: 0 0 0 1px var(--color);
+  border-color: var(--color);
+}
 .group.dragging {
   border-style: dashed;
   border-color: #579135;

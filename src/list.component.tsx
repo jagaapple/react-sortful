@@ -10,6 +10,8 @@ import {
   ListContext,
   PlaceholderRendererInjectedProps,
   PlaceholderRendererMeta,
+  StackedGroupRendererInjectedProps,
+  StackedGroupRendererMeta,
   StackGroupMeta,
 } from "./list";
 
@@ -20,6 +22,8 @@ type Props<T extends ItemIdentifier> = {
   renderGhost: (meta: GhostRendererMeta<T>) => React.ReactNode;
   /** A function to render a placeholder element instead of a dragging item element. */
   renderPlaceholder?: (injectedProps: PlaceholderRendererInjectedProps, meta: PlaceholderRendererMeta<T>) => JSX.Element;
+  /** A function to render an item element when an empty group item is hovered by a dragging item. */
+  renderStackedGroup?: (injectedProps: StackedGroupRendererInjectedProps, meta: StackedGroupRendererMeta<T>) => JSX.Element;
   /**
    * A spacing size (px) between items.
    * @default 8
@@ -34,7 +38,7 @@ type Props<T extends ItemIdentifier> = {
   onDragStart?: (meta: DragStartMeta<T>) => void;
   /** A callback function after end of dragging. */
   onDragEnd: (meta: DragEndMeta<T>) => void;
-  /** A callback function after stacking an item on any group. */
+  /** A callback function while an empty group item is hovered by a dragging item. */
   onStackGroup?: (meta: StackGroupMeta<T>) => void;
   className?: string;
   children?: React.ReactNode;
@@ -43,6 +47,7 @@ type Props<T extends ItemIdentifier> = {
 export const List = <T extends ItemIdentifier>(props: Props<T>) => {
   const [draggingNodeMetaState, setDraggingNodeMetaState] = React.useState<NodeMeta<T>>();
   const [isVisibleDropLineElementState, setIsVisibleDropLineElementState] = React.useState(false);
+  const [stackedGroupIdentifierState, setStackedGroupIdentifierState] = React.useState<T>();
 
   const itemSpacing = props.itemSpacing ?? 8;
   const stackableAreaThreshold = props.stackableAreaThreshold ?? 8;
@@ -84,6 +89,9 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
         isVisibleDropLineElement: isVisibleDropLineElementState,
         setIsVisibleDropLineElement: setIsVisibleDropLineElementState,
         renderPlaceholder: props.renderPlaceholder,
+        stackedGroupIdentifier: stackedGroupIdentifierState,
+        setStackedGroupIdentifier: setStackedGroupIdentifierState,
+        renderStackedGroup: props.renderStackedGroup,
         hoveredNodeMetaRef: hoveredNodeMetaRef,
         destinationMetaRef,
         onDragStart: props.onDragStart,
