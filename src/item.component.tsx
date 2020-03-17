@@ -5,18 +5,26 @@ import { ItemIdentifier } from "./item";
 import { getNodeMeta, NodeMeta } from "./node";
 import { getDropLineDirectionFromXY, getDropLinePosition } from "./drop-line";
 import { ListContext } from "./list.component";
-import { GroupContext } from "./group.component";
 
 type Props<T extends ItemIdentifier> = {
   className?: string;
   identifier: T;
   index: number;
   children?: React.ReactNode;
+  isGroup?: boolean;
 };
+
+const GroupContext = React.createContext<{
+  identifier: ItemIdentifier | undefined;
+  ancestorIdentifiers: ItemIdentifier[];
+}>({ identifier: undefined, ancestorIdentifiers: [] });
 
 export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   const listContext = React.useContext(ListContext);
   const groupContext = React.useContext(GroupContext);
+
+  const ancestorIdentifiers = [...groupContext.ancestorIdentifiers, props.identifier];
+  const isGroup = props.isGroup ?? false;
 
   const setGhostElement = React.useCallback((itemElement: HTMLElement) => {
     const ghostWrapperElement = listContext.ghostWrapperElementRef.current;
@@ -55,7 +63,14 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       // Disables to select elements in entire page.
       document.body.style.userSelect = "none";
 
-      const nodeMeta = getNodeMeta(element, props.identifier, groupContext.identifier, props.index, false);
+      const nodeMeta = getNodeMeta(
+        element,
+        props.identifier,
+        groupContext.identifier,
+        ancestorIdentifiers,
+        props.index,
+        isGroup,
+      );
       listContext.setDraggingNodeMeta(nodeMeta);
       listContext.onDragStart?.({
         identifier: nodeMeta.identifier,
@@ -64,7 +79,15 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         isGroup: nodeMeta.isGroup,
       });
     },
-    [listContext.onDragStart, groupContext.identifier, props.identifier, props.index, setGhostElement],
+    [
+      listContext.onDragStart,
+      groupContext.identifier,
+      props.identifier,
+      props.index,
+      ancestorIdentifiers,
+      isGroup,
+      setGhostElement,
+    ],
   );
   const onDrag = React.useCallback((movementXY: [number, number]) => {
     const ghostWrapperElement = listContext.ghostWrapperElementRef.current;
@@ -86,7 +109,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       identifier: props.identifier,
       groupIdentifier: groupContext.identifier,
       index: props.index,
-      isGroup: false,
+      isGroup: isGroup,
       nextGroupIdentifier: destinationMeta != undefined ? destinationMeta.groupIdentifier : groupContext.identifier,
       nextIndex: destinationMeta != undefined ? destinationMeta.index : props.index,
     });
@@ -94,7 +117,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     listContext.setDraggingNodeMeta(undefined);
     listContext.overedNodeMetaRef.current = undefined;
     listContext.destinationMetaRef.current = undefined;
-  }, [listContext.onDragEnd, groupContext.identifier, props.identifier, props.index, clearGhostElement]);
+  }, [listContext.onDragEnd, groupContext.identifier, props.identifier, props.index, isGroup, clearGhostElement]);
 
   const onMouseOver = React.useCallback(
     (element: HTMLElement) => {
@@ -102,11 +125,12 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         element,
         props.identifier,
         groupContext.identifier,
+        ancestorIdentifiers,
         props.index,
-        false,
+        isGroup,
       );
     },
-    [groupContext.identifier, props.identifier, props.index],
+    [groupContext.identifier, props.identifier, props.index, ancestorIdentifiers, isGroup],
   );
   const onMouseMove = React.useCallback(
     (absoluteXY: [number, number]) => {
@@ -137,24 +161,37 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   );
 
   const binder = useGesture({
-    onHover: ({ event }) => {
+    onHover: (state) => {
       if (listContext.draggingNodeMeta == undefined) return;
 
+      const event: React.SyntheticEvent = state.event;
       const element = event.currentTarget;
       if (!(element instanceof HTMLElement)) return;
 
+      event.stopPropagation();
       onMouseOver(element);
     },
     onMove: ({ xy }) => {
       if (listContext.draggingNodeMeta == undefined) return;
+      if (isGroup) {
+        const overedNodeAncestorIdentifiers = listContext.overedNodeMetaRef.current?.ancestorIdentifiers ?? [];
+        const ancestorIdentifiersWithoutOveredNode = [...overedNodeAncestorIdentifiers];
+        ancestorIdentifiersWithoutOveredNode.pop();
+
+        if (ancestorIdentifiersWithoutOveredNode.includes(props.identifier)) return;
+      }
 
       onMouseMove(xy);
     },
   });
   const draggableBinder = useGesture({
-    onDragStart: ({ event }) => {
+    onDragStart: (state) => {
+      const event: React.SyntheticEvent = state.event;
       const element = event.currentTarget;
       if (!(element instanceof HTMLElement)) return;
+
+      event.persist();
+      event.stopPropagation();
 
       onDragStart(element);
     },
@@ -167,13 +204,15 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   });
 
   return (
-    <div
-      className={props.className}
-      style={{ boxSizing: "border-box", margin: `${listContext.itemSpacing}px 0` }}
-      {...binder()}
-      {...draggableBinder()}
-    >
-      {props.children}
-    </div>
+    <GroupContext.Provider value={{ identifier: props.identifier, ancestorIdentifiers }}>
+      <div
+        className={props.className}
+        style={{ boxSizing: "border-box", margin: `${listContext.itemSpacing}px 0` }}
+        {...binder()}
+        {...draggableBinder()}
+      >
+        {props.children}
+      </div>
+    </GroupContext.Provider>
   );
 };

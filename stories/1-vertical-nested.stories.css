@@ -7,9 +7,19 @@
 
 .group {
   padding: 0 var(--padding) calc(var(--padding) / 2);
-  border: 1px solid #cfe8be;
+  border: 1px solid #bee0a9;
   border-radius: 4px;
   background-color: rgba(113, 189, 69, 0.1);
+}
+.group.dragging {
+  border-style: dashed;
+  border-color: #579135;
+  background-color: transparent;
+  opacity: 0.4;
+}
+.group.ghost {
+  border-color: #aed893;
+  background-color: #e7f3df;
 }
 .group .heading {
   margin-bottom: 4px;
@@ -34,15 +44,18 @@
   border-style: dashed;
   background-color: transparent;
 }
-.item.ghost {
+.item.ghost.static {
+  background-color: #f6f9fc;
+}
+
+.ghost {
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  height: 100%;
   opacity: 0.8;
   animation-name: ghostItemVisible;
   animation-duration: 200ms;
   animation-fill-mode: forwards;
-}
-.item.ghost.static {
-  background-color: #f6f9fc;
 }
 @keyframes ghostItemVisible {
   0% {

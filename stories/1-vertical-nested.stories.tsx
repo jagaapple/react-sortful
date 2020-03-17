@@ -3,7 +3,7 @@ import { storiesOf } from "@storybook/react";
 import classnames from "classnames";
 import arrayMove from "array-move";
 
-import { DragEndMeta, DragStartMeta, DropLineRendererInjectedProps, GhostRendererMeta, Group, Item, List } from "../src";
+import { DragEndMeta, DragStartMeta, DropLineRendererInjectedProps, GhostRendererMeta, Item, List } from "../src";
 
 import { commonStyles } from "./shared";
 import styles from "./1-vertical-nested.stories.css";
@@ -18,7 +18,9 @@ const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => 
 storiesOf("1 Vertical Nested", module)
   .add("Static", () => {
     const renderGhostElement = React.useCallback(
-      () => <div className={classnames(styles.item, styles.ghost, styles.static)} />,
+      ({ isGroup }: GhostRendererMeta<DummyItem["id"]>) => (
+        <div className={classnames({ [styles.item]: !isGroup, [styles.group]: isGroup }, styles.ghost, styles.static)} />
+      ),
       [],
     );
 
@@ -41,7 +43,7 @@ storiesOf("1 Vertical Nested", module)
         <Item className={styles.item} identifier="d" index={3}>
           Item D
         </Item>
-        <Group className={styles.group} identifier="e" index={4}>
+        <Item className={styles.group} identifier="e" index={4} isGroup>
           <div className={styles.heading}>Group E</div>
           <Item className={styles.item} identifier="e-1" index={0}>
             Item E - 1
@@ -55,19 +57,19 @@ storiesOf("1 Vertical Nested", module)
           <Item className={styles.item} identifier="e-4" index={3}>
             Item E - 4
           </Item>
-          <Group className={styles.group} identifier="e-5" index={4}>
+          <Item className={styles.group} identifier="e-5" index={4} isGroup>
             <div className={styles.heading}>Group E - 5</div>
             <Item className={styles.item} identifier="e-5-1" index={0}>
               Item E - 5 - 1
             </Item>
-          </Group>
-          <Group className={styles.group} identifier="e-6" index={4}>
+          </Item>
+          <Item className={styles.group} identifier="e-6" index={4} isGroup>
             <div className={styles.heading}>Group E - 6</div>
-          </Group>
+          </Item>
           <Item className={styles.item} identifier="e-7" index={5}>
             Item E - 7
           </Item>
-        </Group>
+        </Item>
         <Item className={styles.item} identifier="f" index={5}>
           Item F
         </Item>
@@ -108,10 +110,16 @@ storiesOf("1 Vertical Nested", module)
           const childItemElements = childNormalizedItems.map(createItemElement);
 
           return (
-            <Group key={normalizedItem.id} className={styles.group} identifier={normalizedItem.id} index={index}>
+            <Item
+              key={normalizedItem.id}
+              className={classnames(styles.group, { [styles.dragging]: draggingItemIdentifierState === normalizedItem.id })}
+              identifier={normalizedItem.id}
+              index={index}
+              isGroup
+            >
               <div className={styles.heading}>{normalizedItem.title}</div>
               {childItemElements}
-            </Group>
+            </Item>
           );
         }
 
@@ -132,6 +140,14 @@ storiesOf("1 Vertical Nested", module)
     const renderGhostElement = React.useCallback(
       (meta: GhostRendererMeta<DummyItem["id"]>) => {
         const normalizedItem = itemEntitiesMapState.get(meta.identifier);
+
+        if (meta.isGroup) {
+          return (
+            <div className={classnames(styles.group, styles.ghost)}>
+              <div className={styles.heading}>{normalizedItem.title}</div>
+            </div>
+          );
+        }
 
         return <div className={classnames(styles.item, styles.ghost)}>{normalizedItem.title}</div>;
       },
