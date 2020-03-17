@@ -1,16 +1,19 @@
 import * as React from "react";
 import { useGesture } from "react-use-gesture";
 
-import {
-  checkIsInStackableArea,
-  getDropLineDirectionFromXY,
-  getDropLinePosition,
-  getNodeMeta,
-  ItemIdentifier,
-  NodeMeta,
-} from "./shared";
+import { checkIsInStackableArea, getDropLineDirectionFromXY, getNodeMeta, ItemIdentifier, NodeMeta } from "./shared";
 import { ListContext } from "./list";
 import { GroupContext } from "./groups";
+import {
+  checkIsAncestorItem,
+  clearBodyStyle,
+  clearGhostElementStyle,
+  getDropLinePositionItemIndex,
+  initializeGhostElementStyle,
+  moveGhostElement,
+  setBodyStyle,
+  setDropLineElementStyle,
+} from "./item";
 
 type Props<T extends ItemIdentifier> = {
   /** A unique identifier in all items in a root list. */
@@ -38,43 +41,12 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       props.children,
     ]);
 
-  const setGhostElement = React.useCallback((itemElement: HTMLElement) => {
-    const ghostWrapperElement = listContext.ghostWrapperElementRef.current;
-    if (ghostWrapperElement == undefined) return;
-
-    const elementRect = itemElement.getBoundingClientRect();
-    ghostWrapperElement.style.top = `${elementRect.top}px`;
-    ghostWrapperElement.style.left = `${elementRect.left}px`;
-    ghostWrapperElement.style.width = `${elementRect.width}px`;
-    ghostWrapperElement.style.height = `${elementRect.height}px`;
-  }, []);
-  const clearGhostElement = React.useCallback(() => {
-    const ghostWrapperElement = listContext.ghostWrapperElementRef.current;
-    if (ghostWrapperElement == undefined) return;
-
-    ghostWrapperElement.style.removeProperty("width");
-    ghostWrapperElement.style.removeProperty("height");
-  }, []);
-  const setDropLinePositionElement = React.useCallback(
-    (absoluteXY: [number, number], nodeMeta: NodeMeta<T>) => {
-      const dropLineElement = listContext.dropLineElementRef.current;
-      if (dropLineElement == undefined) return;
-
-      const dropLinePosition = getDropLinePosition(absoluteXY, nodeMeta, listContext.itemSpacing);
-      dropLineElement.style.top = `${dropLinePosition.top}px`;
-      dropLineElement.style.left = `${dropLinePosition.left}px`;
-      dropLineElement.style.width = `${nodeMeta.width}px`;
-    },
-    [listContext.itemSpacing],
-  );
-
   const onDragStart = React.useCallback(
     (element: HTMLElement) => {
-      setGhostElement(element);
+      setBodyStyle(document.body);
+      initializeGhostElementStyle(element, listContext.ghostWrapperElementRef.current ?? undefined);
 
-      // Disables to select elements in entire page.
-      document.body.style.userSelect = "none";
-
+      // Sets contexts to values.
       const nodeMeta = getNodeMeta(
         element,
         props.identifier,
@@ -84,6 +56,8 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         isGroup,
       );
       listContext.setDraggingNodeMeta(nodeMeta);
+
+      // Calls callbacks.
       listContext.onDragStart?.({
         identifier: nodeMeta.identifier,
         groupIdentifier: nodeMeta.groupIdentifier,
@@ -91,45 +65,29 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         isGroup: nodeMeta.isGroup,
       });
     },
-    [
-      listContext.onDragStart,
-      groupContext.identifier,
-      props.identifier,
-      props.index,
-      ancestorIdentifiers,
-      isGroup,
-      setGhostElement,
-    ],
+    [listContext.onDragStart, groupContext.identifier, props.identifier, props.index, ancestorIdentifiers, isGroup],
   );
-  const onDrag = React.useCallback((movementXY: [number, number]) => {
-    const ghostWrapperElement = listContext.ghostWrapperElementRef.current;
-    if (ghostWrapperElement == undefined) return;
-
-    const [x, y] = movementXY;
-    ghostWrapperElement.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-  }, []);
   const onDragEnd = React.useCallback(() => {
-    clearGhostElement();
-    listContext.setDraggingNodeMeta(undefined);
-    listContext.setIsVisibleDropLineElement(false);
+    clearBodyStyle(document.body);
+    clearGhostElementStyle(listContext.ghostWrapperElementRef.current ?? undefined);
 
-    // Enables to select elements in entire page.
-    document.body.style.removeProperty("user-select");
-
+    // Calls callbacks.
     const destinationMeta = listContext.destinationMetaRef.current;
     listContext.onDragEnd({
       identifier: props.identifier,
       groupIdentifier: groupContext.identifier,
       index: props.index,
-      isGroup: isGroup,
+      isGroup,
       nextGroupIdentifier: destinationMeta != undefined ? destinationMeta.groupIdentifier : groupContext.identifier,
       nextIndex: destinationMeta != undefined ? destinationMeta.index : props.index,
     });
 
+    // Resets context values.
     listContext.setDraggingNodeMeta(undefined);
+    listContext.setIsVisibleDropLineElement(false);
     listContext.overedNodeMetaRef.current = undefined;
     listContext.destinationMetaRef.current = undefined;
-  }, [listContext.onDragEnd, groupContext.identifier, props.identifier, props.index, isGroup, clearGhostElement]);
+  }, [listContext.onDragEnd, groupContext.identifier, props.identifier, props.index, isGroup]);
 
   const onMouseOver = React.useCallback(
     (element: HTMLElement) => {
@@ -144,52 +102,51 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     },
     [groupContext.identifier, props.identifier, props.index, ancestorIdentifiers, isGroup],
   );
-  const onMouseMove = React.useCallback(
-    (absoluteXY: [number, number]) => {
-      const draggingNodeMeta = listContext.draggingNodeMeta;
-      if (draggingNodeMeta == undefined) return;
-      const overedNodeMeta = listContext.overedNodeMetaRef.current;
-      if (overedNodeMeta == undefined) return;
-      const dropLineElement = listContext.dropLineElementRef.current;
-      if (dropLineElement == undefined) return;
+  const onMouseMoveForStackableGroup = React.useCallback(
+    <T extends ItemIdentifier>(overedNodeMeta: NodeMeta<T>, absoluteXY: [number, number]) => {
+      const isInStackableArea = checkIsInStackableArea(absoluteXY, overedNodeMeta, listContext.stackableAreaThreshold);
+      if (!isInStackableArea) return;
 
-      if (hasNoItems) {
-        const isInStackableArea = checkIsInStackableArea(absoluteXY, overedNodeMeta, listContext.stackableAreaThreshold);
-        if (isInStackableArea) {
-          listContext.setIsVisibleDropLineElement(false);
+      // Sets contexts to values.
+      listContext.setIsVisibleDropLineElement(false);
+      listContext.destinationMetaRef.current = {
+        groupIdentifier: props.identifier,
+        index: undefined,
+      };
 
-          listContext.onStack?.({
-            identifier: props.identifier,
-            groupIdentifier: groupContext.identifier,
-            index: props.index,
-            isGroup,
-            nextGroupIdentifier: overedNodeMeta.identifier,
-          });
-          listContext.destinationMetaRef.current = {
-            groupIdentifier: props.identifier,
-            index: undefined,
-          };
-
-          return;
-        }
-      }
-
+      // Calls callbacks.
+      listContext.onStack?.({
+        identifier: props.identifier,
+        groupIdentifier: groupContext.identifier,
+        index: props.index,
+        isGroup,
+        nextGroupIdentifier: overedNodeMeta.identifier,
+      });
+    },
+    [listContext.stackableAreaThreshold, listContext.onStack, groupContext.identifier, props.identifier, props.index],
+  );
+  const onMouseMoveForItems = React.useCallback(
+    (draggingNodeMeta: NodeMeta<T>, overedNodeMeta: NodeMeta<T>, absoluteXY: [number, number]) => {
       if (draggingNodeMeta.index !== overedNodeMeta.index) listContext.setIsVisibleDropLineElement(true);
 
-      setDropLinePositionElement(absoluteXY, overedNodeMeta);
+      const dropLineElement = listContext.dropLineElementRef.current ?? undefined;
+      setDropLineElementStyle(dropLineElement, listContext.itemSpacing, absoluteXY, overedNodeMeta);
 
+      // Calculates the next index.
       const dropLineDirection = getDropLineDirectionFromXY(absoluteXY, overedNodeMeta);
-      let nextIndex = draggingNodeMeta.index;
-      if (dropLineDirection === "TOP") nextIndex = overedNodeMeta.index;
-      if (dropLineDirection === "BOTTOM") nextIndex = overedNodeMeta.index + 1;
-      const isInSameGroup = draggingNodeMeta.groupIdentifier === overedNodeMeta.groupIdentifier;
-      if (isInSameGroup && draggingNodeMeta.index < nextIndex) nextIndex -= 1;
+      const nextIndex = getDropLinePositionItemIndex(
+        dropLineDirection,
+        draggingNodeMeta.index,
+        draggingNodeMeta.groupIdentifier,
+        overedNodeMeta.index,
+        overedNodeMeta.groupIdentifier,
+      );
 
-      if (
-        listContext.destinationMetaRef.current != undefined &&
-        listContext.destinationMetaRef.current.groupIdentifier != undefined &&
-        listContext.destinationMetaRef.current.index == undefined
-      ) {
+      // Calls callbacks if needed.
+      const destinationMeta = listContext.destinationMetaRef.current;
+      const isComeFromStackedGroup =
+        destinationMeta != undefined && destinationMeta.groupIdentifier != undefined && destinationMeta.index == undefined;
+      if (isComeFromStackedGroup) {
         listContext.onStack?.({
           identifier: props.identifier,
           groupIdentifier: groupContext.identifier,
@@ -199,21 +156,22 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         });
       }
 
-      listContext.destinationMetaRef.current = {
-        groupIdentifier: groupContext.identifier,
-        index: nextIndex,
-      };
+      // Sets contexts to values.
+      listContext.destinationMetaRef.current = { groupIdentifier: groupContext.identifier, index: nextIndex };
     },
-    [
-      listContext.draggingNodeMeta,
-      listContext.onStack,
-      listContext.stackableAreaThreshold,
-      groupContext.identifier,
-      props.identifier,
-      props.index,
-      isGroup,
-      hasNoItems,
-    ],
+    [listContext.itemSpacing, listContext.onStack, groupContext.identifier, props.identifier, props.index, isGroup],
+  );
+  const onMouseMove = React.useCallback(
+    (absoluteXY: [number, number]) => {
+      const draggingNodeMeta = listContext.draggingNodeMeta;
+      if (draggingNodeMeta == undefined) return;
+      const overedNodeMeta = listContext.overedNodeMetaRef.current;
+      if (overedNodeMeta == undefined) return;
+
+      if (hasNoItems) onMouseMoveForStackableGroup(overedNodeMeta, absoluteXY);
+      if (!hasNoItems) onMouseMoveForItems(draggingNodeMeta, overedNodeMeta, absoluteXY);
+    },
+    [listContext.draggingNodeMeta, hasNoItems, onMouseMoveForStackableGroup, onMouseMoveForItems],
   );
 
   const binder = useGesture({
@@ -228,13 +186,11 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     },
     onMove: ({ xy }) => {
       if (listContext.draggingNodeMeta == undefined) return;
-      if (isGroup && !hasNoItems) {
-        const overedNodeAncestorIdentifiers = listContext.overedNodeMetaRef.current?.ancestorIdentifiers ?? [];
-        const ancestorIdentifiersWithoutOveredNode = [...overedNodeAncestorIdentifiers];
-        ancestorIdentifiersWithoutOveredNode.pop();
 
-        if (ancestorIdentifiersWithoutOveredNode.includes(props.identifier)) return;
-      }
+      // Skips if this item is an ancestor group of the dragging item.
+      const ancestorIdentifiers = listContext.overedNodeMetaRef.current?.ancestorIdentifiers ?? [];
+      const isAncestorItemOfDraggingItem = checkIsAncestorItem(props.identifier, isGroup, !hasNoItems, ancestorIdentifiers);
+      if (isAncestorItemOfDraggingItem) return;
 
       onMouseMove(xy);
     },
@@ -253,12 +209,12 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     onDrag: ({ down, movement }) => {
       if (!down) return;
 
-      onDrag(movement);
+      moveGhostElement(listContext.ghostWrapperElementRef.current ?? undefined, movement);
     },
     onDragEnd,
   });
 
-  const element = (
+  const contentElement = (
     <div
       className={props.className}
       style={{ boxSizing: "border-box", position: "static", margin: `${listContext.itemSpacing}px 0` }}
@@ -268,11 +224,11 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       {props.children}
     </div>
   );
-  if (!isGroup) return element;
+  if (!isGroup) return contentElement;
 
   return (
     <GroupContext.Provider value={{ identifier: props.identifier, ancestorIdentifiers, hasNoItems }}>
-      {element}
+      {contentElement}
     </GroupContext.Provider>
   );
 };

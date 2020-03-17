@@ -1,7 +1,8 @@
 import { ItemIdentifier } from "../items";
 import { NodeMeta } from "../nodes";
 
-type DropLineDirection = "TOP" | "RIGHT" | "BOTTOM" | "LEFT";
+export type DropLineDirection = "TOP" | "RIGHT" | "BOTTOM" | "LEFT";
+
 export const getDropLineDirection = (
   nodeWidth: number,
   nodeHeight: number,
