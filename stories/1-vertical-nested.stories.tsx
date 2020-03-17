@@ -102,11 +102,11 @@ storiesOf("1 Vertical Nested", module)
 
     const itemElements = React.useMemo(() => {
       const topLevelNormalizedItems = itemEntitiesMapState
-        .get(rootItemId)
-        .children.map((itemId) => itemEntitiesMapState.get(itemId));
+        .get(rootItemId)!
+        .children!.map((itemId) => itemEntitiesMapState.get(itemId)!);
       const createItemElement = (normalizedItem: NormalizedDummyItem, index: number) => {
         if (normalizedItem.children != undefined) {
-          const childNormalizedItems = normalizedItem.children.map((itemId) => itemEntitiesMapState.get(itemId));
+          const childNormalizedItems = normalizedItem.children.map((itemId) => itemEntitiesMapState.get(itemId)!);
           const childItemElements = childNormalizedItems.map(createItemElement);
 
           return (
@@ -140,6 +140,7 @@ storiesOf("1 Vertical Nested", module)
     const renderGhostElement = React.useCallback(
       (meta: GhostRendererMeta<DummyItem["id"]>) => {
         const normalizedItem = itemEntitiesMapState.get(meta.identifier);
+        if (normalizedItem == undefined) return;
 
         if (meta.isGroup) {
           return (
@@ -164,13 +165,18 @@ storiesOf("1 Vertical Nested", module)
 
         const newMap = new Map(itemEntitiesMapState.entries());
         const normalizedItem = newMap.get(meta.identifier);
+        if (normalizedItem == undefined) return;
         const normalizedGroupItem = newMap.get(meta.groupIdentifier ?? rootItemId);
+        if (normalizedGroupItem == undefined) return;
+
         if (meta.groupIdentifier === meta.nextGroupIdentifier) {
-          normalizedGroupItem.children = arrayMove(normalizedGroupItem.children, meta.index, meta.nextIndex);
+          normalizedGroupItem.children = arrayMove(normalizedGroupItem.children!, meta.index, meta.nextIndex);
         } else {
           const nextNormalizedGroupItem = newMap.get(meta.nextGroupIdentifier ?? rootItemId);
-          normalizedGroupItem.children.splice(meta.index, 1);
-          nextNormalizedGroupItem.children.splice(meta.nextIndex, 0, normalizedItem.id);
+          if (nextNormalizedGroupItem == undefined) return;
+
+          normalizedGroupItem.children!.splice(meta.index, 1);
+          nextNormalizedGroupItem.children!.splice(meta.nextIndex, 0, normalizedItem.id);
         }
 
         setItemEntitiesMapState(newMap);

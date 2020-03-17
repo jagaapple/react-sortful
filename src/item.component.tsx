@@ -161,14 +161,13 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   );
 
   const binder = useGesture({
-    onHover: (state) => {
+    onHover: ({ event }) => {
       if (listContext.draggingNodeMeta == undefined) return;
 
-      const event: React.SyntheticEvent = state.event;
-      const element = event.currentTarget;
+      const element = event?.currentTarget;
       if (!(element instanceof HTMLElement)) return;
 
-      event.stopPropagation();
+      event?.stopPropagation();
       onMouseOver(element);
     },
     onMove: ({ xy }) => {
@@ -185,7 +184,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     },
   });
   const draggableBinder = useGesture({
-    onDragStart: (state) => {
+    onDragStart: (state: any) => {
       const event: React.SyntheticEvent = state.event;
       const element = event.currentTarget;
       if (!(element instanceof HTMLElement)) return;
