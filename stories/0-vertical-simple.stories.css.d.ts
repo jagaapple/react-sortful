@@ -3,8 +3,8 @@ declare const styles: {
   readonly "item": string;
   readonly "dragging": string;
   readonly "ghost": string;
-  readonly "ghostItemVisible": string;
   readonly "static": string;
+  readonly "ghostItemVisible": string;
 };
 export = styles;
 
