@@ -22,7 +22,7 @@ export const Context = React.createContext<{
   renderPlaceholder:
     | ((injectedProps: PlaceholderRendererInjectedProps, meta: PlaceholderRendererMeta<any>) => JSX.Element)
     | undefined;
-  overedNodeMetaRef: React.MutableRefObject<NodeMeta<any> | undefined>;
+  hoveredNodeMetaRef: React.MutableRefObject<NodeMeta<any> | undefined>;
   destinationMetaRef: React.MutableRefObject<DestinationMeta<any> | undefined>;
   onDragStart: ((meta: DragStartMeta<any>) => void) | undefined;
   onDragEnd: (meta: DragEndMeta<any>) => void;

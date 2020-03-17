@@ -85,11 +85,11 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     // Resets context values.
     listContext.setDraggingNodeMeta(undefined);
     listContext.setIsVisibleDropLineElement(false);
-    listContext.overedNodeMetaRef.current = undefined;
+    listContext.hoveredNodeMetaRef.current = undefined;
     listContext.destinationMetaRef.current = undefined;
   }, [listContext.onDragEnd, groupContext.identifier, props.identifier, props.index, isGroup]);
 
-  const onMouseOver = React.useCallback(
+  const onHover = React.useCallback(
     (element: HTMLElement) => {
       // Initialize if the dragging item is this item or an ancestor group of this item.
       const draggingNodeMeta = listContext.draggingNodeMeta;
@@ -99,14 +99,14 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         checkIsAncestorItem(draggingNodeMeta.identifier, true, ancestorIdentifiers);
       if (isNeededInitialization) {
         listContext.setIsVisibleDropLineElement(false);
-        listContext.overedNodeMetaRef.current = undefined;
+        listContext.hoveredNodeMetaRef.current = undefined;
         listContext.destinationMetaRef.current = undefined;
 
         return;
       }
 
       listContext.setIsVisibleDropLineElement(true);
-      listContext.overedNodeMetaRef.current = getNodeMeta(
+      listContext.hoveredNodeMetaRef.current = getNodeMeta(
         element,
         props.identifier,
         groupContext.identifier,
@@ -117,8 +117,8 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     },
     [listContext.draggingNodeMeta, groupContext.identifier, props.identifier, props.index, ancestorIdentifiers, isGroup],
   );
-  const onMouseMoveForStackableGroup = React.useCallback(
-    <T extends ItemIdentifier>(overedNodeMeta: NodeMeta<T>) => {
+  const onMoveForStackableGroup = React.useCallback(
+    <T extends ItemIdentifier>(hoveredNodeMeta: NodeMeta<T>) => {
       // Sets contexts to values.
       listContext.setIsVisibleDropLineElement(false);
       listContext.destinationMetaRef.current = {
@@ -132,26 +132,26 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         groupIdentifier: groupContext.identifier,
         index: props.index,
         isGroup,
-        nextGroupIdentifier: overedNodeMeta.identifier,
+        nextGroupIdentifier: hoveredNodeMeta.identifier,
       });
     },
     [listContext.stackableAreaThreshold, listContext.onStack, groupContext.identifier, props.identifier, props.index],
   );
-  const onMouseMoveForItems = React.useCallback(
-    (draggingNodeMeta: NodeMeta<T>, overedNodeMeta: NodeMeta<T>, absoluteXY: [number, number]) => {
-      if (draggingNodeMeta.index !== overedNodeMeta.index) listContext.setIsVisibleDropLineElement(true);
+  const onMoveForItems = React.useCallback(
+    (draggingNodeMeta: NodeMeta<T>, hoveredNodeMeta: NodeMeta<T>, absoluteXY: [number, number]) => {
+      if (draggingNodeMeta.index !== hoveredNodeMeta.index) listContext.setIsVisibleDropLineElement(true);
 
       const dropLineElement = listContext.dropLineElementRef.current ?? undefined;
-      setDropLineElementStyle(dropLineElement, listContext.itemSpacing, absoluteXY, overedNodeMeta);
+      setDropLineElementStyle(dropLineElement, listContext.itemSpacing, absoluteXY, hoveredNodeMeta);
 
       // Calculates the next index.
-      const dropLineDirection = getDropLineDirectionFromXY(absoluteXY, overedNodeMeta);
+      const dropLineDirection = getDropLineDirectionFromXY(absoluteXY, hoveredNodeMeta);
       const nextIndex = getDropLinePositionItemIndex(
         dropLineDirection,
         draggingNodeMeta.index,
         draggingNodeMeta.groupIdentifier,
-        overedNodeMeta.index,
-        overedNodeMeta.groupIdentifier,
+        hoveredNodeMeta.index,
+        hoveredNodeMeta.groupIdentifier,
       );
 
       // Calls callbacks if needed.
@@ -173,20 +173,20 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     },
     [listContext.itemSpacing, listContext.onStack, groupContext.identifier, props.identifier, props.index, isGroup],
   );
-  const onMouseMove = React.useCallback(
+  const onMove = React.useCallback(
     (absoluteXY: [number, number]) => {
       const draggingNodeMeta = listContext.draggingNodeMeta;
       if (draggingNodeMeta == undefined) return;
-      const overedNodeMeta = listContext.overedNodeMetaRef.current;
-      if (overedNodeMeta == undefined) return;
+      const hoveredNodeMeta = listContext.hoveredNodeMetaRef.current;
+      if (hoveredNodeMeta == undefined) return;
 
-      if (hasNoItems && checkIsInStackableArea(absoluteXY, overedNodeMeta, listContext.stackableAreaThreshold)) {
-        onMouseMoveForStackableGroup(overedNodeMeta);
+      if (hasNoItems && checkIsInStackableArea(absoluteXY, hoveredNodeMeta, listContext.stackableAreaThreshold)) {
+        onMoveForStackableGroup(hoveredNodeMeta);
       } else {
-        onMouseMoveForItems(draggingNodeMeta, overedNodeMeta, absoluteXY);
+        onMoveForItems(draggingNodeMeta, hoveredNodeMeta, absoluteXY);
       }
     },
-    [listContext.draggingNodeMeta, hasNoItems, onMouseMoveForStackableGroup, onMouseMoveForItems],
+    [listContext.draggingNodeMeta, hasNoItems, onMoveForStackableGroup, onMoveForItems],
   );
 
   const binder = useGesture({
@@ -197,19 +197,19 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       if (!(element instanceof HTMLElement)) return;
 
       event?.stopPropagation();
-      onMouseOver(element);
+      onHover(element);
     },
     onMove: ({ xy }) => {
       if (listContext.draggingNodeMeta == undefined) return;
 
       // Skips if this item is an ancestor group of the dragging item.
-      const overedNodeAncestors = listContext.overedNodeMetaRef.current?.ancestorIdentifiers ?? [];
-      if (checkIsAncestorItem(props.identifier, !hasNoItems, overedNodeAncestors)) return;
+      const hoveredNodeAncestors = listContext.hoveredNodeMetaRef.current?.ancestorIdentifiers ?? [];
+      if (checkIsAncestorItem(props.identifier, !hasNoItems, hoveredNodeAncestors)) return;
       if (props.identifier === listContext.draggingNodeMeta.identifier) return;
       // Skips if the dragging item is an ancestor group of this item.
       if (checkIsAncestorItem(listContext.draggingNodeMeta.identifier, true, ancestorIdentifiers)) return;
 
-      onMouseMove(xy);
+      onMove(xy);
     },
   });
   const draggableBinder = useGesture({

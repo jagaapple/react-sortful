@@ -18,14 +18,14 @@ export const getDropLinePositionItemIndex = <T extends ItemIdentifier>(
   dropLineDirection: DropLineDirection | undefined,
   draggingItemIndex: number,
   draggingItemGroupIdentifier: T | undefined,
-  overedItemIndex: number,
-  overedItemGroupIdentifier: T | undefined,
+  hoveredItemIndex: number,
+  hoveredItemGroupIdentifier: T | undefined,
 ) => {
   let nextIndex = draggingItemIndex;
-  if (dropLineDirection === "TOP") nextIndex = overedItemIndex;
-  if (dropLineDirection === "BOTTOM") nextIndex = overedItemIndex + 1;
+  if (dropLineDirection === "TOP") nextIndex = hoveredItemIndex;
+  if (dropLineDirection === "BOTTOM") nextIndex = hoveredItemIndex + 1;
 
-  const isInSameGroup = draggingItemGroupIdentifier === overedItemGroupIdentifier;
+  const isInSameGroup = draggingItemGroupIdentifier === hoveredItemGroupIdentifier;
   if (isInSameGroup && draggingItemIndex < nextIndex) nextIndex -= 1;
 
   return nextIndex;

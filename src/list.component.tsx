@@ -49,7 +49,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
-  const overedNodeMetaRef = React.useRef<NodeMeta<T>>();
+  const hoveredNodeMetaRef = React.useRef<NodeMeta<T>>();
   const destinationMetaRef = React.useRef<DestinationMeta<T>>();
 
   const dropLineElement = React.useMemo(() => {
@@ -84,7 +84,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
         isVisibleDropLineElement: isVisibleDropLineElementState,
         setIsVisibleDropLineElement: setIsVisibleDropLineElementState,
         renderPlaceholder: props.renderPlaceholder,
-        overedNodeMetaRef,
+        hoveredNodeMetaRef: hoveredNodeMetaRef,
         destinationMetaRef,
         onDragStart: props.onDragStart,
         onDragEnd: props.onDragEnd,
