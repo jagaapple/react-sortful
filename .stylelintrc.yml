@@ -133,7 +133,7 @@ rules:
   # Disallow duplicate font family names.
   font-family-no-duplicate-names:  true
   # Disallow missing generic families in lists of font family names.
-  font-family-no-missing-generic-family-keyword: true
+  font-family-no-missing-generic-family-keyword: ~
   # Specify a blacklist of disallowed functions.
   function-blacklist: ~
   # Disallow an invalid expression within calc functions.
