@@ -163,19 +163,22 @@ storiesOf("1 Vertical Nested", module)
         if (normalizedItem == undefined) return;
         const normalizedGroupItem = newMap.get(meta.groupIdentifier ?? rootItemId);
         if (normalizedGroupItem == undefined) return;
+        if (normalizedGroupItem.children == undefined) return;
 
         if (meta.groupIdentifier === meta.nextGroupIdentifier) {
           const nextIndex = meta.nextIndex ?? normalizedGroupItem.children?.length ?? 0;
-          normalizedGroupItem.children = arrayMove(normalizedGroupItem.children!, meta.index, nextIndex);
+          normalizedGroupItem.children = arrayMove(normalizedGroupItem.children, meta.index, nextIndex);
         } else {
           const nextNormalizedGroupItem = newMap.get(meta.nextGroupIdentifier ?? rootItemId);
           if (nextNormalizedGroupItem == undefined) return;
           if (nextNormalizedGroupItem.children == undefined) return;
 
-          normalizedGroupItem.children!.splice(meta.index, 1);
+          normalizedGroupItem.children.splice(meta.index, 1);
           if (meta.nextIndex == undefined) {
+            // Inserts an item to a group which has no items.
             nextNormalizedGroupItem.children.push(meta.identifier);
           } else {
+            // Insets an item to a group.
             nextNormalizedGroupItem.children.splice(meta.nextIndex, 0, normalizedItem.id);
           }
         }

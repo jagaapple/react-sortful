@@ -88,9 +88,10 @@ storiesOf("0 Vertical Simple", module)
       [itemsById],
     );
 
-    const onDragStart = React.useCallback((meta: DragStartMeta<DummyItem["id"]>) => {
-      setDraggingItemIdentifierState(meta.identifier);
-    }, []);
+    const onDragStart = React.useCallback(
+      (meta: DragStartMeta<DummyItem["id"]>) => setDraggingItemIdentifierState(meta.identifier),
+      [],
+    );
     const onDragEnd = React.useCallback(
       (meta: DragEndMeta<DummyItem["id"]>) => {
         if (meta.nextIndex == undefined) return;
