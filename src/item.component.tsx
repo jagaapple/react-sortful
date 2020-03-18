@@ -31,6 +31,11 @@ type Props<T extends ItemIdentifier> = {
    * @default false
    */
   isLocked?: boolean;
+  /**
+   * Whether it is impossible to put items on both sides of this item.
+   * @default false
+   */
+  isLonely?: boolean;
   className?: string;
   children?: React.ReactNode;
 };
@@ -42,6 +47,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   const ancestorIdentifiers = [...groupContext.ancestorIdentifiers, props.identifier];
   const isGroup = props.isGroup ?? false;
   const isLocked = (listContext.isDisabled || props.isLocked) ?? false;
+  const isLonley = props.isLonely ?? false;
 
   // Registers an identifier to the group context.
   const childIdentifiersRef = React.useRef<Set<ItemIdentifier>>(new Set());
@@ -153,6 +159,12 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   );
   const onMoveForItems = React.useCallback(
     (draggingNodeMeta: NodeMeta<T>, hoveredNodeMeta: NodeMeta<T>, absoluteXY: [number, number]) => {
+      if (isLonley) {
+        listContext.setIsVisibleDropLineElement(false);
+        listContext.destinationMetaRef.current = undefined;
+
+        return;
+      }
       if (draggingNodeMeta.index !== hoveredNodeMeta.index) listContext.setIsVisibleDropLineElement(true);
 
       const dropLineElement = listContext.dropLineElementRef.current ?? undefined;
@@ -194,6 +206,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       props.identifier,
       props.index,
       isGroup,
+      isLonley,
     ],
   );
   const onMove = React.useCallback(
