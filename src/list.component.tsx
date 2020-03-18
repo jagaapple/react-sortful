@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { ItemIdentifier, NodeMeta } from "./shared";
+import { Direction, ItemIdentifier, NodeMeta } from "./shared";
 import {
   DestinationMeta,
   DragEndMeta,
@@ -35,6 +35,12 @@ type Props<T extends ItemIdentifier> = {
    */
   stackableAreaThreshold?: number;
   /**
+   * A direction to recognize drop area.
+   * Note that this will not change styles, so you have to apply styles such as being arranged side by side.
+   * @default "vertical"
+   */
+  direction?: Direction;
+  /**
    * Whether all items are not able to move, drag, and stack.
    * @default false
    */
@@ -56,6 +62,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
 
   const itemSpacing = props.itemSpacing ?? 8;
   const stackableAreaThreshold = props.stackableAreaThreshold ?? 8;
+  const direction = props.direction ?? "vertical";
   const isDisabled = props.isDisabled ?? false;
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
@@ -69,12 +76,12 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
       position: "absolute",
       top: 0,
       left: 0,
-      transform: "translate(0, -50%)",
+      transform: direction === "vertical" ? "translate(0, -50%)" : "translate(-50%, 0)",
       pointerEvents: "none",
     };
 
     return props.renderDropLine({ ref: dropLineElementRef, style });
-  }, [props.renderDropLine, isVisibleDropLineElementState]);
+  }, [props.renderDropLine, isVisibleDropLineElementState, direction]);
   const ghostElement = React.useMemo(() => {
     if (draggingNodeMetaState == undefined) return;
 
@@ -82,6 +89,11 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
 
     return props.renderGhost({ identifier, groupIdentifier, index, isGroup });
   }, [props.renderGhost, draggingNodeMetaState]);
+
+  const margin: [string, string, string, string] = ["0", "0", "0", "0"];
+  if (direction === "vertical") margin[0] = `${itemSpacing}px`;
+  if (direction === "horizontal") margin[3] = `${itemSpacing}px`;
+  const style: React.CSSProperties = { position: "relative", margin: margin.join(" ") };
 
   return (
     <ListContext.Provider
@@ -100,13 +112,14 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
         renderStackedGroup: props.renderStackedGroup,
         hoveredNodeMetaRef: hoveredNodeMetaRef,
         destinationMetaRef,
+        direction,
         isDisabled,
         onDragStart: props.onDragStart,
         onDragEnd: props.onDragEnd,
         onStackGroup: props.onStackGroup,
       }}
     >
-      <div className={props.className} style={{ position: "relative", margin: `${itemSpacing}px 0 0` }}>
+      <div className={props.className} style={style}>
         {props.children}
 
         {dropLineElement}

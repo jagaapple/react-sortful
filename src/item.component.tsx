@@ -151,10 +151,10 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       if (draggingNodeMeta.index !== hoveredNodeMeta.index) listContext.setIsVisibleDropLineElement(true);
 
       const dropLineElement = listContext.dropLineElementRef.current ?? undefined;
-      setDropLineElementStyle(dropLineElement, listContext.itemSpacing, absoluteXY, hoveredNodeMeta);
+      setDropLineElementStyle(dropLineElement, listContext.itemSpacing, absoluteXY, hoveredNodeMeta, listContext.direction);
 
       // Calculates the next index.
-      const dropLineDirection = getDropLineDirectionFromXY(absoluteXY, hoveredNodeMeta);
+      const dropLineDirection = getDropLineDirectionFromXY(absoluteXY, hoveredNodeMeta, listContext.direction);
       const nextIndex = getDropLinePositionItemIndex(
         dropLineDirection,
         draggingNodeMeta.index,
@@ -181,7 +181,15 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       listContext.setStackedGroupIdentifier(undefined);
       listContext.destinationMetaRef.current = { groupIdentifier: groupContext.identifier, index: nextIndex };
     },
-    [listContext.itemSpacing, listContext.onStackGroup, groupContext.identifier, props.identifier, props.index, isGroup],
+    [
+      listContext.itemSpacing,
+      listContext.direction,
+      listContext.onStackGroup,
+      groupContext.identifier,
+      props.identifier,
+      props.index,
+      isGroup,
+    ],
   );
   const onMove = React.useCallback(
     (absoluteXY: [number, number]) => {
@@ -190,13 +198,16 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       const hoveredNodeMeta = listContext.hoveredNodeMetaRef.current;
       if (hoveredNodeMeta == undefined) return;
 
-      if (hasNoItems && checkIsInStackableArea(absoluteXY, hoveredNodeMeta, listContext.stackableAreaThreshold)) {
+      if (
+        hasNoItems &&
+        checkIsInStackableArea(absoluteXY, hoveredNodeMeta, listContext.stackableAreaThreshold, listContext.direction)
+      ) {
         onMoveForStackableGroup(hoveredNodeMeta);
       } else {
         onMoveForItems(draggingNodeMeta, hoveredNodeMeta, absoluteXY);
       }
     },
-    [listContext.draggingNodeMeta, hasNoItems, onMoveForStackableGroup, onMoveForItems],
+    [listContext.draggingNodeMeta, listContext.direction, hasNoItems, onMoveForStackableGroup, onMoveForItems],
   );
 
   const binder = useGesture({
@@ -249,10 +260,13 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     const placeholderRenderer = listContext.renderPlaceholder;
     const stackedGroupRenderer = listContext.renderStackedGroup;
 
+    const margin: [string, string, string, string] = ["0", "0", "0", "0"];
+    if (listContext.direction === "vertical") margin[2] = `${listContext.itemSpacing}px`;
+    if (listContext.direction === "horizontal") margin[1] = `${listContext.itemSpacing}px`;
     const style: React.CSSProperties = {
       boxSizing: "border-box",
       position: "static",
-      margin: `0 0 ${listContext.itemSpacing}px`,
+      margin: margin.join(" "),
     };
     const rendererMeta: Omit<PlaceholderRendererMeta<any>, "isGroup"> | StackedGroupRendererMeta<any> = {
       identifier: props.identifier,
@@ -284,6 +298,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     listContext.itemSpacing,
     listContext.stackedGroupIdentifier,
     listContext.renderPlaceholder,
+    listContext.direction,
     groupContext.identifier,
     props.className,
     props.identifier,
