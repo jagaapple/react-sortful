@@ -34,6 +34,11 @@ type Props<T extends ItemIdentifier> = {
    * @default 8
    */
   stackableAreaThreshold?: number;
+  /**
+   * Whether all items are not able to move, drag, and stack.
+   * @default false
+   */
+  isDisabled?: boolean;
   /** A callback function after starting of dragging. */
   onDragStart?: (meta: DragStartMeta<T>) => void;
   /** A callback function after end of dragging. */
@@ -51,6 +56,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
 
   const itemSpacing = props.itemSpacing ?? 8;
   const stackableAreaThreshold = props.stackableAreaThreshold ?? 8;
+  const isDisabled = props.isDisabled ?? false;
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
@@ -94,6 +100,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
         renderStackedGroup: props.renderStackedGroup,
         hoveredNodeMetaRef: hoveredNodeMetaRef,
         destinationMetaRef,
+        isDisabled,
         onDragStart: props.onDragStart,
         onDragEnd: props.onDragEnd,
         onStackGroup: props.onStackGroup,

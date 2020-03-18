@@ -46,6 +46,13 @@
 .group .heading.opened::before {
   content: "\f07c";
 }
+.group .heading.locked::before {
+  color: #cfd4db;
+  content: "\f114";
+}
+.group .heading.locked.opened::before {
+  content: "\f115";
+}
 
 .item {
   display: flex;
@@ -63,6 +70,14 @@
 .item.dragging {
   border-color: #cfd4db;
   background-color: #f6f9fc;
+}
+.item.locked::before {
+  color: #cfd4db;
+  content: "\f023";
+}
+
+.disabled {
+  color: #cfd4db;
 }
 
 .ghost {
