@@ -24,7 +24,7 @@ const initialItems: DummyItem[] = [
   { id: "d", title: "Item D" },
   { id: "e", title: "Item E" },
 ];
-const disabledItemIds = initialItems.filter((_, index) => index % 2 === 0).map((item) => item.id);
+const lockedItemIds = initialItems.filter((_, index) => index % 2 === 0).map((item) => item.id);
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
   <div
@@ -34,7 +34,7 @@ const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => 
   />
 );
 
-export const DynamicPartialDisabledComponent = () => {
+export const DynamicPartialLockedComponent = () => {
   const [itemsState, setItemsState] = React.useState(initialItems);
   const itemsById = React.useMemo(
     () =>
@@ -49,15 +49,15 @@ export const DynamicPartialDisabledComponent = () => {
   const itemElements = React.useMemo(
     () =>
       itemsState.map((item, index) => {
-        const isDisabled = disabledItemIds.includes(item.id);
+        const isLocked = lockedItemIds.includes(item.id);
 
         return (
           <Item
             key={item.id}
-            className={classnames(styles.item, { [styles.locked]: isDisabled })}
+            className={classnames(styles.item, { [styles.locked]: isLocked })}
             identifier={item.id}
             index={index}
-            isDisabled={isDisabled}
+            isLocked={isLocked}
           >
             {item.title}
           </Item>

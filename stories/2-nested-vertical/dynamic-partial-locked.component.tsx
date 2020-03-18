@@ -22,27 +22,29 @@ type NormalizedDummyItem = Omit<DummyItem, "children"> & { children: DummyItem["
 
 const rootItemId = "root";
 const initialItemEntitiesMap = new Map<DummyItem["id"], NormalizedDummyItem>([
-  [rootItemId, { id: rootItemId, title: "", children: ["a", "b", "c"] }],
+  [rootItemId, { id: rootItemId, title: "", children: ["a", "b", "c", "d", "e", "f"] }],
   ["a", { id: "a", title: "Item A", children: undefined }],
-  ["b", { id: "b", title: "Group B", children: ["b-1", "b-2", "b-3", "b-4"] }],
-  ["b-1", { id: "b-1", title: "Item B - 1", children: undefined }],
-  ["b-2", { id: "b-2", title: "Group B - 2", children: ["b-2-1"] }],
-  ["b-2-1", { id: "b-2-1", title: "Item B - 2 - 1", children: undefined }],
-  ["b-3", { id: "b-3", title: "Group B - 3", children: [] }],
-  ["b-4", { id: "b-4", title: "Item B - 4", children: undefined }],
+  ["b", { id: "b", title: "Item B", children: undefined }],
   ["c", { id: "c", title: "Item C", children: undefined }],
+  ["d", { id: "d", title: "Item D", children: undefined }],
+  ["e", { id: "e", title: "Group E", children: ["e-1", "e-2", "e-3", "e-4", "e-5", "e-6", "e-7"] }],
+  ["e-1", { id: "e-1", title: "Item E - 1", children: undefined }],
+  ["e-2", { id: "e-2", title: "Item E - 2", children: undefined }],
+  ["e-3", { id: "e-3", title: "Item E - 3", children: undefined }],
+  ["e-4", { id: "e-4", title: "Item E - 4", children: undefined }],
+  ["e-5", { id: "e-5", title: "Group E - 5", children: ["e-5-1"] }],
+  ["e-5-1", { id: "e-5-1", title: "Item E - 5 - 1", children: undefined }],
+  ["e-6", { id: "e-6", title: "Group E - 6", children: [] }],
+  ["e-7", { id: "e-7", title: "Item E - 7", children: undefined }],
+  ["f", { id: "f", title: "Item F", children: undefined }],
 ]);
-const disabledItemIds = ["a", "b-2"];
+const lockedItemIds = ["b", "c", "e-2", "e-3", "e-5"];
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
-  <div
-    ref={injectedProps.ref}
-    className={classnames(commonStyles.dropLine, commonStyles.horizontal)}
-    style={injectedProps.style}
-  />
+  <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
 );
 
-export const DynamicPartialDisabledComponent = () => {
+export const DynamicPartialLockedComponent = () => {
   const [itemEntitiesMapState, setItemEntitiesMapState] = React.useState(initialItemEntitiesMap);
 
   const itemElements = React.useMemo(() => {
@@ -50,7 +52,7 @@ export const DynamicPartialDisabledComponent = () => {
       .get(rootItemId)!
       .children!.map((itemId) => itemEntitiesMapState.get(itemId)!);
     const createItemElement = (normalizedItem: NormalizedDummyItem, index: number) => {
-      const isDisabled = disabledItemIds.includes(normalizedItem.id);
+      const isLocked = lockedItemIds.includes(normalizedItem.id);
       if (normalizedItem.children != undefined) {
         const childNormalizedItems = normalizedItem.children.map((itemId) => itemEntitiesMapState.get(itemId)!);
         const childItemElements = childNormalizedItems.map(createItemElement);
@@ -61,10 +63,10 @@ export const DynamicPartialDisabledComponent = () => {
             className={styles.group}
             identifier={normalizedItem.id}
             index={index}
-            isDisabled={isDisabled}
+            isLocked={isLocked}
             isGroup
           >
-            <div className={classnames(styles.heading, { [styles.locked]: isDisabled })}>{normalizedItem.title}</div>
+            <div className={classnames(styles.heading, { [styles.locked]: isLocked })}>{normalizedItem.title}</div>
             {childItemElements}
           </Item>
         );
@@ -73,10 +75,10 @@ export const DynamicPartialDisabledComponent = () => {
       return (
         <Item
           key={normalizedItem.id}
-          className={classnames(styles.item, { [styles.locked]: isDisabled })}
+          className={classnames(styles.item, { [styles.locked]: isLocked })}
           identifier={normalizedItem.id}
           index={index}
-          isDisabled={isDisabled}
+          isLocked={isLocked}
         >
           {normalizedItem.title}
         </Item>
@@ -170,7 +172,6 @@ export const DynamicPartialDisabledComponent = () => {
       renderGhost={renderGhostElement}
       renderPlaceholder={renderPlaceholderElement}
       renderStackedGroup={renderStackedGroupElement}
-      direction="horizontal"
       onDragEnd={onDragEnd}
     >
       {itemElements}

@@ -152,7 +152,7 @@ const initialItemEntitiesMap = new Map<DummyItem["id"], NormalizedDummyItem>([
   ],
   ["37e73dcc-53b1-423a-9574-c78942c60a0f", { id: "37e73dcc-53b1-423a-9574-c78942c60a0f", title: "Network", children: [] }],
 ]);
-const disabledItemIds = [
+const lockedItemIds = [
   "7eebbba8-c485-42b4-9df9-2057caddce6d",
   "6725369f-d929-4fa9-a955-704486824a30",
   "e353fca1-0ca7-4f1a-9292-bc90a3b1a5e7",
@@ -169,7 +169,7 @@ type Props = {
   isDisabled?: boolean;
 };
 
-export const DynamicPartialDisabledComponent = (props: Props) => {
+export const DynamicPartialLockedComponent = (props: Props) => {
   const [itemEntitiesMapState, setItemEntitiesMapState] = React.useState(initialItemEntitiesMap);
 
   const itemElements = React.useMemo(() => {
@@ -177,7 +177,7 @@ export const DynamicPartialDisabledComponent = (props: Props) => {
       .get(rootItemId)!
       .children!.map((itemId) => itemEntitiesMapState.get(itemId)!);
     const createItemElement = (normalizedItem: NormalizedDummyItem, index: number) => {
-      const isDisabled = disabledItemIds.includes(normalizedItem.id);
+      const isLocked = lockedItemIds.includes(normalizedItem.id);
       if (normalizedItem.children != undefined) {
         const childNormalizedItems = normalizedItem.children.map((itemId) => itemEntitiesMapState.get(itemId)!);
         const childItemElements = childNormalizedItems.map(createItemElement);
@@ -189,10 +189,10 @@ export const DynamicPartialDisabledComponent = (props: Props) => {
             className={styles.group}
             identifier={normalizedItem.id}
             index={index}
-            isDisabled={isDisabled}
+            isLocked={isLocked}
             isGroup
           >
-            <div className={classnames(groupHeadingClassname, { [styles.opened]: hasItems, [styles.locked]: isDisabled })}>
+            <div className={classnames(groupHeadingClassname, { [styles.opened]: hasItems, [styles.locked]: isLocked })}>
               {normalizedItem.title}
             </div>
             {childItemElements}
@@ -203,10 +203,10 @@ export const DynamicPartialDisabledComponent = (props: Props) => {
       return (
         <Item
           key={normalizedItem.id}
-          className={classnames(itemClassName, { [styles.locked]: isDisabled })}
+          className={classnames(itemClassName, { [styles.locked]: isLocked })}
           identifier={normalizedItem.id}
           index={index}
-          isDisabled={isDisabled}
+          isLocked={isLocked}
         >
           {normalizedItem.title}
         </Item>

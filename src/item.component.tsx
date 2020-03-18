@@ -30,7 +30,7 @@ type Props<T extends ItemIdentifier> = {
    * Stacking and popping will be allowed. Grandchild items will not be affected.
    * @default false
    */
-  isDisabled?: boolean;
+  isLocked?: boolean;
   className?: string;
   children?: React.ReactNode;
 };
@@ -41,7 +41,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
 
   const ancestorIdentifiers = [...groupContext.ancestorIdentifiers, props.identifier];
   const isGroup = props.isGroup ?? false;
-  const isDisabled = (listContext.isDisabled || props.isDisabled) ?? false;
+  const isLocked = (listContext.isDisabled || props.isLocked) ?? false;
   const hasNoItems =
     isGroup &&
     React.useMemo(() => React.Children.toArray(props.children).filter((child: any) => child.type === Item).length === 0, [
@@ -242,18 +242,18 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       event.persist();
       event.stopPropagation();
 
-      if (isDisabled) return;
+      if (isLocked) return;
 
       onDragStart(element);
     },
     onDrag: ({ down, movement }) => {
-      if (isDisabled) return;
+      if (isLocked) return;
       if (!down) return;
 
       moveGhostElement(listContext.ghostWrapperElementRef.current ?? undefined, movement);
     },
     onDragEnd: () => {
-      if (isDisabled) return;
+      if (isLocked) return;
 
       onDragEnd();
     },
