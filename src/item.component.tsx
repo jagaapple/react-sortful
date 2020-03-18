@@ -247,11 +247,16 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       onDragStart(element);
     },
     onDrag: ({ down, movement }) => {
+      if (isDisabled) return;
       if (!down) return;
 
       moveGhostElement(listContext.ghostWrapperElementRef.current ?? undefined, movement);
     },
-    onDragEnd,
+    onDragEnd: () => {
+      if (isDisabled) return;
+
+      onDragEnd();
+    },
   });
 
   const contentElement = React.useMemo((): JSX.Element => {
