@@ -5,5 +5,5 @@ import { ItemIdentifier } from "../shared";
 export const Context = React.createContext<{
   identifier: ItemIdentifier | undefined;
   ancestorIdentifiers: ItemIdentifier[];
-  hasNoItems: boolean;
-}>({ identifier: undefined, ancestorIdentifiers: [], hasNoItems: false });
+  childIdentifiersRef: React.MutableRefObject<Set<ItemIdentifier>>;
+}>({ identifier: undefined, ancestorIdentifiers: [], childIdentifiersRef: { current: new Set() } });

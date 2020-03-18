@@ -1,12 +1,6 @@
 import { ItemIdentifier } from "../shared";
 
-export const checkIsAncestorItem = (
-  targetItemIdentifier: ItemIdentifier,
-  hasItems: boolean,
-  ancestorIdentifiersOfChild: ItemIdentifier[],
-) => {
-  if (!hasItems) return false;
-
+export const checkIsAncestorItem = (targetItemIdentifier: ItemIdentifier, ancestorIdentifiersOfChild: ItemIdentifier[]) => {
   const ancestorIdentifiersWithoutTarget = [...ancestorIdentifiersOfChild];
   ancestorIdentifiersWithoutTarget.pop();
 
