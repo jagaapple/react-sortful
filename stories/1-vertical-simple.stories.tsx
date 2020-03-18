@@ -1,9 +1,9 @@
 import * as React from "react";
 import { storiesOf } from "@storybook/react";
 
-import { DynamicComponent, DynamicPartialDisabledComponent, StaticComponent } from "./0-vertical-simple";
+import { DynamicComponent, DynamicPartialDisabledComponent, StaticComponent } from "./1-simple-vertical";
 
-storiesOf("0 Vertical Simple", module)
+storiesOf("1 Simple (vertical)", module)
   .add("Static", () => <StaticComponent />)
   .add("Dynamic", () => <DynamicComponent />)
   .add("Dynamic (disabled)", () => <DynamicComponent isDisabled />)
