@@ -31,6 +31,7 @@ export const Context = React.createContext<{
     | undefined;
   hoveredNodeMetaRef: React.MutableRefObject<NodeMeta<any> | undefined>;
   destinationMetaRef: React.MutableRefObject<DestinationMeta<any> | undefined>;
+  isDisabled: boolean;
   onDragStart: ((meta: DragStartMeta<any>) => void) | undefined;
   onDragEnd: (meta: DragEndMeta<any>) => void;
   onStackGroup: ((meta: StackGroupMeta<any>) => void) | undefined;

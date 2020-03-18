@@ -43,7 +43,11 @@ const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => 
   <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
 );
 
-export const DynamicComponent = () => {
+type Props = {
+  isDisabled?: boolean;
+};
+
+export const DynamicComponent = (props: Props) => {
   const [itemEntitiesMapState, setItemEntitiesMapState] = React.useState(initialItemEntitiesMap);
 
   const itemElements = React.useMemo(() => {
@@ -152,11 +156,12 @@ export const DynamicComponent = () => {
 
   return (
     <List
-      className={styles.wrapper}
+      className={classnames(styles.wrapper, { [styles.disabled]: props.isDisabled })}
       renderDropLine={renderDropLineElement}
       renderGhost={renderGhostElement}
       renderPlaceholder={renderPlaceholderElement}
       renderStackedGroup={renderStackedGroupElement}
+      isDisabled={props.isDisabled}
       onDragEnd={onDragEnd}
     >
       {itemElements}

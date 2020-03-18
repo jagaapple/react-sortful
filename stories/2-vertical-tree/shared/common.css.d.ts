@@ -7,6 +7,7 @@ declare const styles: {
   readonly "heading": string;
   readonly "opened": string;
   readonly "item": string;
+  readonly "disabled": string;
   readonly "ghost": string;
   readonly "ghostItemVisible": string;
   readonly "static": string;

@@ -35,6 +35,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
 
   const ancestorIdentifiers = [...groupContext.ancestorIdentifiers, props.identifier];
   const isGroup = props.isGroup ?? false;
+  const isDisabled = listContext.isDisabled;
   const hasNoItems =
     isGroup &&
     React.useMemo(() => React.Children.toArray(props.children).filter((child: any) => child.type === Item).length === 0, [
@@ -217,6 +218,8 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   });
   const draggableBinder = useGesture({
     onDragStart: (state: any) => {
+      if (isDisabled) return;
+
       const event: React.SyntheticEvent = state.event;
       const element = event.currentTarget;
       if (!(element instanceof HTMLElement)) return;

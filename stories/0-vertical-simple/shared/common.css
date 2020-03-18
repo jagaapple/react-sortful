@@ -5,7 +5,7 @@
 
 .item {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   padding: 8px 16px;
   min-height: 48px;
@@ -17,6 +17,9 @@
   color: #cfd4db;
   border-style: dashed;
   background-color: transparent;
+}
+.wrapper.disabled .item {
+  color: #cfd4db;
 }
 .item.ghost.static {
   background-color: #f6f9fc;

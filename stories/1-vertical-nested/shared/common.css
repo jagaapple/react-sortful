@@ -30,9 +30,13 @@
 .group .heading {
   margin-bottom: 4px;
   padding: 8px 4px 0;
+  color: #579135;
   font-size: 12px;
   font-weight: bold;
   line-height: 1.4;
+}
+.wrapper.disabled .group .heading {
+  color: #bee0a9;
 }
 
 .item {
@@ -49,6 +53,9 @@
   color: #cfd4db;
   border-style: dashed;
   background-color: transparent;
+}
+.wrapper.disabled .item {
+  color: #cfd4db;
 }
 .item.ghost.static {
   background-color: #f6f9fc;
