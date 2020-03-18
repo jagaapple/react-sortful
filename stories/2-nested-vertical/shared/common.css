@@ -1,7 +1,6 @@
 .wrapper {
   --padding: 8px;
 
-  padding: var(--padding);
   width: 512px;
 }
 

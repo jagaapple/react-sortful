@@ -252,7 +252,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     const style: React.CSSProperties = {
       boxSizing: "border-box",
       position: "static",
-      margin: `${listContext.itemSpacing}px 0`,
+      margin: `0 0 ${listContext.itemSpacing}px`,
     };
     const rendererMeta: Omit<PlaceholderRendererMeta<any>, "isGroup"> | StackedGroupRendererMeta<any> = {
       identifier: props.identifier,

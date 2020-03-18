@@ -106,7 +106,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
         onStackGroup: props.onStackGroup,
       }}
     >
-      <div className={props.className} style={{ position: "relative" }}>
+      <div className={props.className} style={{ position: "relative", margin: `${itemSpacing}px 0 0` }}>
         {props.children}
 
         {dropLineElement}
