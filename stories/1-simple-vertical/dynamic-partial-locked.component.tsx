@@ -24,16 +24,13 @@ const initialItems: DummyItem[] = [
   { id: "d", title: "Item D" },
   { id: "e", title: "Item E" },
 ];
+const lockedItemIds = initialItems.filter((_, index) => index % 2 === 0).map((item) => item.id);
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
   <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
 );
 
-type Props = {
-  isDisabled?: boolean;
-};
-
-export const DynamicComponent = (props: Props) => {
+export const DynamicPartialLockedComponent = () => {
   const [itemsState, setItemsState] = React.useState(initialItems);
   const itemsById = React.useMemo(
     () =>
@@ -47,11 +44,15 @@ export const DynamicComponent = (props: Props) => {
 
   const itemElements = React.useMemo(
     () =>
-      itemsState.map((item, index) => (
-        <Item key={item.id} identifier={item.id} index={index}>
-          <div className={styles.item}>{item.title}</div>
-        </Item>
-      )),
+      itemsState.map((item, index) => {
+        const isLocked = lockedItemIds.includes(item.id);
+
+        return (
+          <Item key={item.id} identifier={item.id} index={index} isLocked={isLocked}>
+            <div className={classnames(styles.item, { [styles.locked]: isLocked })}>{item.title}</div>
+          </Item>
+        );
+      }),
     [itemsState],
   );
   const renderGhostElement = React.useCallback(
@@ -86,11 +87,10 @@ export const DynamicComponent = (props: Props) => {
 
   return (
     <List
-      className={classnames(styles.wrapper, { [styles.disabled]: props.isDisabled })}
+      className={styles.wrapper}
       renderDropLine={renderDropLineElement}
       renderGhost={renderGhostElement}
       renderPlaceholder={renderPlaceholderElement}
-      isDisabled={props.isDisabled}
       onDragEnd={onDragEnd}
     >
       {itemElements}

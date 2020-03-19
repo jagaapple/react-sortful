@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { NodeMeta } from "../shared";
+import { Direction, NodeMeta } from "../shared";
 import {
   DestinationMeta,
   DragEndMeta,
@@ -31,6 +31,8 @@ export const Context = React.createContext<{
     | undefined;
   hoveredNodeMetaRef: React.MutableRefObject<NodeMeta<any> | undefined>;
   destinationMetaRef: React.MutableRefObject<DestinationMeta<any> | undefined>;
+  direction: Direction;
+  draggingCursorStyle: React.CSSProperties["cursor"] | undefined;
   isDisabled: boolean;
   onDragStart: ((meta: DragStartMeta<any>) => void) | undefined;
   onDragEnd: (meta: DragEndMeta<any>) => void;

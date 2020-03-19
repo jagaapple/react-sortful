@@ -1,8 +1,6 @@
 .wrapper {
   --padding: 8px;
   --icon-width: 14px;
-
-  padding: var(--padding);
 }
 
 .withIcon::before {

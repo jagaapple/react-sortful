@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { ItemIdentifier, NodeMeta } from "./shared";
+import { Direction, ItemIdentifier, NodeMeta } from "./shared";
 import {
   DestinationMeta,
   DragEndMeta,
@@ -16,9 +16,9 @@ import {
 } from "./list";
 
 type Props<T extends ItemIdentifier> = {
-  /** A function to render a drop line element in dragging any item. */
+  /** A function to render a drop line element when dragging any item. */
   renderDropLine: (injectedProps: DropLineRendererInjectedProps) => React.ReactNode;
-  /** A function to render a ghost element in dragging any item. */
+  /** A function to render a ghost element when dragging any item. */
   renderGhost: (meta: GhostRendererMeta<T>) => React.ReactNode;
   /** A function to render a placeholder element instead of a dragging item element. */
   renderPlaceholder?: (injectedProps: PlaceholderRendererInjectedProps, meta: PlaceholderRendererMeta<T>) => JSX.Element;
@@ -34,6 +34,14 @@ type Props<T extends ItemIdentifier> = {
    * @default 8
    */
   stackableAreaThreshold?: number;
+  /**
+   * A direction to recognize drop area.
+   * Note that this will not change styles, so you have to apply styles such as being arranged side by side.
+   * @default "vertical"
+   */
+  direction?: Direction;
+  /** A cursor style when dragging. */
+  draggingCursorStyle?: React.CSSProperties["cursor"];
   /**
    * Whether all items are not able to move, drag, and stack.
    * @default false
@@ -56,6 +64,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
 
   const itemSpacing = props.itemSpacing ?? 8;
   const stackableAreaThreshold = props.stackableAreaThreshold ?? 8;
+  const direction = props.direction ?? "vertical";
   const isDisabled = props.isDisabled ?? false;
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
@@ -69,12 +78,12 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
       position: "absolute",
       top: 0,
       left: 0,
-      transform: "translate(0, -50%)",
+      transform: direction === "vertical" ? "translate(0, -50%)" : "translate(-50%, 0)",
       pointerEvents: "none",
     };
 
     return props.renderDropLine({ ref: dropLineElementRef, style });
-  }, [props.renderDropLine, isVisibleDropLineElementState]);
+  }, [props.renderDropLine, isVisibleDropLineElementState, direction]);
   const ghostElement = React.useMemo(() => {
     if (draggingNodeMetaState == undefined) return;
 
@@ -82,6 +91,10 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
 
     return props.renderGhost({ identifier, groupIdentifier, index, isGroup });
   }, [props.renderGhost, draggingNodeMetaState]);
+
+  const padding: [string, string] = ["0", "0"];
+  if (direction === "vertical") padding[0] = `${itemSpacing}px`;
+  if (direction === "horizontal") padding[1] = `${itemSpacing}px`;
 
   return (
     <ListContext.Provider
@@ -100,13 +113,15 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
         renderStackedGroup: props.renderStackedGroup,
         hoveredNodeMetaRef: hoveredNodeMetaRef,
         destinationMetaRef,
+        direction,
+        draggingCursorStyle: props.draggingCursorStyle,
         isDisabled,
         onDragStart: props.onDragStart,
         onDragEnd: props.onDragEnd,
         onStackGroup: props.onStackGroup,
       }}
     >
-      <div className={props.className} style={{ position: "relative" }}>
+      <div className={props.className} style={{ position: "relative", padding: padding.join(" ") }}>
         {props.children}
 
         {dropLineElement}

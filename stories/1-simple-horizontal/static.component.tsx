@@ -7,7 +7,11 @@ import { commonStyles } from "../shared";
 import { styles } from "./shared";
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
-  <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
+  <div
+    ref={injectedProps.ref}
+    className={classnames(commonStyles.dropLine, commonStyles.horizontal)}
+    style={injectedProps.style}
+  />
 );
 const renderGhostElement = () => <div className={classnames(styles.item, styles.ghost, styles.static)} />;
 const renderPlaceholderElement = (injectedProps: PlaceholderRendererInjectedProps) => (
@@ -24,6 +28,7 @@ export const StaticComponent = () => (
     renderDropLine={renderDropLineElement}
     renderGhost={renderGhostElement}
     renderPlaceholder={renderPlaceholderElement}
+    direction="horizontal"
     onDragEnd={() => false}
   >
     <Item identifier="a" index={0}>

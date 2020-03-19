@@ -26,7 +26,11 @@ const initialItems: DummyItem[] = [
 ];
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
-  <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
+  <div
+    ref={injectedProps.ref}
+    className={classnames(commonStyles.dropLine, commonStyles.horizontal)}
+    style={injectedProps.style}
+  />
 );
 
 type Props = {
@@ -90,6 +94,7 @@ export const DynamicComponent = (props: Props) => {
       renderDropLine={renderDropLineElement}
       renderGhost={renderGhostElement}
       renderPlaceholder={renderPlaceholderElement}
+      direction="horizontal"
       isDisabled={props.isDisabled}
       onDragEnd={onDragEnd}
     >

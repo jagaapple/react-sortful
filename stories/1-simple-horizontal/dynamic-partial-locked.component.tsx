@@ -24,13 +24,17 @@ const initialItems: DummyItem[] = [
   { id: "d", title: "Item D" },
   { id: "e", title: "Item E" },
 ];
-const disabledItemIds = initialItems.filter((_, index) => index % 2 === 0).map((item) => item.id);
+const lockedItemIds = initialItems.filter((_, index) => index % 2 === 0).map((item) => item.id);
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
-  <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
+  <div
+    ref={injectedProps.ref}
+    className={classnames(commonStyles.dropLine, commonStyles.horizontal)}
+    style={injectedProps.style}
+  />
 );
 
-export const DynamicPartialDisabledComponent = () => {
+export const DynamicPartialLockedComponent = () => {
   const [itemsState, setItemsState] = React.useState(initialItems);
   const itemsById = React.useMemo(
     () =>
@@ -45,17 +49,11 @@ export const DynamicPartialDisabledComponent = () => {
   const itemElements = React.useMemo(
     () =>
       itemsState.map((item, index) => {
-        const isDisabled = disabledItemIds.includes(item.id);
+        const isLocked = lockedItemIds.includes(item.id);
 
         return (
-          <Item
-            key={item.id}
-            className={classnames(styles.item, { [styles.locked]: isDisabled })}
-            identifier={item.id}
-            index={index}
-            isDisabled={isDisabled}
-          >
-            {item.title}
+          <Item key={item.id} identifier={item.id} index={index} isLocked={isLocked}>
+            <div className={classnames(styles.item, { [styles.locked]: isLocked })}>{item.title}</div>
           </Item>
         );
       }),
@@ -97,6 +95,7 @@ export const DynamicPartialDisabledComponent = () => {
       renderDropLine={renderDropLineElement}
       renderGhost={renderGhostElement}
       renderPlaceholder={renderPlaceholderElement}
+      direction="horizontal"
       onDragEnd={onDragEnd}
     >
       {itemElements}

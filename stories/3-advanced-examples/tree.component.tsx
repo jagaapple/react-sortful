@@ -15,7 +15,7 @@ import {
 } from "../../src";
 
 import { commonStyles } from "../shared";
-import { styles } from "./shared";
+import styles from "./tree.css";
 
 type DummyItem = { id: string; title: string; children: DummyItem[] | undefined };
 type NormalizedDummyItem = Omit<DummyItem, "children"> & { children: DummyItem["id"][] | undefined };
@@ -163,7 +163,7 @@ type Props = {
   isDisabled?: boolean;
 };
 
-export const DynamicComponent = (props: Props) => {
+export const TreeComponent = (props: Props) => {
   const [itemEntitiesMapState, setItemEntitiesMapState] = React.useState(initialItemEntitiesMap);
 
   const itemElements = React.useMemo(() => {
@@ -177,16 +177,18 @@ export const DynamicComponent = (props: Props) => {
         const hasItems = childItemElements.length > 0;
 
         return (
-          <Item key={normalizedItem.id} className={styles.group} identifier={normalizedItem.id} index={index} isGroup>
-            <div className={classnames(groupHeadingClassname, { [styles.opened]: hasItems })}>{normalizedItem.title}</div>
-            {childItemElements}
+          <Item key={normalizedItem.id} identifier={normalizedItem.id} index={index} isGroup>
+            <div className={styles.group}>
+              <div className={classnames(groupHeadingClassname, { [styles.opened]: hasItems })}>{normalizedItem.title}</div>
+              {childItemElements}
+            </div>
           </Item>
         );
       }
 
       return (
-        <Item key={normalizedItem.id} className={itemClassName} identifier={normalizedItem.id} index={index}>
-          {normalizedItem.title}
+        <Item key={normalizedItem.id} identifier={normalizedItem.id} index={index}>
+          <div className={itemClassName}>{normalizedItem.title}</div>
         </Item>
       );
     };
@@ -249,7 +251,7 @@ export const DynamicComponent = (props: Props) => {
       if (normalizedGroupItem.children == undefined) return;
 
       if (meta.groupIdentifier === meta.nextGroupIdentifier) {
-        const nextIndex = meta.nextIndex ?? normalizedGroupItem.children?.length ?? 0;
+        const nextIndex = meta.nextIndex ?? normalizedGroupItem.children.length;
         normalizedGroupItem.children = arrayMove(normalizedGroupItem.children, meta.index, nextIndex);
       } else {
         const nextNormalizedGroupItem = newMap.get(meta.nextGroupIdentifier ?? rootItemId);

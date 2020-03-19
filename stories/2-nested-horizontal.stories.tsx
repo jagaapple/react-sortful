@@ -1,10 +1,10 @@
 import * as React from "react";
 import { storiesOf } from "@storybook/react";
 
-import { DynamicComponent, DynamicPartialDisabledComponent, StaticComponent } from "./3-tree-vertical";
+import { DynamicComponent, DynamicPartialLockedComponent, StaticComponent } from "./2-nested-horizontal";
 
-storiesOf("3 Tree (vertical)", module)
+storiesOf("2 Nested (horizontal)", module)
   .add("Static", () => <StaticComponent />)
   .add("Dynamic", () => <DynamicComponent />)
   .add("Dynamic (disabled)", () => <DynamicComponent isDisabled />)
-  .add("Dynamic (partial disabled)", () => <DynamicPartialDisabledComponent />);
+  .add("Dynamic (partial locked)", () => <DynamicPartialLockedComponent />);

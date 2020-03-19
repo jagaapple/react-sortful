@@ -38,13 +38,13 @@ const initialItemEntitiesMap = new Map<DummyItem["id"], NormalizedDummyItem>([
   ["e-7", { id: "e-7", title: "Item E - 7", children: undefined }],
   ["f", { id: "f", title: "Item F", children: undefined }],
 ]);
-const disabledItemIds = ["b", "c", "e-2", "e-3", "e-5"];
+const lockedItemIds = ["b", "c", "e-2", "e-3", "e-5"];
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
   <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
 );
 
-export const DynamicPartialDisabledComponent = () => {
+export const DynamicPartialLockedComponent = () => {
   const [itemEntitiesMapState, setItemEntitiesMapState] = React.useState(initialItemEntitiesMap);
 
   const itemElements = React.useMemo(() => {
@@ -52,35 +52,24 @@ export const DynamicPartialDisabledComponent = () => {
       .get(rootItemId)!
       .children!.map((itemId) => itemEntitiesMapState.get(itemId)!);
     const createItemElement = (normalizedItem: NormalizedDummyItem, index: number) => {
-      const isDisabled = disabledItemIds.includes(normalizedItem.id);
+      const isLocked = lockedItemIds.includes(normalizedItem.id);
       if (normalizedItem.children != undefined) {
         const childNormalizedItems = normalizedItem.children.map((itemId) => itemEntitiesMapState.get(itemId)!);
         const childItemElements = childNormalizedItems.map(createItemElement);
 
         return (
-          <Item
-            key={normalizedItem.id}
-            className={styles.group}
-            identifier={normalizedItem.id}
-            index={index}
-            isDisabled={isDisabled}
-            isGroup
-          >
-            <div className={classnames(styles.heading, { [styles.locked]: isDisabled })}>{normalizedItem.title}</div>
-            {childItemElements}
+          <Item key={normalizedItem.id} identifier={normalizedItem.id} index={index} isLocked={isLocked} isGroup>
+            <div className={styles.group}>
+              <div className={classnames(styles.heading, { [styles.locked]: isLocked })}>{normalizedItem.title}</div>
+              {childItemElements}
+            </div>
           </Item>
         );
       }
 
       return (
-        <Item
-          key={normalizedItem.id}
-          className={classnames(styles.item, { [styles.locked]: isDisabled })}
-          identifier={normalizedItem.id}
-          index={index}
-          isDisabled={isDisabled}
-        >
-          {normalizedItem.title}
+        <Item key={normalizedItem.id} identifier={normalizedItem.id} index={index} isLocked={isLocked}>
+          <div className={classnames(styles.item, { [styles.locked]: isLocked })}>{normalizedItem.title}</div>
         </Item>
       );
     };
@@ -121,10 +110,11 @@ export const DynamicPartialDisabledComponent = () => {
   const renderStackedGroupElement = React.useCallback(
     (injectedProps: StackedGroupRendererInjectedProps, { identifier }: StackedGroupRendererMeta<DummyItem["id"]>) => {
       const normalizedItem = itemEntitiesMapState.get(identifier)!;
+      const isLocked = lockedItemIds.includes(normalizedItem.id);
 
       return (
         <div {...injectedProps.binder()} className={classnames(styles.group, styles.stacked)} style={injectedProps.style}>
-          <div className={styles.heading}>{normalizedItem.title}</div>
+          <div className={classnames(styles.heading, { [styles.locked]: isLocked })}>{normalizedItem.title}</div>
         </div>
       );
     },
