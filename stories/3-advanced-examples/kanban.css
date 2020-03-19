@@ -12,16 +12,16 @@
 }
 
 .dropLine {
-  height: 2px;
-  background-color: #71bd45;
+  height: 4px;
+  border-radius: 10px;
+  background-color: #748da0;
 }
 
 .group {
   width: 256px;
   min-height: 108px;
-  border: 1px solid #cfd4db;
-  border-radius: 4px;
-  background-color: white;
+  border-radius: 8px;
+  background-color: #e7eff4;
 }
 .group.stacked {
   --color: #007bff;
@@ -31,12 +31,10 @@
   border-color: var(--color);
 }
 .group .heading {
-  padding: 12px 16px;
+  padding: 12px 16px 4px;
   font-size: 14px;
   font-weight: bold;
-  border-bottom: 1px solid #cfd4db;
   border-radius: 5px 5px 0 0;
-  background-color: #f6f9fc;
 }
 
 .items {
@@ -48,15 +46,15 @@
   align-items: center;
   padding: 8px 16px;
   min-height: 48px;
-  color: #579135;
-  border: 1px solid #9dd17e;
-  background-color: #cfe8be;
+  color: #1b2b4a;
+  font-weight: bold;
+  border-radius: 6px;
+  background-color: white;
   cursor: grab;
 }
 .item.dragging {
-  color: #bee0a9;
-  border-style: dashed;
-  background-color: transparent;
+  color: white;
+  background-color: #cfdce5;
   cursor: grabbing;
 }
 .item.draggingAny {
@@ -67,9 +65,8 @@
 }
 
 .ghost {
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
   width: 100%;
   height: 100%;
-  opacity: 0.8;
   transform: scale(0.8) rotate(5deg);
 }

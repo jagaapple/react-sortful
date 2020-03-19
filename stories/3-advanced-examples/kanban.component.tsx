@@ -14,7 +14,6 @@ import {
   StackedGroupRendererMeta,
 } from "../../src";
 
-import { commonStyles } from "../shared";
 import styles from "./kanban.css";
 
 type DummyItem = { id: string; title: string; children?: DummyItem["id"][] };
@@ -65,7 +64,7 @@ const initialItemEntitiesMap = new Map<DummyItem["id"], DummyItem>([
 ]);
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
-  <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
+  <div ref={injectedProps.ref} className={styles.dropLine} style={injectedProps.style} />
 );
 
 export const KanbanComponent = () => {
@@ -179,6 +178,7 @@ export const KanbanComponent = () => {
       renderPlaceholder={renderPlaceholderElement}
       renderStackedGroup={renderStackedGroupElement}
       draggingCursorStyle="grabbing"
+      itemSpacing={10}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
