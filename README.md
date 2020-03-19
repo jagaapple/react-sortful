@@ -1,11 +1,19 @@
 <h1 align="center">react-sortful</h1>
 
-<h4 align="center">🔃 Sortable components for horizontal and vertical, and tree forms. 🔄</h4>
+<h4 align="center">🔃 Sortable components for horizontal and vertical, nested, and tree forms. 🔄</h4>
 
-```ts
-import { returnOne } from "react-sortful";
+<img src="./.docs/main.png" width="896" alt="Simple Vertical List, Nested Horizontal List, File Tree, Kanban, and Layers Panel">
 
-returnOne(); // 1
+```tsx
+<List renderDropLine={renderDropLine} renderGhost={renderGhost} onDragEnd={onDragEnd}>
+  <Item identifier="a" index={0}>Item A</Item>
+  <Item identifier="b" index={1} isGroup>
+    <div>Item B (Group)</div>
+    <Item identifier="b-1" index={0}>Nested Item B - 1</Item>
+    <Item identifier="b-2" index={1}>Nested Item B - 2</Item>
+  </Item>
+  <Item identifier="c" index={2}>Item C</Item>
+</List>
 ```
 
 <div align="center">
@@ -34,20 +42,30 @@ returnOne(); // 1
 
 
 ## Features
-| FEATURES         | WHAT YOU CAN DO             |
-|------------------|-----------------------------|
-| 1️⃣ **Feature 1**  | You can do it               |
-| 2️⃣ **Feature 2**  | You can do it               |
-| 3️⃣ **Feature 3**  | You can do it               |
-| 🎩 **Type Safe** | You can use with TypeScript |
+| FEATURES                                   | WHAT YOU CAN DO                                                           |
+|--------------------------------------------|---------------------------------------------------------------------------|
+| ⚛️ **Designed for React**                   | Get sortable components for your React project                            |
+| ✨ **Simple API**                           | All you need is to know props of two components                           |
+| 🔄 **Support for vertical and horizontal** | You can create vertical and horizontal lists                              |
+| 👨‍👩‍👧‍👦 **Support for nested lists**         | You can stack lists in lists                                              |
+| 🌴 **Creatable any forms**                 | Easy to create a draggable file tree, TODO lists, layers panel, and so on |
+| 🎩 **Type Safe**                           | You can use with TypeScript                                               |
 
 When you become interested in react-sortful, see [online catalogs (Storybook)](https://www.chromaticqa.com/library?appId=5e6025bcf2b5b700222c2c33)!
+
+> ❗️ **react-sortful is currently in beta.**
+> You can use react-sortful right now, but you might need to create pull requests for advanced use cases or fix for some bugs.
+> Some of APIs will have breaking changes over time.
+
+> 🙇🏻‍♂️ **Send me pull requests.**
+> This was created to develop author's project and I don't have much time, please send me pull requests instead of issues.
+> I will fix any bugs as soon as possible, but will not add new features for a while.
 
 
 ## Quick Start
 ### Requirements
 - npm or Yarn
-- Node.js 10.0.0 or higher
+- React 16.8.0 or higher ( `react` and `react-dom` packages )
 
 ### Installation
 ```bash
@@ -62,6 +80,8 @@ $ yarn add react-sortful
 
 ### Setup
 Firstly you have to do.
+
+TODO
 
 
 ## Contributing to react-sortful

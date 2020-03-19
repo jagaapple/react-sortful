@@ -17,11 +17,10 @@ import {
 import { commonStyles } from "../shared";
 import { styles } from "./shared";
 
-type DummyItem = { id: string; title: string; children: DummyItem[] | undefined };
-type NormalizedDummyItem = Omit<DummyItem, "children"> & { children: DummyItem["id"][] | undefined };
+type DummyItem = { id: string; title: string; children: DummyItem["id"][] | undefined };
 
 const rootItemId = "root";
-const initialItemEntitiesMap = new Map<DummyItem["id"], NormalizedDummyItem>([
+const initialItemEntitiesMap = new Map<DummyItem["id"], DummyItem>([
   [rootItemId, { id: rootItemId, title: "", children: ["a", "b", "c", "d", "e", "f"] }],
   ["a", { id: "a", title: "Item A", children: undefined }],
   ["b", { id: "b", title: "Item B", children: undefined }],
@@ -51,18 +50,16 @@ export const DynamicComponent = (props: Props) => {
   const [itemEntitiesMapState, setItemEntitiesMapState] = React.useState(initialItemEntitiesMap);
 
   const itemElements = React.useMemo(() => {
-    const topLevelNormalizedItems = itemEntitiesMapState
-      .get(rootItemId)!
-      .children!.map((itemId) => itemEntitiesMapState.get(itemId)!);
-    const createItemElement = (normalizedItem: NormalizedDummyItem, index: number) => {
-      if (normalizedItem.children != undefined) {
-        const childNormalizedItems = normalizedItem.children.map((itemId) => itemEntitiesMapState.get(itemId)!);
-        const childItemElements = childNormalizedItems.map(createItemElement);
+    const topLevelItems = itemEntitiesMapState.get(rootItemId)!.children!.map((itemId) => itemEntitiesMapState.get(itemId)!);
+    const createItemElement = (item: DummyItem, index: number) => {
+      if (item.children != undefined) {
+        const childItems = item.children.map((itemId) => itemEntitiesMapState.get(itemId)!);
+        const childItemElements = childItems.map(createItemElement);
 
         return (
-          <Item key={normalizedItem.id} identifier={normalizedItem.id} index={index} isGroup>
+          <Item key={item.id} identifier={item.id} index={index} isGroup>
             <div className={styles.group}>
-              <div className={styles.heading}>{normalizedItem.title}</div>
+              <div className={styles.heading}>{item.title}</div>
               {childItemElements}
             </div>
           </Item>
@@ -70,36 +67,36 @@ export const DynamicComponent = (props: Props) => {
       }
 
       return (
-        <Item key={normalizedItem.id} identifier={normalizedItem.id} index={index}>
-          <div className={styles.item}>{normalizedItem.title}</div>
+        <Item key={item.id} identifier={item.id} index={index}>
+          <div className={styles.item}>{item.title}</div>
         </Item>
       );
     };
 
-    return topLevelNormalizedItems.map(createItemElement);
+    return topLevelItems.map(createItemElement);
   }, [itemEntitiesMapState]);
   const renderGhostElement = React.useCallback(
     ({ identifier, isGroup }: GhostRendererMeta<DummyItem["id"]>) => {
-      const normalizedItem = itemEntitiesMapState.get(identifier);
-      if (normalizedItem == undefined) return;
+      const item = itemEntitiesMapState.get(identifier);
+      if (item == undefined) return;
 
       if (isGroup) {
         return (
           <div className={classnames(styles.group, styles.ghost)}>
-            <div className={styles.heading}>{normalizedItem.title}</div>
+            <div className={styles.heading}>{item.title}</div>
           </div>
         );
       }
 
-      return <div className={classnames(styles.item, styles.ghost)}>{normalizedItem.title}</div>;
+      return <div className={classnames(styles.item, styles.ghost)}>{item.title}</div>;
     },
     [itemEntitiesMapState],
   );
   const renderPlaceholderElement = React.useCallback(
     (injectedProps: PlaceholderRendererInjectedProps, { identifier, isGroup }: PlaceholderRendererMeta<DummyItem["id"]>) => {
-      const normalizedItem = itemEntitiesMapState.get(identifier)!;
+      const item = itemEntitiesMapState.get(identifier)!;
       const className = classnames({ [styles.group]: isGroup, [styles.item]: !isGroup }, styles.dragging);
-      const children = isGroup ? <div className={styles.heading}>{normalizedItem.title}</div> : normalizedItem.title;
+      const children = isGroup ? <div className={styles.heading}>{item.title}</div> : item.title;
 
       return (
         <div {...injectedProps.binder()} className={className} style={injectedProps.style}>
@@ -111,11 +108,11 @@ export const DynamicComponent = (props: Props) => {
   );
   const renderStackedGroupElement = React.useCallback(
     (injectedProps: StackedGroupRendererInjectedProps, { identifier }: StackedGroupRendererMeta<DummyItem["id"]>) => {
-      const normalizedItem = itemEntitiesMapState.get(identifier)!;
+      const item = itemEntitiesMapState.get(identifier)!;
 
       return (
         <div {...injectedProps.binder()} className={classnames(styles.group, styles.stacked)} style={injectedProps.style}>
-          <div className={styles.heading}>{normalizedItem.title}</div>
+          <div className={styles.heading}>{item.title}</div>
         </div>
       );
     },
@@ -127,27 +124,27 @@ export const DynamicComponent = (props: Props) => {
       if (meta.groupIdentifier === meta.nextGroupIdentifier && meta.index === meta.nextIndex) return;
 
       const newMap = new Map(itemEntitiesMapState.entries());
-      const normalizedItem = newMap.get(meta.identifier);
-      if (normalizedItem == undefined) return;
-      const normalizedGroupItem = newMap.get(meta.groupIdentifier ?? rootItemId);
-      if (normalizedGroupItem == undefined) return;
-      if (normalizedGroupItem.children == undefined) return;
+      const item = newMap.get(meta.identifier);
+      if (item == undefined) return;
+      const groupItem = newMap.get(meta.groupIdentifier ?? rootItemId);
+      if (groupItem == undefined) return;
+      if (groupItem.children == undefined) return;
 
       if (meta.groupIdentifier === meta.nextGroupIdentifier) {
-        const nextIndex = meta.nextIndex ?? normalizedGroupItem.children?.length ?? 0;
-        normalizedGroupItem.children = arrayMove(normalizedGroupItem.children, meta.index, nextIndex);
+        const nextIndex = meta.nextIndex ?? groupItem.children?.length ?? 0;
+        groupItem.children = arrayMove(groupItem.children, meta.index, nextIndex);
       } else {
-        const nextNormalizedGroupItem = newMap.get(meta.nextGroupIdentifier ?? rootItemId);
-        if (nextNormalizedGroupItem == undefined) return;
-        if (nextNormalizedGroupItem.children == undefined) return;
+        const nextGroupItem = newMap.get(meta.nextGroupIdentifier ?? rootItemId);
+        if (nextGroupItem == undefined) return;
+        if (nextGroupItem.children == undefined) return;
 
-        normalizedGroupItem.children.splice(meta.index, 1);
+        groupItem.children.splice(meta.index, 1);
         if (meta.nextIndex == undefined) {
           // Inserts an item to a group which has no items.
-          nextNormalizedGroupItem.children.push(meta.identifier);
+          nextGroupItem.children.push(meta.identifier);
         } else {
           // Insets an item to a group.
-          nextNormalizedGroupItem.children.splice(meta.nextIndex, 0, normalizedItem.id);
+          nextGroupItem.children.splice(meta.nextIndex, 0, item.id);
         }
       }
 
