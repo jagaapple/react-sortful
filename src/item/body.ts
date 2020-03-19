@@ -3,7 +3,6 @@ export const setBodyStyle = (bodyElement: HTMLElement, draggingCusrsorStyle: str
   bodyElement.style.userSelect = "none";
 
   // Applies a cursor style when dragging.
-  console.log(draggingCusrsorStyle);
   if (draggingCusrsorStyle != undefined) bodyElement.style.cursor = draggingCusrsorStyle;
 };
 

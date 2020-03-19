@@ -16,9 +16,9 @@ import {
 } from "./list";
 
 type Props<T extends ItemIdentifier> = {
-  /** A function to render a drop line element in dragging any item. */
+  /** A function to render a drop line element when dragging any item. */
   renderDropLine: (injectedProps: DropLineRendererInjectedProps) => React.ReactNode;
-  /** A function to render a ghost element in dragging any item. */
+  /** A function to render a ghost element when dragging any item. */
   renderGhost: (meta: GhostRendererMeta<T>) => React.ReactNode;
   /** A function to render a placeholder element instead of a dragging item element. */
   renderPlaceholder?: (injectedProps: PlaceholderRendererInjectedProps, meta: PlaceholderRendererMeta<T>) => JSX.Element;
