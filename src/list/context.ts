@@ -32,6 +32,7 @@ export const Context = React.createContext<{
   hoveredNodeMetaRef: React.MutableRefObject<NodeMeta<any> | undefined>;
   destinationMetaRef: React.MutableRefObject<DestinationMeta<any> | undefined>;
   direction: Direction;
+  draggingCursorStyle: React.CSSProperties["cursor"] | undefined;
   isDisabled: boolean;
   onDragStart: ((meta: DragStartMeta<any>) => void) | undefined;
   onDragEnd: (meta: DragEndMeta<any>) => void;

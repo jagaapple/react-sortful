@@ -61,7 +61,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
 
   const onDragStart = React.useCallback(
     (element: HTMLElement) => {
-      setBodyStyle(document.body);
+      setBodyStyle(document.body, listContext.draggingCursorStyle);
       initializeGhostElementStyle(element, listContext.ghostWrapperElementRef.current ?? undefined);
 
       // Sets contexts to values.
@@ -83,7 +83,15 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         isGroup: nodeMeta.isGroup,
       });
     },
-    [listContext.onDragStart, groupContext.identifier, props.identifier, props.index, ancestorIdentifiers, isGroup],
+    [
+      listContext.onDragStart,
+      listContext.draggingCursorStyle,
+      groupContext.identifier,
+      props.identifier,
+      props.index,
+      ancestorIdentifiers,
+      isGroup,
+    ],
   );
   const onDragEnd = React.useCallback(() => {
     clearBodyStyle(document.body);

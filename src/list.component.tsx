@@ -40,6 +40,8 @@ type Props<T extends ItemIdentifier> = {
    * @default "vertical"
    */
   direction?: Direction;
+  /** A cursor style when dragging. */
+  draggingCursorStyle?: React.CSSProperties["cursor"];
   /**
    * Whether all items are not able to move, drag, and stack.
    * @default false
@@ -113,6 +115,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
         hoveredNodeMetaRef: hoveredNodeMetaRef,
         destinationMetaRef,
         direction,
+        draggingCursorStyle: props.draggingCursorStyle,
         isDisabled,
         onDragStart: props.onDragStart,
         onDragEnd: props.onDragEnd,
