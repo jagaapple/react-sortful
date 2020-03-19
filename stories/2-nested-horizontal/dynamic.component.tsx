@@ -58,16 +58,18 @@ export const DynamicComponent = (props: Props) => {
         const childItemElements = childNormalizedItems.map(createItemElement);
 
         return (
-          <Item key={normalizedItem.id} className={styles.group} identifier={normalizedItem.id} index={index} isGroup>
-            <div className={styles.heading}>{normalizedItem.title}</div>
-            {childItemElements}
+          <Item key={normalizedItem.id} identifier={normalizedItem.id} index={index} isGroup>
+            <div className={styles.group}>
+              <div className={styles.heading}>{normalizedItem.title}</div>
+              {childItemElements}
+            </div>
           </Item>
         );
       }
 
       return (
-        <Item key={normalizedItem.id} className={styles.item} identifier={normalizedItem.id} index={index}>
-          {normalizedItem.title}
+        <Item key={normalizedItem.id} identifier={normalizedItem.id} index={index}>
+          <div className={styles.item}>{normalizedItem.title}</div>
         </Item>
       );
     };

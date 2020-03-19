@@ -52,8 +52,8 @@ export const DynamicComponent = (props: Props) => {
   const itemElements = React.useMemo(
     () =>
       itemsState.map((item, index) => (
-        <Item key={item.id} className={styles.item} identifier={item.id} index={index}>
-          {item.title}
+        <Item key={item.id} identifier={item.id} index={index}>
+          <div className={styles.item}>{item.title}</div>
         </Item>
       )),
     [itemsState],

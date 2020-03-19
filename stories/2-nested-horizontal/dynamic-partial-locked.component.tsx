@@ -56,29 +56,18 @@ export const DynamicPartialLockedComponent = () => {
         const childItemElements = childNormalizedItems.map(createItemElement);
 
         return (
-          <Item
-            key={normalizedItem.id}
-            className={styles.group}
-            identifier={normalizedItem.id}
-            index={index}
-            isLocked={isLocked}
-            isGroup
-          >
-            <div className={classnames(styles.heading, { [styles.locked]: isLocked })}>{normalizedItem.title}</div>
-            {childItemElements}
+          <Item key={normalizedItem.id} identifier={normalizedItem.id} index={index} isLocked={isLocked} isGroup>
+            <div className={styles.group}>
+              <div className={classnames(styles.heading, { [styles.locked]: isLocked })}>{normalizedItem.title}</div>
+              {childItemElements}
+            </div>
           </Item>
         );
       }
 
       return (
-        <Item
-          key={normalizedItem.id}
-          className={classnames(styles.item, { [styles.locked]: isLocked })}
-          identifier={normalizedItem.id}
-          index={index}
-          isLocked={isLocked}
-        >
-          {normalizedItem.title}
+        <Item key={normalizedItem.id} identifier={normalizedItem.id} index={index} isLocked={isLocked}>
+          <div className={classnames(styles.item, { [styles.locked]: isLocked })}>{normalizedItem.title}</div>
         </Item>
       );
     };

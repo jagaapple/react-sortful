@@ -92,10 +92,9 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
     return props.renderGhost({ identifier, groupIdentifier, index, isGroup });
   }, [props.renderGhost, draggingNodeMetaState]);
 
-  const margin: [string, string, string, string] = ["0", "0", "0", "0"];
-  if (direction === "vertical") margin[0] = `${itemSpacing}px`;
-  if (direction === "horizontal") margin[3] = `${itemSpacing}px`;
-  const style: React.CSSProperties = { position: "relative", margin: margin.join(" ") };
+  const padding: [string, string] = ["0", "0"];
+  if (direction === "vertical") padding[0] = `${itemSpacing}px`;
+  if (direction === "horizontal") padding[1] = `${itemSpacing}px`;
 
   return (
     <ListContext.Provider
@@ -122,7 +121,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
         onStackGroup: props.onStackGroup,
       }}
     >
-      <div className={props.className} style={style}>
+      <div className={props.className} style={{ position: "relative", padding: padding.join(" ") }}>
         {props.children}
 
         {dropLineElement}

@@ -6,7 +6,6 @@ import { getDropLineDirection } from "./direcitons";
 export const getDropLinePosition = <T extends ItemIdentifier>(
   absoluteXY: [number, number],
   nodeMeta: NodeMeta<T>,
-  itemSpacing: number,
   direction: Direction,
 ): ElementPosition => {
   const x = Math.max(absoluteXY[0] - nodeMeta.absolutePosition.left, 0);
@@ -17,10 +16,8 @@ export const getDropLinePosition = <T extends ItemIdentifier>(
 
   let left = nodeMeta.relativePosition.left;
   let top = nodeMeta.relativePosition.top;
-  if (dropLineDirection === "TOP") top -= itemSpacing / 2;
-  if (dropLineDirection === "BOTTOM") top += nodeMeta.height + itemSpacing / 2;
-  if (dropLineDirection === "LEFT") left -= itemSpacing / 2;
-  if (dropLineDirection === "RIGHT") left += nodeMeta.width + itemSpacing / 2;
+  if (dropLineDirection === "BOTTOM") top += nodeMeta.height;
+  if (dropLineDirection === "RIGHT") left += nodeMeta.width;
 
   return { top, left };
 };

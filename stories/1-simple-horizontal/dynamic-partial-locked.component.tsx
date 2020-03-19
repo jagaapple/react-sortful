@@ -52,14 +52,8 @@ export const DynamicPartialLockedComponent = () => {
         const isLocked = lockedItemIds.includes(item.id);
 
         return (
-          <Item
-            key={item.id}
-            className={classnames(styles.item, { [styles.locked]: isLocked })}
-            identifier={item.id}
-            index={index}
-            isLocked={isLocked}
-          >
-            {item.title}
+          <Item key={item.id} identifier={item.id} index={index} isLocked={isLocked}>
+            <div className={classnames(styles.item, { [styles.locked]: isLocked })}>{item.title}</div>
           </Item>
         );
       }),

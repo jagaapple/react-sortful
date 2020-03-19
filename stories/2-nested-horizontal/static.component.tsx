@@ -50,29 +50,35 @@ export const StaticComponent = () => (
     direction="horizontal"
     onDragEnd={() => false}
   >
-    <Item className={styles.item} identifier="a" index={0}>
-      Item A
+    <Item identifier="a" index={0}>
+      <div className={styles.item}>Item A</div>
     </Item>
-    <Item className={styles.group} identifier="b" index={1} isGroup>
-      <div className={styles.heading}>Group B</div>
-      <Item className={styles.item} identifier="b-1" index={0}>
-        Item B - 1
-      </Item>
-      <Item className={styles.group} identifier="b-2" index={1} isGroup>
-        <div className={styles.heading}>Group B - 2</div>
-        <Item className={styles.item} identifier="b-2-1" index={0}>
-          Item B - 2 - 1
+    <Item identifier="b" index={1} isGroup>
+      <div className={styles.group}>
+        <div className={styles.heading}>Group B</div>
+        <Item identifier="b-1" index={0}>
+          <div className={styles.item}>Item B - 1</div>
         </Item>
-      </Item>
-      <Item className={styles.group} identifier="b-3" index={2} isGroup>
-        <div className={styles.heading}>Group B - 3</div>
-      </Item>
-      <Item className={styles.item} identifier="b-4" index={3}>
-        Item B - 4
-      </Item>
+        <Item identifier="b-2" index={1} isGroup>
+          <div className={styles.group}>
+            <div className={styles.heading}>Group B - 2</div>
+            <Item identifier="b-2-1" index={0}>
+              <div className={styles.item}>Item B - 2 - 1</div>
+            </Item>
+          </div>
+        </Item>
+        <Item identifier="b-3" index={2} isGroup>
+          <div className={styles.group}>
+            <div className={styles.heading}>Group B - 3</div>
+          </div>
+        </Item>
+        <Item identifier="b-4" index={3}>
+          <div className={styles.item}>Item B - 4</div>
+        </Item>
+      </div>
     </Item>
-    <Item className={styles.item} identifier="c" index={2}>
-      Item C
+    <Item identifier="c" index={2}>
+      <div className={styles.item}>Item C</div>
     </Item>
   </List>
 );

@@ -1,11 +1,23 @@
-export const initializeGhostElementStyle = (itemElement: HTMLElement, ghostWrapperElement: HTMLElement | undefined) => {
+import { Direction } from "../shared";
+
+export const initializeGhostElementStyle = (
+  itemElement: HTMLElement,
+  ghostWrapperElement: HTMLElement | undefined,
+  itemSpacing: number,
+  direction: Direction,
+) => {
   if (ghostWrapperElement == undefined) return;
 
   const elementRect = itemElement.getBoundingClientRect();
-  ghostWrapperElement.style.top = `${elementRect.top}px`;
-  ghostWrapperElement.style.left = `${elementRect.left}px`;
-  ghostWrapperElement.style.width = `${elementRect.width}px`;
-  ghostWrapperElement.style.height = `${elementRect.height}px`;
+  const top = direction === "vertical" ? elementRect.top + itemSpacing / 2 : elementRect.top;
+  const left = direction === "horizontal" ? elementRect.left + itemSpacing / 2 : elementRect.left;
+  const width = direction === "horizontal" ? elementRect.width - itemSpacing : elementRect.width;
+  const height = direction === "vertical" ? elementRect.height - itemSpacing : elementRect.height;
+
+  ghostWrapperElement.style.top = `${top}px`;
+  ghostWrapperElement.style.left = `${left}px`;
+  ghostWrapperElement.style.width = `${width}px`;
+  ghostWrapperElement.style.height = `${height}px`;
 };
 
 export const moveGhostElement = (ghostWrapperElement: HTMLElement | undefined, movementXY: [number, number]) => {

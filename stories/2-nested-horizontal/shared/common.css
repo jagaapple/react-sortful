@@ -10,7 +10,8 @@
   display: flex;
   justify-content: flex-start;
   align-items: stretch;
-  padding: var(--padding) 0;
+  padding: var(--padding) calc(var(--padding) / 2) var(--padding) 0;
+  height: 100%;
   border: 1px solid #bee0a9;
   border-radius: 4px;
   background-color: rgba(113, 189, 69, 0.1);
@@ -19,6 +20,8 @@
   --color: #71bd45;
 
   box-shadow: 0 0 0 1px var(--color);
+  width: 100%;
+  min-height: 100%;
   border-color: var(--color);
 }
 .group.dragging {
@@ -59,6 +62,7 @@
   align-items: center;
   padding: 8px 16px;
   min-width: 128px;
+  height: 100%;
   min-height: 48px;
   border: 1px solid #cfd4db;
   border-radius: 4px;

@@ -9,6 +9,8 @@ import {
   clearBodyStyle,
   clearGhostElementStyle,
   getDropLinePositionItemIndex,
+  getPlaceholderElementStyle,
+  getStackedGroupElementStyle,
   initializeGhostElementStyle,
   moveGhostElement,
   setBodyStyle,
@@ -36,7 +38,6 @@ type Props<T extends ItemIdentifier> = {
    * @default false
    */
   isLonely?: boolean;
-  className?: string;
   children?: React.ReactNode;
 };
 
@@ -62,7 +63,12 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   const onDragStart = React.useCallback(
     (element: HTMLElement) => {
       setBodyStyle(document.body, listContext.draggingCursorStyle);
-      initializeGhostElementStyle(element, listContext.ghostWrapperElementRef.current ?? undefined);
+      initializeGhostElementStyle(
+        element,
+        listContext.ghostWrapperElementRef.current ?? undefined,
+        listContext.itemSpacing,
+        listContext.direction,
+      );
 
       // Sets contexts to values.
       const nodeMeta = getNodeMeta(
@@ -84,6 +90,8 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       });
     },
     [
+      listContext.itemSpacing,
+      listContext.direction,
       listContext.onDragStart,
       listContext.draggingCursorStyle,
       groupContext.identifier,
@@ -176,7 +184,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       if (draggingNodeMeta.index !== hoveredNodeMeta.index) listContext.setIsVisibleDropLineElement(true);
 
       const dropLineElement = listContext.dropLineElementRef.current ?? undefined;
-      setDropLineElementStyle(dropLineElement, listContext.itemSpacing, absoluteXY, hoveredNodeMeta, listContext.direction);
+      setDropLineElementStyle(dropLineElement, absoluteXY, hoveredNodeMeta, listContext.direction);
 
       // Calculates the next index.
       const dropLineDirection = getDropLineDirectionFromXY(absoluteXY, hoveredNodeMeta, listContext.direction);
@@ -207,7 +215,6 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       listContext.destinationMetaRef.current = { groupIdentifier: groupContext.identifier, index: nextIndex };
     },
     [
-      listContext.itemSpacing,
       listContext.direction,
       listContext.onStackGroup,
       groupContext.identifier,
@@ -291,50 +298,45 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   const contentElement = React.useMemo((): JSX.Element => {
     const draggingNodeMeta = listContext.draggingNodeMeta;
     const isDragging = draggingNodeMeta != undefined && props.identifier === draggingNodeMeta.identifier;
-    const placeholderRenderer = listContext.renderPlaceholder;
-    const stackedGroupRenderer = listContext.renderStackedGroup;
+    const { renderPlaceholder, renderStackedGroup, itemSpacing, direction } = listContext;
 
-    const margin: [string, string, string, string] = ["0", "0", "0", "0"];
-    if (listContext.direction === "vertical") margin[2] = `${listContext.itemSpacing}px`;
-    if (listContext.direction === "horizontal") margin[1] = `${listContext.itemSpacing}px`;
-    const style: React.CSSProperties = {
-      boxSizing: "border-box",
-      position: "static",
-      margin: margin.join(" "),
-    };
     const rendererMeta: Omit<PlaceholderRendererMeta<any>, "isGroup"> | StackedGroupRendererMeta<any> = {
       identifier: props.identifier,
       groupIdentifier: groupContext.identifier,
       index: props.index,
     };
-    if (listContext.stackedGroupIdentifier === props.identifier && stackedGroupRenderer != undefined) {
-      const hoveredNodeMeta = listContext.hoveredNodeMetaRef.current;
 
-      return stackedGroupRenderer(
-        { binder, style: { ...style, width: hoveredNodeMeta?.width, height: hoveredNodeMeta?.height } },
-        rendererMeta,
-      );
+    let children = props.children;
+    if (isDragging && renderPlaceholder != undefined) {
+      const style = getPlaceholderElementStyle(draggingNodeMeta, itemSpacing, direction);
+      children = renderPlaceholder({ binder, style }, { ...rendererMeta, isGroup });
     }
-    if (isDragging && placeholderRenderer != undefined) {
-      return placeholderRenderer(
-        { binder, style: { ...style, width: draggingNodeMeta?.width, height: draggingNodeMeta?.height } },
-        { ...rendererMeta, isGroup },
-      );
+    if (listContext.stackedGroupIdentifier === props.identifier && renderStackedGroup != undefined) {
+      const style = getStackedGroupElementStyle(listContext.hoveredNodeMetaRef.current, itemSpacing, direction);
+      children = renderStackedGroup({ binder, style }, rendererMeta);
     }
+
+    const padding: [string, string] = ["0", "0"];
+    if (direction === "vertical") padding[0] = `${itemSpacing / 2}px`;
+    if (direction === "horizontal") padding[1] = `${itemSpacing / 2}px`;
 
     return (
-      <div className={props.className} style={style} {...binder()} {...draggableBinder()}>
-        {props.children}
+      <div
+        style={{ boxSizing: "border-box", position: "static", padding: padding.join(" ") }}
+        {...binder()}
+        {...draggableBinder()}
+      >
+        {children}
       </div>
     );
   }, [
     listContext.draggingNodeMeta,
-    listContext.itemSpacing,
-    listContext.stackedGroupIdentifier,
     listContext.renderPlaceholder,
+    listContext.renderStackedGroup,
+    listContext.stackedGroupIdentifier,
+    listContext.itemSpacing,
     listContext.direction,
     groupContext.identifier,
-    props.className,
     props.identifier,
     props.children,
     props.index,

@@ -2,14 +2,13 @@ import { Direction, DropLineDirection, getDropLinePosition, ItemIdentifier, Node
 
 export const setDropLineElementStyle = <T extends ItemIdentifier>(
   dropLineElement: HTMLElement | undefined,
-  itemSpacing: number,
   absoluteXY: [number, number],
   nodeMeta: NodeMeta<T>,
   direction: Direction,
 ) => {
   if (dropLineElement == undefined) return;
 
-  const dropLinePosition = getDropLinePosition(absoluteXY, nodeMeta, itemSpacing, direction);
+  const dropLinePosition = getDropLinePosition(absoluteXY, nodeMeta, direction);
   dropLineElement.style.top = `${dropLinePosition.top}px`;
   dropLineElement.style.left = `${dropLinePosition.left}px`;
 

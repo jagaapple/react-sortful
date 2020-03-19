@@ -45,47 +45,53 @@ export const StaticComponent = () => (
     renderStackedGroup={renderStackedGroupElement}
     onDragEnd={() => false}
   >
-    <Item className={styles.item} identifier="a" index={0}>
-      Item A
+    <Item identifier="a" index={0}>
+      <div className={styles.item}>Item A</div>
     </Item>
-    <Item className={styles.item} identifier="b" index={1}>
-      Item B
+    <Item identifier="b" index={1}>
+      <div className={styles.item}>Item B</div>
     </Item>
-    <Item className={styles.item} identifier="c" index={2}>
-      Item C
+    <Item identifier="c" index={2}>
+      <div className={styles.item}>Item C</div>
     </Item>
-    <Item className={styles.item} identifier="d" index={3}>
-      Item D
+    <Item identifier="d" index={3}>
+      <div className={styles.item}>Item D</div>
     </Item>
-    <Item className={styles.group} identifier="e" index={4} isGroup>
-      <div className={styles.heading}>Group E</div>
-      <Item className={styles.item} identifier="e-1" index={0}>
-        Item E - 1
-      </Item>
-      <Item className={styles.item} identifier="e-2" index={1}>
-        Item E - 2
-      </Item>
-      <Item className={styles.item} identifier="e-3" index={2}>
-        Item E - 3
-      </Item>
-      <Item className={styles.item} identifier="e-4" index={3}>
-        Item E - 4
-      </Item>
-      <Item className={styles.group} identifier="e-5" index={4} isGroup>
-        <div className={styles.heading}>Group E - 5</div>
-        <Item className={styles.item} identifier="e-5-1" index={0}>
-          Item E - 5 - 1
+    <Item identifier="e" index={4} isGroup>
+      <div className={styles.group}>
+        <div className={styles.heading}>Group E</div>
+        <Item identifier="e-1" index={0}>
+          <div className={styles.item}>Item E - 1</div>
         </Item>
-      </Item>
-      <Item className={styles.group} identifier="e-6" index={4} isGroup>
-        <div className={styles.heading}>Group E - 6</div>
-      </Item>
-      <Item className={styles.item} identifier="e-7" index={5}>
-        Item E - 7
-      </Item>
+        <Item identifier="e-2" index={1}>
+          <div className={styles.item}>Item E - 2</div>
+        </Item>
+        <Item identifier="e-3" index={2}>
+          <div className={styles.item}>Item E - 3</div>
+        </Item>
+        <Item identifier="e-4" index={3}>
+          <div className={styles.item}>Item E - 4</div>
+        </Item>
+        <Item identifier="e-5" index={4} isGroup>
+          <div className={styles.group}>
+            <div className={styles.heading}>Group E - 5</div>
+            <Item identifier="e-5-1" index={0}>
+              <div className={styles.item}>Item E - 5 - 1</div>
+            </Item>
+          </div>
+        </Item>
+        <Item identifier="e-6" index={4} isGroup>
+          <div className={styles.group}>
+            <div className={styles.heading}>Group E - 6</div>
+          </div>
+        </Item>
+        <Item identifier="e-7" index={5}>
+          <div className={styles.item}>Item E - 7</div>
+        </Item>
+      </div>
     </Item>
-    <Item className={styles.item} identifier="f" index={5}>
-      Item F
+    <Item identifier="f" index={5}>
+      <div className={styles.item}>Item F</div>
     </Item>
   </List>
 );

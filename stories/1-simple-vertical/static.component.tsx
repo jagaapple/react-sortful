@@ -26,20 +26,20 @@ export const StaticComponent = () => (
     renderPlaceholder={renderPlaceholderElement}
     onDragEnd={() => false}
   >
-    <Item className={styles.item} identifier="a" index={0}>
-      Item A
+    <Item identifier="a" index={0}>
+      <div className={styles.item}>Item A</div>
     </Item>
-    <Item className={styles.item} identifier="b" index={1}>
-      Item B
+    <Item identifier="b" index={1}>
+      <div className={styles.item}>Item B</div>
     </Item>
-    <Item className={styles.item} identifier="c" index={2}>
-      Item C
+    <Item identifier="c" index={2}>
+      <div className={styles.item}>Item C</div>
     </Item>
-    <Item className={styles.item} identifier="d" index={3}>
-      Item D
+    <Item identifier="d" index={3}>
+      <div className={styles.item}>Item D</div>
     </Item>
-    <Item className={styles.item} identifier="e" index={4}>
-      Item E
+    <Item identifier="e" index={4}>
+      <div className={styles.item}>Item E</div>
     </Item>
   </List>
 );
