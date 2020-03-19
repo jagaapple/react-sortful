@@ -259,7 +259,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     // Clears a dragging node after 50ms in order to prevent setting and clearing at the same time.
     window.clearTimeout(clearingDraggingNodeTimeoutIdRef.current);
     clearingDraggingNodeTimeoutIdRef.current = window.setTimeout(() => {
-      if (listContext.hoveredNodeMetaRef.current?.identifier != props.identifier) return;
+      if (listContext.hoveredNodeMetaRef.current?.identifier !== props.identifier) return;
 
       listContext.setIsVisibleDropLineElement(false);
       listContext.setStackedGroupIdentifier(undefined);
