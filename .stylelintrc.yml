@@ -299,7 +299,7 @@ rules:
   # Limit the number of attribute selectors in a selector.
   selector-max-attribute: 1
   # Limit the number of classes in a selector.
-  selector-max-class: 4
+  selector-max-class: 5
   # Limit the number of combinators in a selector.
   selector-max-combinators: 2
   # Limit the number of compound selectors in a selector.
