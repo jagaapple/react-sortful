@@ -60,6 +60,15 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     };
   }, []);
 
+  // Clears timers.
+  const clearingDraggingNodeTimeoutIdRef = React.useRef<number>();
+  React.useEffect(
+    () => () => {
+      window.clearTimeout(clearingDraggingNodeTimeoutIdRef.current);
+    },
+    [],
+  );
+
   const onDragStart = React.useCallback(
     (element: HTMLElement) => {
       setBodyStyle(document.body, listContext.draggingCursorStyle);
@@ -244,6 +253,20 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     },
     [listContext.draggingNodeMeta, listContext.direction, onMoveForStackableGroup, onMoveForItems, isGroup],
   );
+  const onLeave = React.useCallback(() => {
+    if (listContext.draggingNodeMeta == undefined) return;
+
+    // Clears a dragging node after 50ms in order to prevent setting and clearing at the same time.
+    window.clearTimeout(clearingDraggingNodeTimeoutIdRef.current);
+    clearingDraggingNodeTimeoutIdRef.current = window.setTimeout(() => {
+      if (listContext.hoveredNodeMetaRef.current?.identifier != props.identifier) return;
+
+      listContext.setIsVisibleDropLineElement(false);
+      listContext.setStackedGroupIdentifier(undefined);
+      listContext.hoveredNodeMetaRef.current = undefined;
+      listContext.destinationMetaRef.current = undefined;
+    }, 50);
+  }, [listContext.draggingNodeMeta, props.identifier]);
 
   const binder = useGesture({
     onHover: ({ event }) => {
@@ -268,6 +291,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
 
       onMove(xy);
     },
+    onPointerLeave: onLeave,
   });
   const draggableBinder = useGesture({
     onDragStart: (state: any) => {
