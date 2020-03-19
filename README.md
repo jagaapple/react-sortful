@@ -1,6 +1,6 @@
 <h1 align="center">react-sortful</h1>
 
-<h4 align="center">🔃 Sortable components for horizontal and vertical, and tree forms. 🔄</h4>
+<h4 align="center">🔃 Sortable components for horizontal and vertical, nested, and tree forms. 🔄</h4>
 
 ```ts
 import { returnOne } from "react-sortful";

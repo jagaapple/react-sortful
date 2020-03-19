@@ -1,10 +1,14 @@
 {
   "name": "react-sortful",
   "version": "0.1.0",
-  "description": "Sortable components for horizontal and vertical, and tree forms.",
+  "description": "Sortable components for horizontal and vertical, nested, and tree forms.",
   "keywords": [
     "React",
+    "drag",
+    "dnd",
     "sort",
+    "arrange",
+    "nest",
     "tree"
   ],
   "homepage": "https://github.com/jagaapple/react-sortful",
