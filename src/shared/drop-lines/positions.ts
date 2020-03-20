@@ -34,14 +34,14 @@ export const checkIsInStackableArea = <T extends ItemIdentifier>(
   if (direciton === "vertical") {
     const nodeTop = 0;
     const nodeBottom = nodeMeta.height;
-    const isInStackableAreaY = nodeTop + stackableAreaThreshold < y && y < nodeBottom - stackableAreaThreshold;
+    const isInStackableAreaY = nodeTop + stackableAreaThreshold <= y && y <= nodeBottom - stackableAreaThreshold;
 
     return isInStackableAreaY;
   }
   if (direciton === "horizontal") {
     const nodeLeft = 0;
     const nodeRight = nodeMeta.width;
-    const isInStackableAreaX = nodeLeft + stackableAreaThreshold < x && x < nodeRight - stackableAreaThreshold;
+    const isInStackableAreaX = nodeLeft + stackableAreaThreshold <= x && x <= nodeRight - stackableAreaThreshold;
 
     return isInStackableAreaX;
   }
