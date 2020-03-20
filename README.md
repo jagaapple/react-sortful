@@ -179,17 +179,17 @@ const renderDropLine = (injectedProps: DropLineRendererInjectedProps) => (
 #### `renderGhost` Prop
 `renderGhost` Prop requires to return a React element. Types of arguments are the following.
 
-|        | TYPE                                                                                  | TYPE NAME (for TypeScript) |
-|--------|---------------------------------------------------------------------------------------|----------------------------|
-| `meta` | `{ identifier: T; groupIdentifier: T | undefined; index: number; isGroup: boolean; }` | `GhostRendererMeta<T>`     |
+|        | TYPE                                                                                   | TYPE NAME (for TypeScript) |
+|--------|----------------------------------------------------------------------------------------|----------------------------|
+| `meta` | `{ identifier: T; groupIdentifier: T \| undefined; index: number; isGroup: boolean; }` | `GhostRendererMeta<T>`     |
 
 #### `renderPlaceholder` Prop
 `renderPlaceholder` Prop requires to return a React element. Types of arguments are the following.
 
-|                 | TYPE                                                                                  | TYPE NAME (for TypeScript)         |
-|-----------------|---------------------------------------------------------------------------------------|------------------------------------|
-| `injectedProps` | `{ style: React.CSSProperties; }`                                                     | `PlaceholderRendererInjectedProps` |
-| `meta`          | `{ identifier: T; groupIdentifier: T | undefined; index: number; isGroup: boolean; }` | `PlaceholderRendererMeta<T>`       |
+|                 | TYPE                                                                                   | TYPE NAME (for TypeScript)         |
+|-----------------|----------------------------------------------------------------------------------------|------------------------------------|
+| `injectedProps` | `{ style: React.CSSProperties; }`                                                      | `PlaceholderRendererInjectedProps` |
+| `meta`          | `{ identifier: T; groupIdentifier: T \| undefined; index: number; isGroup: boolean; }` | `PlaceholderRendererMeta<T>`       |
 
 Note that you have to pass `injectedProps` to a placeholder element like the following, otherwise react-sortful does not work fine.
 
@@ -202,10 +202,10 @@ const renderPlaceholder = (injectedProps: PlaceholderRendererInjectedProps) => (
 #### `renderStackedGroup` Prop
 `renderStackedGroup` Prop requires to return a React element. Types of arguments are the following.
 
-|                 | TYPE                                                                | TYPE NAME (for TypeScript)          |
-|-----------------|---------------------------------------------------------------------|-------------------------------------|
-| `injectedProps` | `{ style: React.CSSProperties; }`                                   | `StackedGroupRendererInjectedProps` |
-| `meta`          | `{ identifier: T; groupIdentifier: T | undefined; index: number; }` | `StackedGroupRendererMeta<T>`       |
+|                 | TYPE                                                                 | TYPE NAME (for TypeScript)          |
+|-----------------|----------------------------------------------------------------------|-------------------------------------|
+| `injectedProps` | `{ style: React.CSSProperties; }`                                    | `StackedGroupRendererInjectedProps` |
+| `meta`          | `{ identifier: T; groupIdentifier: T \| undefined; index: number; }` | `StackedGroupRendererMeta<T>`       |
 
 Note that you have to pass `injectedProps` to a stacked group item element like the following, otherwise react-sortful does not work fine.
 
@@ -233,16 +233,16 @@ arrange side by side.
 #### `onDragStart` Prop
 Types of arguments are the following.
 
-|        | TYPE                                                                                  | TYPE NAME (for TypeScript) |
-|--------|---------------------------------------------------------------------------------------|----------------------------|
-| `meta` | `{ identifier: T; groupIdentifier: T | undefined; index: number; isGroup: boolean; }` | `DragStartMeta<T>`         |
+|        | TYPE                                                                                   | TYPE NAME (for TypeScript) |
+|--------|----------------------------------------------------------------------------------------|----------------------------|
+| `meta` | `{ identifier: T; groupIdentifier: T \| undefined; index: number; isGroup: boolean; }` | `DragStartMeta<T>`         |
 
 #### `onDragEnd` Prop
 Types of arguments are the following.
 
-|        | TYPE                                                                                                                                                     | TYPE NAME (for TypeScript) |
-|--------|----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
-| `meta` | `{ identifier: T; groupIdentifier: T | undefined; index: number; isGroup: boolean; nextGroupIdentifier: T | undefined; nextIndex: number | undefined; }` | `DragEndMeta<T>`           |
+|        | TYPE                                                                                                                                                        | TYPE NAME (for TypeScript) |
+|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
+| `meta` | `{ identifier: T; groupIdentifier: T \| undefined; index: number; isGroup: boolean; nextGroupIdentifier: T \| undefined; nextIndex: number \| undefined; }` | `DragEndMeta<T>`           |
 
 When `meta.nextIndex` is `undefined` , a dragged item will not change or will be stacked on a group item.
 
