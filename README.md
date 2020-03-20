@@ -49,6 +49,7 @@
   - [`Item` Component](#item-component)
     - [`isLonely` Prop](#islonely-prop)
   - [`DragHandle` Component](#draghandle-component)
+- [Examples](#examples)
 - [Road map](#road-map)
 - [Contributing to react-sortful](#contributing-to-react-sortful)
 - [License](#license)
@@ -274,6 +275,19 @@ be needed.
 > 🚫 **Placeholder Limitations.**
 > If you use `DragHandle` in some items, **don't forget containing `DragHandle` in a placeholder element** in the items,
 > otherwise drag and drop will not work fine.
+
+
+## Examples
+You can see more examples from [here](https://www.chromaticqa.com/library?appId=5e6025bcf2b5b700222c2c33).
+
+- [Simple Horizontal List](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=1%20Simple%20(horizontal)&buildNumber=37&specName=Dynamic)
+- [Nested Horizontal List](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=2%20Nested%20(horizontal)&buildNumber=37&specName=Dynamic)
+- [Simple Vertical List](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=1%20Simple%20(vertical)&buildNumber=37&specName=Dynamic)
+- [Nested Vertical List](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=2%20Nested%20(vertical)&buildNumber=37&specName=Dynamic)
+- [Custom Drag Handle](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=3%20Advanced%20Examples&buildNumber=37&specName=Custom%20drag%20handle)
+- [Tree](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=3%20Advanced%20Examples&buildNumber=37&specName=Tree)
+- [Kanban](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=3%20Advanced%20Examples&buildNumber=37&specName=Kanban)
+- [Layers Panel](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=3%20Advanced%20Examples&buildNumber=37&specName=Layers%20panel)
 
 
 ## Road map
