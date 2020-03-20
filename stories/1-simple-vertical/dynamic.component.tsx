@@ -67,7 +67,7 @@ export const DynamicComponent = (props: Props) => {
       const item = itemsById[identifier];
 
       return (
-        <div {...injectedProps.binder()} className={classnames(styles.item, styles.placeholder)} style={injectedProps.style}>
+        <div className={classnames(styles.item, styles.placeholder)} style={injectedProps.style}>
           {item.title}
         </div>
       );

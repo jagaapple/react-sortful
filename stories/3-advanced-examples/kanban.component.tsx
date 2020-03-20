@@ -110,7 +110,7 @@ export const KanbanComponent = () => {
       const item = itemEntitiesMapState.get(identifier)!;
 
       return (
-        <div {...injectedProps.binder()} className={classnames(styles.item, styles.placeholder)} style={injectedProps.style}>
+        <div className={classnames(styles.item, styles.placeholder)} style={injectedProps.style}>
           {item.title}
         </div>
       );
@@ -122,7 +122,7 @@ export const KanbanComponent = () => {
       const rootItem = itemEntitiesMapState.get(identifier)!;
 
       return (
-        <div {...injectedProps.binder()} className={classnames(styles.group, styles.stacked)} style={injectedProps.style}>
+        <div className={classnames(styles.group, styles.stacked)} style={injectedProps.style}>
           <div className={styles.heading}>{rootItem.title}</div>
         </div>
       );

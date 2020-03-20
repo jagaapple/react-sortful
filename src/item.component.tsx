@@ -333,11 +333,11 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     let children = props.children;
     if (isDragging && renderPlaceholder != undefined) {
       const style = getPlaceholderElementStyle(draggingNodeMeta, itemSpacing, direction);
-      children = renderPlaceholder({ binder, style }, { ...rendererMeta, isGroup });
+      children = renderPlaceholder({ style }, { ...rendererMeta, isGroup });
     }
     if (listContext.stackedGroupIdentifier === props.identifier && renderStackedGroup != undefined) {
       const style = getStackedGroupElementStyle(listContext.hoveredNodeMetaRef.current, itemSpacing, direction);
-      children = renderStackedGroup({ binder, style }, rendererMeta);
+      children = renderStackedGroup({ style }, rendererMeta);
     }
 
     const padding: [string, string] = ["0", "0"];

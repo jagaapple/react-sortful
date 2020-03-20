@@ -11,11 +11,7 @@ const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => 
 );
 const renderGhostElement = () => <div className={classnames(styles.item, styles.ghost, styles.static)} />;
 const renderPlaceholderElement = (injectedProps: PlaceholderRendererInjectedProps) => (
-  <div
-    {...injectedProps.binder()}
-    className={classnames(styles.item, styles.placeholder, styles.static)}
-    style={injectedProps.style}
-  />
+  <div className={classnames(styles.item, styles.placeholder, styles.static)} style={injectedProps.style} />
 );
 
 export const StaticComponent = () => (

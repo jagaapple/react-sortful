@@ -216,7 +216,7 @@ export const TreeComponent = (props: Props) => {
       const children = isGroup ? <div className={groupHeadingClassname}>{item.title}</div> : item.title;
 
       return (
-        <div {...injectedProps.binder()} className={className} style={injectedProps.style}>
+        <div className={className} style={injectedProps.style}>
           {children}
         </div>
       );
@@ -228,7 +228,7 @@ export const TreeComponent = (props: Props) => {
       const item = itemEntitiesMapState.get(identifier)!;
 
       return (
-        <div {...injectedProps.binder()} className={classnames(styles.group, styles.stacked)} style={injectedProps.style}>
+        <div className={classnames(styles.group, styles.stacked)} style={injectedProps.style}>
           <div className={groupHeadingClassname}>{item.title}</div>
         </div>
       );
