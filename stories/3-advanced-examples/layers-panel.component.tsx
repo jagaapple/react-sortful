@@ -154,9 +154,7 @@ export const LayersPanelComponent = () => {
     [layerEntitiesMapState],
   );
   const renderPlaceholderElement = React.useCallback(
-    (injectedProps: PlaceholderRendererInjectedProps) => (
-      <div {...injectedProps.binder()} className={styles.placeholder} style={injectedProps.style} />
-    ),
+    (injectedProps: PlaceholderRendererInjectedProps) => <div className={styles.placeholder} style={injectedProps.style} />,
     [layerEntitiesMapState],
   );
   const renderStackedGroupElement = React.useCallback(
@@ -164,11 +162,7 @@ export const LayersPanelComponent = () => {
       const layer = layerEntitiesMapState.get(identifier)!;
 
       return (
-        <div
-          {...injectedProps.binder()}
-          className={classnames(styles.item, styles.group, styles.stacked)}
-          style={injectedProps.style}
-        >
+        <div className={classnames(styles.item, styles.group, styles.stacked)} style={injectedProps.style}>
           <div className={classnames("fa", "fa-arrow-circle-right ", styles.icon, styles.arrow)} />
           <div className={classnames("fa", "fa-folder", styles.icon, styles.folder)} />
           {layer.name}

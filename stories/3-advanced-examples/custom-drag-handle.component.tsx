@@ -4,6 +4,7 @@ import arrayMove from "array-move";
 
 import {
   DragEndMeta,
+  DragHandleComponent,
   DropLineRendererInjectedProps,
   GhostRendererMeta,
   Item,
@@ -12,8 +13,7 @@ import {
   PlaceholderRendererMeta,
 } from "../../src";
 
-import { commonStyles } from "../shared";
-import { styles } from "./shared";
+import styles from "./custom-drag-handle.css";
 
 type DummyItem = { id: string; title: string };
 
@@ -24,17 +24,22 @@ const initialItems: DummyItem[] = [
   { id: "d", title: "Item D" },
   { id: "e", title: "Item E" },
 ];
-const lockedItemIds = initialItems.filter((_, index) => index % 2 === 0).map((item) => item.id);
 
+const dotsSVG = (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+    <circle cx="18" cy="12" r="3" />
+    <circle cx="18" cy="24" r="3" />
+    <circle cx="18" cy="36" r="3" />
+    <circle cx="30" cy="12" r="3" />
+    <circle cx="30" cy="24" r="3" />
+    <circle cx="30" cy="36" r="3" />
+  </svg>
+);
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
-  <div
-    ref={injectedProps.ref}
-    className={classnames(commonStyles.dropLine, commonStyles.horizontal)}
-    style={injectedProps.style}
-  />
+  <div ref={injectedProps.ref} className={styles.dropLine} style={injectedProps.style} />
 );
 
-export const DynamicPartialLockedComponent = () => {
+export const CustomDragHandleComponent = () => {
   const [itemsState, setItemsState] = React.useState(initialItems);
   const itemsById = React.useMemo(
     () =>
@@ -48,22 +53,28 @@ export const DynamicPartialLockedComponent = () => {
 
   const itemElements = React.useMemo(
     () =>
-      itemsState.map((item, index) => {
-        const isLocked = lockedItemIds.includes(item.id);
+      itemsState.map((item, index) => (
+        <Item key={item.id} identifier={item.id} index={index} isUsedCustomDragHandlers>
+          <div className={styles.item}>
+            <DragHandleComponent className={styles.dragHandle}>{dotsSVG}</DragHandleComponent>
 
-        return (
-          <Item key={item.id} identifier={item.id} index={index} isLocked={isLocked}>
-            <div className={classnames(styles.item, { [styles.locked]: isLocked })}>{item.title}</div>
-          </Item>
-        );
-      }),
+            {item.title}
+          </div>
+        </Item>
+      )),
     [itemsState],
   );
   const renderGhostElement = React.useCallback(
     ({ identifier }: GhostRendererMeta<DummyItem["id"]>) => {
       const item = itemsById[identifier];
 
-      return <div className={classnames(styles.item, styles.ghost)}>{item.title}</div>;
+      return (
+        <div className={classnames(styles.item, styles.ghost)}>
+          <div className={styles.dragHandle}>{dotsSVG}</div>
+
+          {item.title}
+        </div>
+      );
     },
     [itemsById],
   );
@@ -73,6 +84,8 @@ export const DynamicPartialLockedComponent = () => {
 
       return (
         <div className={classnames(styles.item, styles.placeholder)} style={injectedProps.style}>
+          <DragHandleComponent className={styles.dragHandle}>{dotsSVG}</DragHandleComponent>
+
           {item.title}
         </div>
       );
@@ -95,7 +108,8 @@ export const DynamicPartialLockedComponent = () => {
       renderDropLine={renderDropLineElement}
       renderGhost={renderGhostElement}
       renderPlaceholder={renderPlaceholderElement}
-      direction="horizontal"
+      itemSpacing={12}
+      draggingCursorStyle="grabbing"
       onDragEnd={onDragEnd}
     >
       {itemElements}

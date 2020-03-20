@@ -1,15 +1,7 @@
 import * as React from "react";
 import arrayMove from "array-move";
 
-import {
-  DragEndMeta,
-  DropLineRendererInjectedProps,
-  GhostRendererMeta,
-  Item,
-  List,
-  PlaceholderRendererInjectedProps,
-  PlaceholderRendererMeta,
-} from "../../src";
+import { DragEndMeta, DropLineRendererInjectedProps, GhostRendererMeta, Item, List } from "../../src";
 
 type DummyItem = { id: string; title: string };
 
@@ -54,18 +46,6 @@ export const NonStyledComponent = () => {
     },
     [itemsById],
   );
-  const renderPlaceholderElement = React.useCallback(
-    (injectedProps: PlaceholderRendererInjectedProps, { identifier }: PlaceholderRendererMeta<DummyItem["id"]>) => {
-      const item = itemsById[identifier];
-
-      return (
-        <div {...injectedProps.binder()} style={injectedProps.style}>
-          {item.title}
-        </div>
-      );
-    },
-    [itemsById],
-  );
 
   const onDragEnd = React.useCallback(
     (meta: DragEndMeta<DummyItem["id"]>) => {
@@ -77,12 +57,7 @@ export const NonStyledComponent = () => {
   );
 
   return (
-    <List
-      renderDropLine={renderDropLineElement}
-      renderGhost={renderGhostElement}
-      renderPlaceholder={renderPlaceholderElement}
-      onDragEnd={onDragEnd}
-    >
+    <List renderDropLine={renderDropLineElement} renderGhost={renderGhostElement} onDragEnd={onDragEnd}>
       {itemElements}
     </List>
   );

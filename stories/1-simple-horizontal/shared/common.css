@@ -15,7 +15,7 @@
   border-radius: 4px;
   background-color: white;
 }
-.item.dragging {
+.item.placeholder {
   color: #cfd4db;
   border-style: dashed;
   background-color: transparent;

@@ -52,16 +52,13 @@
   background-color: white;
   cursor: grab;
 }
-.item.dragging {
+.item.placeholder {
   color: white;
   background-color: #cfdce5;
   cursor: grabbing;
 }
 .item.draggingAny {
   cursor: grabbing;
-}
-.item.ghost.static {
-  background-color: #f6f9fc;
 }
 
 .ghost {

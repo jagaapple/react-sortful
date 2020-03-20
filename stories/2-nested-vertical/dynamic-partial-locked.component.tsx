@@ -93,11 +93,11 @@ export const DynamicPartialLockedComponent = () => {
   const renderPlaceholderElement = React.useCallback(
     (injectedProps: PlaceholderRendererInjectedProps, { identifier, isGroup }: PlaceholderRendererMeta<DummyItem["id"]>) => {
       const item = itemEntitiesMapState.get(identifier)!;
-      const className = classnames({ [styles.group]: isGroup, [styles.item]: !isGroup }, styles.dragging);
+      const className = classnames({ [styles.group]: isGroup, [styles.item]: !isGroup }, styles.placeholder);
       const children = isGroup ? <div className={styles.heading}>{item.title}</div> : item.title;
 
       return (
-        <div {...injectedProps.binder()} className={className} style={injectedProps.style}>
+        <div className={className} style={injectedProps.style}>
           {children}
         </div>
       );
@@ -110,7 +110,7 @@ export const DynamicPartialLockedComponent = () => {
       const isLocked = lockedItemIds.includes(item.id);
 
       return (
-        <div {...injectedProps.binder()} className={classnames(styles.group, styles.stacked)} style={injectedProps.style}>
+        <div className={classnames(styles.group, styles.stacked)} style={injectedProps.style}>
           <div className={classnames(styles.heading, { [styles.locked]: isLocked })}>{item.title}</div>
         </div>
       );

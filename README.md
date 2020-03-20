@@ -42,14 +42,14 @@
 
 
 ## Features
-| FEATURES                                   | WHAT YOU CAN DO                                                           |
-|--------------------------------------------|---------------------------------------------------------------------------|
-| ⚛️ **Designed for React**                   | Get sortable components for your React project                            |
-| ✨ **Simple API**                           | All you need is to know props of two components                           |
-| 🔄 **Support for vertical and horizontal** | You can create vertical and horizontal lists                              |
-| 👨‍👩‍👧‍👦 **Support for nested lists**         | You can stack lists in lists                                              |
-| 🌴 **Creatable any forms**                 | Easy to create a draggable file tree, TODO lists, layers panel, and so on |
-| 🎩 **Type Safe**                           | You can use with TypeScript                                               |
+| FEATURES                                   | WHAT YOU CAN DO                                                       |
+|--------------------------------------------|-----------------------------------------------------------------------|
+| ⚛️ **Designed for React**                   | Get sortable components for your React project                        |
+| ✨ **Simple API**                           | All you need is to know props of two components                       |
+| 🔄 **Support for vertical and horizontal** | You can create vertical and horizontal lists                          |
+| 👨‍👩‍👧‍👦 **Support for nested lists**         | You can stack lists in lists                                          |
+| 🌴 **Creatable any forms**                 | Easy to create a draggable file tree, Kanban, layers panel, and so on |
+| 🎩 **Type Safe**                           | You can use with TypeScript                                           |
 
 When you become interested in react-sortful, see [online catalogs (Storybook)](https://www.chromaticqa.com/library?appId=5e6025bcf2b5b700222c2c33)!
 

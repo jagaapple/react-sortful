@@ -17,7 +17,7 @@
   border: 1px dashed transparent;
   border-radius: 4px;
 }
-.group.dragging {
+.group.placeholder {
   border-color: #cfd4db;
   background-color: #f6f9fc;
 }
@@ -65,7 +65,7 @@
 .item::before {
   content: "\f016";
 }
-.item.dragging {
+.item.placeholder {
   border-color: #cfd4db;
   background-color: #f6f9fc;
 }
@@ -84,9 +84,6 @@
   animation-name: ghostItemVisible;
   animation-duration: 200ms;
   animation-fill-mode: forwards;
-}
-.ghost.static {
-  background-color: #e2e6eb;
 }
 @keyframes ghostItemVisible {
   0% {

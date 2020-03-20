@@ -27,13 +27,12 @@ const renderPlaceholderElement = (
   { isGroup }: PlaceholderRendererMeta<DummyItem["id"]>,
 ) => (
   <div
-    {...injectedProps.binder()}
-    className={classnames({ [styles.item]: !isGroup, [styles.group]: isGroup }, styles.dragging)}
+    className={classnames({ [styles.item]: !isGroup, [styles.group]: isGroup }, styles.placeholder)}
     style={injectedProps.style}
   />
 );
 const renderStackedGroupElement = (injectedProps: StackedGroupRendererInjectedProps) => (
-  <div {...injectedProps.binder()} className={classnames(styles.group, styles.stacked)} style={injectedProps.style} />
+  <div className={classnames(styles.group, styles.stacked)} style={injectedProps.style} />
 );
 
 export const StaticComponent = () => (
