@@ -19,12 +19,12 @@ import {
 } from "./item";
 
 type Props<T extends ItemIdentifier> = {
-  /** A unique identifier in all items in a root list. */
+  /** A unique identifier in all items of list. */
   identifier: T;
   /** A unique and sequential index number in a parent group. */
   index: number;
   /**
-   * Whether this item contains child items.
+   * Whether an item is possible to have child items.
    * @default false
    */
   isGroup?: boolean;
@@ -35,12 +35,12 @@ type Props<T extends ItemIdentifier> = {
    */
   isLocked?: boolean;
   /**
-   * Whether it is impossible to put items on both sides of this item.
+   * Whether droppable areas on both sides of an item is disabled.
    * @default false
    */
   isLonely?: boolean;
   /**
-   * Whether this item contains custom drag handlers in child items (not grandchildren).
+   * Whether an item contains custom drag handlers in child items (not grandchildren).
    * @default false
    */
   isUsedCustomDragHandlers?: boolean;

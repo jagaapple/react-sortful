@@ -16,13 +16,22 @@ import {
 } from "./list";
 
 type Props<T extends ItemIdentifier> = {
-  /** A function to render a drop line element when dragging any item. */
+  /**
+   * A function to return an element used as a drop line.
+   * A drop line is a line to display a destination position to users.
+   */
   renderDropLine: (injectedProps: DropLineRendererInjectedProps) => React.ReactNode;
-  /** A function to render a ghost element when dragging any item. */
+  /**
+   * A function to return an element used as a ghost.
+   * A ghost is an element following a mouse pointer when dragging.
+   */
   renderGhost: (meta: GhostRendererMeta<T>) => React.ReactNode;
-  /** A function to render a placeholder element instead of a dragging item element. */
+  /**
+   * A function to return an element used as a placeholder.
+   * A placeholder is an element remaining in place when dragging the element.
+   */
   renderPlaceholder?: (injectedProps: PlaceholderRendererInjectedProps, meta: PlaceholderRendererMeta<T>) => JSX.Element;
-  /** A function to render an item element when an empty group item is hovered by a dragging item. */
+  /** A function to render an item element when an empty group item is hovered by a dragged item. */
   renderStackedGroup?: (injectedProps: StackedGroupRendererInjectedProps, meta: StackedGroupRendererMeta<T>) => JSX.Element;
   /**
    * A spacing size (px) between items.
@@ -30,12 +39,12 @@ type Props<T extends ItemIdentifier> = {
    */
   itemSpacing?: number;
   /**
-   * A threshold size (px) of stackable area for groups.
+   * A threshold size (px) of stackable area for group items.
    * @default 8
    */
   stackableAreaThreshold?: number;
   /**
-   * A direction to recognize drop area.
+   * A direction to recognize a drop area.
    * Note that this will not change styles, so you have to apply styles such as being arranged side by side.
    * @default "vertical"
    */
@@ -51,7 +60,7 @@ type Props<T extends ItemIdentifier> = {
   onDragStart?: (meta: DragStartMeta<T>) => void;
   /** A callback function after end of dragging. */
   onDragEnd: (meta: DragEndMeta<T>) => void;
-  /** A callback function while an empty group item is hovered by a dragging item. */
+  /** A callback function when an empty group item is hovered by a dragged item. */
   onStackGroup?: (meta: StackGroupMeta<T>) => void;
   className?: string;
   children?: React.ReactNode;
