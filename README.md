@@ -49,6 +49,7 @@
   - [`Item` Component](#item-component)
     - [`isLonely` Prop](#islonely-prop)
   - [`DragHandle` Component](#draghandle-component)
+- [Examples](#examples)
 - [Road map](#road-map)
 - [Contributing to react-sortful](#contributing-to-react-sortful)
 - [License](#license)
@@ -60,10 +61,11 @@
 | FEATURES                                   | WHAT YOU CAN DO                                                       |
 |--------------------------------------------|-----------------------------------------------------------------------|
 | ⚛️ **Designed for React**                   | Get sortable components for your React project                        |
-| ✨ **Simple API**                           | All you need is to know props of two components                       |
+| ✨ **Simple API**                           | All you need is to know Props of two components                       |
 | 🔄 **Support for vertical and horizontal** | You can create vertical and horizontal lists                          |
 | 👨‍👩‍👧‍👦 **Support for nested lists**         | You can stack lists in lists                                          |
 | 🌴 **Creatable any forms**                 | Easy to create a draggable file tree, Kanban, layers panel, and so on |
+| ❤️ **Ready for CSS and styled-components**  | Customize using your favorite styling way                             |
 | 🎩 **Type Safe**                           | You can use with TypeScript                                           |
 
 When you get interested in react-sortful, see [online catalogs (Storybook)](https://www.chromaticqa.com/library?appId=5e6025bcf2b5b700222c2c33)!
@@ -179,17 +181,17 @@ const renderDropLine = (injectedProps: DropLineRendererInjectedProps) => (
 #### `renderGhost` Prop
 `renderGhost` Prop requires to return a React element. Types of arguments are the following.
 
-|        | TYPE                                                                                  | TYPE NAME (for TypeScript) |
-|--------|---------------------------------------------------------------------------------------|----------------------------|
-| `meta` | `{ identifier: T; groupIdentifier: T | undefined; index: number; isGroup: boolean; }` | `GhostRendererMeta<T>`     |
+|        | TYPE                                                                                   | TYPE NAME (for TypeScript) |
+|--------|----------------------------------------------------------------------------------------|----------------------------|
+| `meta` | `{ identifier: T; groupIdentifier: T \| undefined; index: number; isGroup: boolean; }` | `GhostRendererMeta<T>`     |
 
 #### `renderPlaceholder` Prop
 `renderPlaceholder` Prop requires to return a React element. Types of arguments are the following.
 
-|                 | TYPE                                                                                  | TYPE NAME (for TypeScript)         |
-|-----------------|---------------------------------------------------------------------------------------|------------------------------------|
-| `injectedProps` | `{ style: React.CSSProperties; }`                                                     | `PlaceholderRendererInjectedProps` |
-| `meta`          | `{ identifier: T; groupIdentifier: T | undefined; index: number; isGroup: boolean; }` | `PlaceholderRendererMeta<T>`       |
+|                 | TYPE                                                                                   | TYPE NAME (for TypeScript)         |
+|-----------------|----------------------------------------------------------------------------------------|------------------------------------|
+| `injectedProps` | `{ style: React.CSSProperties; }`                                                      | `PlaceholderRendererInjectedProps` |
+| `meta`          | `{ identifier: T; groupIdentifier: T \| undefined; index: number; isGroup: boolean; }` | `PlaceholderRendererMeta<T>`       |
 
 Note that you have to pass `injectedProps` to a placeholder element like the following, otherwise react-sortful does not work fine.
 
@@ -202,10 +204,10 @@ const renderPlaceholder = (injectedProps: PlaceholderRendererInjectedProps) => (
 #### `renderStackedGroup` Prop
 `renderStackedGroup` Prop requires to return a React element. Types of arguments are the following.
 
-|                 | TYPE                                                                | TYPE NAME (for TypeScript)          |
-|-----------------|---------------------------------------------------------------------|-------------------------------------|
-| `injectedProps` | `{ style: React.CSSProperties; }`                                   | `StackedGroupRendererInjectedProps` |
-| `meta`          | `{ identifier: T; groupIdentifier: T | undefined; index: number; }` | `StackedGroupRendererMeta<T>`       |
+|                 | TYPE                                                                 | TYPE NAME (for TypeScript)          |
+|-----------------|----------------------------------------------------------------------|-------------------------------------|
+| `injectedProps` | `{ style: React.CSSProperties; }`                                    | `StackedGroupRendererInjectedProps` |
+| `meta`          | `{ identifier: T; groupIdentifier: T \| undefined; index: number; }` | `StackedGroupRendererMeta<T>`       |
 
 Note that you have to pass `injectedProps` to a stacked group item element like the following, otherwise react-sortful does not work fine.
 
@@ -233,16 +235,16 @@ arrange side by side.
 #### `onDragStart` Prop
 Types of arguments are the following.
 
-|        | TYPE                                                                                  | TYPE NAME (for TypeScript) |
-|--------|---------------------------------------------------------------------------------------|----------------------------|
-| `meta` | `{ identifier: T; groupIdentifier: T | undefined; index: number; isGroup: boolean; }` | `DragStartMeta<T>`         |
+|        | TYPE                                                                                   | TYPE NAME (for TypeScript) |
+|--------|----------------------------------------------------------------------------------------|----------------------------|
+| `meta` | `{ identifier: T; groupIdentifier: T \| undefined; index: number; isGroup: boolean; }` | `DragStartMeta<T>`         |
 
 #### `onDragEnd` Prop
 Types of arguments are the following.
 
-|        | TYPE                                                                                                                                                     | TYPE NAME (for TypeScript) |
-|--------|----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
-| `meta` | `{ identifier: T; groupIdentifier: T | undefined; index: number; isGroup: boolean; nextGroupIdentifier: T | undefined; nextIndex: number | undefined; }` | `DragEndMeta<T>`           |
+|        | TYPE                                                                                                                                                        | TYPE NAME (for TypeScript) |
+|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
+| `meta` | `{ identifier: T; groupIdentifier: T \| undefined; index: number; isGroup: boolean; nextGroupIdentifier: T \| undefined; nextIndex: number \| undefined; }` | `DragEndMeta<T>`           |
 
 When `meta.nextIndex` is `undefined` , a dragged item will not change or will be stacked on a group item.
 
@@ -273,6 +275,19 @@ be needed.
 > 🚫 **Placeholder Limitations.**
 > If you use `DragHandle` in some items, **don't forget containing `DragHandle` in a placeholder element** in the items,
 > otherwise drag and drop will not work fine.
+
+
+## Examples
+You can see more examples from [here](https://www.chromaticqa.com/library?appId=5e6025bcf2b5b700222c2c33).
+
+- [Simple Horizontal List](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=1%20Simple%20(horizontal)&buildNumber=37&specName=Dynamic)
+- [Nested Horizontal List](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=2%20Nested%20(horizontal)&buildNumber=37&specName=Dynamic)
+- [Simple Vertical List](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=1%20Simple%20(vertical)&buildNumber=37&specName=Dynamic)
+- [Nested Vertical List](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=2%20Nested%20(vertical)&buildNumber=37&specName=Dynamic)
+- [Custom Drag Handle](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=3%20Advanced%20Examples&buildNumber=37&specName=Custom%20drag%20handle)
+- [Tree](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=3%20Advanced%20Examples&buildNumber=37&specName=Tree)
+- [Kanban](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=3%20Advanced%20Examples&buildNumber=37&specName=Kanban)
+- [Layers Panel](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=3%20Advanced%20Examples&buildNumber=37&specName=Layers%20panel)
 
 
 ## Road map
