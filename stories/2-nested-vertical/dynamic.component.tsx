@@ -95,7 +95,7 @@ export const DynamicComponent = (props: Props) => {
   const renderPlaceholderElement = React.useCallback(
     (injectedProps: PlaceholderRendererInjectedProps, { identifier, isGroup }: PlaceholderRendererMeta<DummyItem["id"]>) => {
       const item = itemEntitiesMapState.get(identifier)!;
-      const className = classnames({ [styles.group]: isGroup, [styles.item]: !isGroup }, styles.dragging);
+      const className = classnames({ [styles.group]: isGroup, [styles.item]: !isGroup }, styles.placeholder);
       const children = isGroup ? <div className={styles.heading}>{item.title}</div> : item.title;
 
       return (

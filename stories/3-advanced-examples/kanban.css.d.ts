@@ -6,7 +6,7 @@ declare const styles: {
   readonly "heading": string;
   readonly "items": string;
   readonly "item": string;
-  readonly "dragging": string;
+  readonly "placeholder": string;
   readonly "draggingAny": string;
   readonly "ghost": string;
   readonly "static": string;

@@ -212,7 +212,7 @@ export const TreeComponent = (props: Props) => {
   const renderPlaceholderElement = React.useCallback(
     (injectedProps: PlaceholderRendererInjectedProps, { identifier, isGroup }: PlaceholderRendererMeta<DummyItem["id"]>) => {
       const item = itemEntitiesMapState.get(identifier)!;
-      const className = classnames({ [styles.group]: isGroup, [itemClassName]: !isGroup }, styles.dragging);
+      const className = classnames({ [styles.group]: isGroup, [itemClassName]: !isGroup }, styles.placeholder);
       const children = isGroup ? <div className={groupHeadingClassname}>{item.title}</div> : item.title;
 
       return (

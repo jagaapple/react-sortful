@@ -72,7 +72,7 @@ export const DynamicPartialLockedComponent = () => {
       const item = itemsById[identifier];
 
       return (
-        <div {...injectedProps.binder()} className={classnames(styles.item, styles.dragging)} style={injectedProps.style}>
+        <div {...injectedProps.binder()} className={classnames(styles.item, styles.placeholder)} style={injectedProps.style}>
           {item.title}
         </div>
       );

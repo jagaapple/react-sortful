@@ -52,7 +52,7 @@
   background-color: white;
   cursor: grab;
 }
-.item.dragging {
+.item.placeholder {
   color: white;
   background-color: #cfdce5;
   cursor: grabbing;

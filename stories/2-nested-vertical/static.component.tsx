@@ -28,7 +28,7 @@ const renderPlaceholderElement = (
 ) => (
   <div
     {...injectedProps.binder()}
-    className={classnames({ [styles.item]: !isGroup, [styles.group]: isGroup }, styles.dragging)}
+    className={classnames({ [styles.item]: !isGroup, [styles.group]: isGroup }, styles.placeholder)}
     style={injectedProps.style}
   />
 );

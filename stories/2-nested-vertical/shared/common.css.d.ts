@@ -2,7 +2,7 @@ declare const styles: {
   readonly "wrapper": string;
   readonly "group": string;
   readonly "stacked": string;
-  readonly "dragging": string;
+  readonly "placeholder": string;
   readonly "ghost": string;
   readonly "heading": string;
   readonly "disabled": string;

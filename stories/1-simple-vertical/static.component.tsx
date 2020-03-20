@@ -13,7 +13,7 @@ const renderGhostElement = () => <div className={classnames(styles.item, styles.
 const renderPlaceholderElement = (injectedProps: PlaceholderRendererInjectedProps) => (
   <div
     {...injectedProps.binder()}
-    className={classnames(styles.item, styles.dragging, styles.static)}
+    className={classnames(styles.item, styles.placeholder, styles.static)}
     style={injectedProps.style}
   />
 );
