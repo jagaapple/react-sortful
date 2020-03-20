@@ -12,6 +12,7 @@ import {
   getPlaceholderElementStyle,
   getStackedGroupElementStyle,
   initializeGhostElementStyle,
+  ItemContext,
   moveGhostElement,
   setBodyStyle,
   setDropLineElementStyle,
@@ -29,7 +30,7 @@ type Props<T extends ItemIdentifier> = {
   isGroup?: boolean;
   /**
    * Whether child items are not able to move and drag.
-   * Stacking and popping will be allowed. Grandchild items will not be affected.
+   * Stacking and popping child items will be allowed. Grandchild items will not be affected.
    * @default false
    */
   isLocked?: boolean;
@@ -38,6 +39,11 @@ type Props<T extends ItemIdentifier> = {
    * @default false
    */
   isLonely?: boolean;
+  /**
+   * Whether this item contains custom drag handlers in child items (not grandchildren).
+   * @default false
+   */
+  isUsedCustomDragHandlers?: boolean;
   children?: React.ReactNode;
 };
 
@@ -45,10 +51,13 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   const listContext = React.useContext(ListContext);
   const groupContext = React.useContext(GroupContext);
 
+  const wrapperElementRef = React.useRef<HTMLDivElement>(null);
+
   const ancestorIdentifiers = [...groupContext.ancestorIdentifiers, props.identifier];
   const isGroup = props.isGroup ?? false;
   const isLocked = (listContext.isDisabled || props.isLocked) ?? false;
   const isLonley = props.isLonely ?? false;
+  const isUsedCustomDragHandlers = props.isUsedCustomDragHandlers ?? false;
 
   // Registers an identifier to the group context.
   const childIdentifiersRef = React.useRef<Set<ItemIdentifier>>(new Set());
@@ -69,47 +78,45 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     [],
   );
 
-  const onDragStart = React.useCallback(
-    (element: HTMLElement) => {
-      setBodyStyle(document.body, listContext.draggingCursorStyle);
-      initializeGhostElementStyle(
-        element,
-        listContext.ghostWrapperElementRef.current ?? undefined,
-        listContext.itemSpacing,
-        listContext.direction,
-      );
+  const onDragStart = React.useCallback(() => {
+    const element = wrapperElementRef.current;
+    if (element == undefined) return;
 
-      // Sets contexts to values.
-      const nodeMeta = getNodeMeta(
-        element,
-        props.identifier,
-        groupContext.identifier,
-        ancestorIdentifiers,
-        props.index,
-        isGroup,
-      );
-      listContext.setDraggingNodeMeta(nodeMeta);
-
-      // Calls callbacks.
-      listContext.onDragStart?.({
-        identifier: nodeMeta.identifier,
-        groupIdentifier: nodeMeta.groupIdentifier,
-        index: nodeMeta.index,
-        isGroup: nodeMeta.isGroup,
-      });
-    },
-    [
+    setBodyStyle(document.body, listContext.draggingCursorStyle);
+    initializeGhostElementStyle(
+      element,
+      listContext.ghostWrapperElementRef.current ?? undefined,
       listContext.itemSpacing,
       listContext.direction,
-      listContext.onDragStart,
-      listContext.draggingCursorStyle,
-      groupContext.identifier,
-      props.identifier,
-      props.index,
-      ancestorIdentifiers,
-      isGroup,
-    ],
-  );
+    );
+
+    // Sets contexts to values.
+    const nodeMeta = getNodeMeta(element, props.identifier, groupContext.identifier, ancestorIdentifiers, props.index, isGroup);
+    listContext.setDraggingNodeMeta(nodeMeta);
+
+    // Calls callbacks.
+    listContext.onDragStart?.({
+      identifier: nodeMeta.identifier,
+      groupIdentifier: nodeMeta.groupIdentifier,
+      index: nodeMeta.index,
+      isGroup: nodeMeta.isGroup,
+    });
+  }, [
+    listContext.itemSpacing,
+    listContext.direction,
+    listContext.onDragStart,
+    listContext.draggingCursorStyle,
+    groupContext.identifier,
+    props.identifier,
+    props.index,
+    ancestorIdentifiers,
+    isGroup,
+  ]);
+  const onDrag = React.useCallback((isDown: boolean, absoluteXY: [number, number]) => {
+    if (!isDown) return;
+
+    moveGhostElement(listContext.ghostWrapperElementRef.current ?? undefined, absoluteXY);
+  }, []);
   const onDragEnd = React.useCallback(() => {
     clearBodyStyle(document.body);
     clearGhostElementStyle(listContext.ghostWrapperElementRef.current ?? undefined);
@@ -293,29 +300,26 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     },
     onPointerLeave: onLeave,
   });
+  const dragHandlers: React.ContextType<typeof ItemContext>["dragHandlers"] = { onDragStart, onDrag, onDragEnd };
   const draggableBinder = useGesture({
     onDragStart: (state: any) => {
-      const event: React.SyntheticEvent = state.event;
-      const element = event.currentTarget;
-      if (!(element instanceof HTMLElement)) return;
+      if (isLocked) return;
 
+      const event: React.SyntheticEvent = state.event;
       event.persist();
       event.stopPropagation();
 
-      if (isLocked) return;
-
-      onDragStart(element);
+      dragHandlers.onDragStart();
     },
     onDrag: ({ down, movement }) => {
       if (isLocked) return;
-      if (!down) return;
 
-      moveGhostElement(listContext.ghostWrapperElementRef.current ?? undefined, movement);
+      dragHandlers.onDrag(down, movement);
     },
     onDragEnd: () => {
       if (isLocked) return;
 
-      onDragEnd();
+      dragHandlers.onDragEnd();
     },
   });
 
@@ -346,9 +350,10 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
 
     return (
       <div
+        ref={wrapperElementRef}
         style={{ boxSizing: "border-box", position: "static", padding: padding.join(" ") }}
         {...binder()}
-        {...draggableBinder()}
+        {...(isUsedCustomDragHandlers ? {} : draggableBinder())}
       >
         {children}
       </div>
@@ -365,14 +370,15 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     props.children,
     props.index,
     isGroup,
+    isUsedCustomDragHandlers,
     binder,
     draggableBinder,
   ]);
-  if (!isGroup) return contentElement;
+  if (!isGroup) return <ItemContext.Provider value={{ isLocked, dragHandlers }}>{contentElement}</ItemContext.Provider>;
 
   return (
     <GroupContext.Provider value={{ identifier: props.identifier, ancestorIdentifiers, childIdentifiersRef }}>
-      {contentElement}
+      <ItemContext.Provider value={{ isLocked, dragHandlers }}>{contentElement}</ItemContext.Provider>
     </GroupContext.Provider>
   );
 };
