@@ -9,7 +9,6 @@ declare const styles: {
   readonly "placeholder": string;
   readonly "draggingAny": string;
   readonly "ghost": string;
-  readonly "static": string;
 };
 export = styles;
 

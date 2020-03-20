@@ -11,7 +11,6 @@ declare const styles: {
   readonly "disabled": string;
   readonly "ghost": string;
   readonly "ghostItemVisible": string;
-  readonly "static": string;
 };
 export = styles;
 

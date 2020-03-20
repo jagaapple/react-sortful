@@ -60,9 +60,6 @@
 .item.draggingAny {
   cursor: grabbing;
 }
-.item.ghost.static {
-  background-color: #f6f9fc;
-}
 
 .ghost {
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);

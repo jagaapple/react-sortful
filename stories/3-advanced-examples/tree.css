@@ -85,9 +85,6 @@
   animation-duration: 200ms;
   animation-fill-mode: forwards;
 }
-.ghost.static {
-  background-color: #e2e6eb;
-}
 @keyframes ghostItemVisible {
   0% {
     opacity: 0;
