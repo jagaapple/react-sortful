@@ -11,14 +11,8 @@ export const getDropLineDirection = (
 ): DropLineDirection | undefined => {
   const [pointerX, pointerY] = pointerXY;
 
-  if (direction === "vertical") {
-    if (nodeHeight / 2 >= pointerY) return "TOP";
-    if (nodeHeight / 2 < pointerY) return "BOTTOM";
-  }
-  if (direction === "horizontal") {
-    if (nodeWidth / 2 >= pointerX) return "LEFT";
-    if (nodeWidth / 2 < pointerX) return "RIGHT";
-  }
+  if (direction === "vertical") return nodeHeight / 2 >= pointerY ? "TOP" : "BOTTOM";
+  if (direction === "horizontal") return nodeWidth / 2 >= pointerX ? "LEFT" : "RIGHT";
 };
 
 export const getDropLineDirectionFromXY = <T extends ItemIdentifier>(
