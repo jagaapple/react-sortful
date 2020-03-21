@@ -1,23 +1,32 @@
 const styleElementId = "react-sortful-global-style";
 
-export const setBodyStyle = (bodyElement: HTMLElement, draggingCusrsorStyle: string | undefined) => {
+export const setBodyStyle = (
+  bodyElement: HTMLElement,
+  draggingCusrsorStyle: string | undefined,
+  // istanbul ignore next
+  documentElement = document,
+) => {
   // Disables to select elements in entire page.
   bodyElement.style.userSelect = "none";
 
   // Applies a cursor style when dragging.
   if (draggingCusrsorStyle != undefined) {
-    const styleElement = document.createElement("style");
+    const styleElement = documentElement.createElement("style");
     styleElement.textContent = `* { cursor: ${draggingCusrsorStyle} !important; }`;
     styleElement.setAttribute("id", styleElementId);
 
-    document.head.appendChild(styleElement);
+    documentElement.head.appendChild(styleElement);
   }
 };
 
-export const clearBodyStyle = (bodyElement: HTMLElement) => {
+export const clearBodyStyle = (
+  bodyElement: HTMLElement,
+  // istanbul ignore next
+  documentElement = document,
+) => {
   // Enables to select elements in entire page.
   bodyElement.style.removeProperty("user-select");
 
   // Resets a cursor style when dragging.
-  document.getElementById(styleElementId)?.remove();
+  documentElement.getElementById(styleElementId)?.remove();
 };
