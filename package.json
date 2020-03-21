@@ -1,6 +1,6 @@
 {
   "name": "react-sortful",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Sortable components for horizontal and vertical, nested, and tree forms.",
   "keywords": [
     "React",

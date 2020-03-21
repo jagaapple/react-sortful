@@ -55,10 +55,6 @@
 .item.placeholder {
   color: white;
   background-color: #cfdce5;
-  cursor: grabbing;
-}
-.item.draggingAny {
-  cursor: grabbing;
 }
 
 .ghost {

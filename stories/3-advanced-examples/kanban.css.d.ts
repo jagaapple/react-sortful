@@ -7,7 +7,6 @@ declare const styles: {
   readonly "items": string;
   readonly "item": string;
   readonly "placeholder": string;
-  readonly "draggingAny": string;
   readonly "ghost": string;
 };
 export = styles;
