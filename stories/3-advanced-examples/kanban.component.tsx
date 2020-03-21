@@ -69,16 +69,15 @@ const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => 
 
 export const KanbanComponent = () => {
   const [itemEntitiesMapState, setItemEntitiesMapState] = React.useState(initialItemEntitiesMap);
-  const [isDraggingAnyItemState, setIsDraggingAnyItemState] = React.useState(false);
 
   const createItemElements = React.useCallback(
     (items: DummyItem[]) =>
       items.map((item, index) => (
         <Item key={item.id} identifier={item.id} index={index}>
-          <div className={classnames(styles.item, { [styles.draggingAny]: isDraggingAnyItemState })}>{item.title}</div>
+          <div className={styles.item}>{item.title}</div>
         </Item>
       )),
-    [isDraggingAnyItemState],
+    [],
   );
   const leftItemElements = React.useMemo(() => {
     const leftItems = itemEntitiesMapState.get(leftRootItemId)!.children!.map((itemId) => itemEntitiesMapState.get(itemId)!);
@@ -130,12 +129,7 @@ export const KanbanComponent = () => {
     [],
   );
 
-  const onDragStart = React.useCallback(() => {
-    setIsDraggingAnyItemState(true);
-  }, []);
   const onDragEnd = React.useCallback((meta: DragEndMeta<DummyItem["id"]>) => {
-    setIsDraggingAnyItemState(false);
-
     if (meta.groupIdentifier === meta.nextGroupIdentifier && meta.index === meta.nextIndex) return;
 
     const newMap = new Map(itemEntitiesMapState.entries());
@@ -179,7 +173,6 @@ export const KanbanComponent = () => {
       renderStackedGroup={renderStackedGroupElement}
       draggingCursorStyle="grabbing"
       itemSpacing={10}
-      onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
       <Item identifier={leftRootItem.id} index={0} isLocked isGroup isLonely>
