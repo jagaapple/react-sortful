@@ -278,7 +278,7 @@ be needed.
 
 
 ## Examples
-You can see more examples from [here](https://www.chromaticqa.com/library?appId=5e6025bcf2b5b700222c2c33).
+You can see more examples from [online catalogs (Storybook)](https://www.chromaticqa.com/library?appId=5e6025bcf2b5b700222c2c33)!
 
 - [Simple Horizontal List](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=1%20Simple%20(horizontal)&buildNumber=37&specName=Dynamic)
 - [Nested Horizontal List](https://www.chromaticqa.com/component?appId=5e6025bcf2b5b700222c2c33&name=2%20Nested%20(horizontal)&buildNumber=37&specName=Dynamic)
