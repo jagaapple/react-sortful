@@ -94,3 +94,110 @@
     transform: scale(0.8);
   }
 }
+
+.horizontalwrapper {
+  --padding: 8px;
+
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.horizontalgroup {
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  padding: var(--padding) calc(var(--padding) / 2) var(--padding) 0;
+  height: 100%;
+  border: 1px solid #bee0a9;
+  border-radius: 4px;
+  background-color: rgba(113, 189, 69, 0.1);
+}
+.horizontalgroup.horizontalstacked {
+  --color: #71bd45;
+
+  box-shadow: 0 0 0 1px var(--color);
+  width: 100%;
+  min-height: 100%;
+  border-color: var(--color);
+}
+.horizontalgroup.horizontalplaceholder {
+  border-style: dashed;
+  border-color: #579135;
+  background-color: transparent;
+  opacity: 0.4;
+}
+.horizontalgroup.horizontalghost {
+  border-color: #aed893;
+  background-color: #e7f3df;
+}
+.horizontalgroup .horizontalheading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 12px;
+  color: #579135;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1.4;
+}
+.horizontalwrapper.horizontaldisabled .horizontalgroup .horizontalheading {
+  color: #bee0a9;
+}
+.horizontalgroup .horizontalheading.horizontallocked::after {
+  margin-left: 8px;
+  color: #aed893;
+  font-family: "FontAwesome";
+  font-size: 14px;
+  text-align: center;
+  content: "\f023";
+}
+
+.horizontalitem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  min-width: 128px;
+  height: 100%;
+  min-height: 48px;
+  border: 1px solid #cfd4db;
+  border-radius: 4px;
+  background-color: white;
+}
+.horizontalitem.horizontalplaceholder {
+  color: #cfd4db;
+  border-style: dashed;
+  background-color: transparent;
+}
+.horizontalwrapper.horizontaldisabled .horizontalitem {
+  color: #cfd4db;
+}
+.horizontalitem.horizontallocked::after {
+  color: #cfd4db;
+  font-family: "FontAwesome";
+  font-size: 14px;
+  text-align: center;
+  content: "\f023";
+}
+.horizontalitem.horizontalghost.horizontalstatic {
+  background-color: #f6f9fc;
+}
+
+.horizontalghost {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+  animation-name: ghostItemVisible;
+  animation-duration: 200ms;
+  animation-fill-mode: forwards;
+}
+@keyframes ghostItemVisible {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.8);
+  }
+}

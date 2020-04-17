@@ -3,11 +3,11 @@ import classnames from "classnames";
 
 import { DropLineRendererInjectedProps, Item, List, PlaceholderRendererInjectedProps } from "../../src";
 
-import { commonStyles } from "../shared";
+import { commonStyles2 } from "../shared";
 import { styles } from "./shared";
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
-  <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
+  <div ref={injectedProps.ref} className={commonStyles2.dropLine} style={injectedProps.style} />
 );
 const renderGhostElement = () => <div className={classnames(styles.item, styles.ghost, styles.static)} />;
 const renderPlaceholderElement = (injectedProps: PlaceholderRendererInjectedProps) => (

@@ -14,7 +14,7 @@ import {
   StackedGroupRendererMeta,
 } from "../../src";
 
-import { commonStyles } from "../shared";
+import { commonStyles2 } from "../shared";
 import { styles } from "./shared";
 
 type DummyItem = { id: string; title: string; children: DummyItem["id"][] | undefined };
@@ -39,7 +39,7 @@ const initialItemEntitiesMap = new Map<DummyItem["id"], DummyItem>([
 ]);
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
-  <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
+  <div ref={injectedProps.ref} className={commonStyles2.dropLine} style={injectedProps.style} />
 );
 
 type Props = {

@@ -14,6 +14,7 @@ import {
   StackedGroupRendererMeta,
   StackGroupMeta,
 } from "./list";
+import { MutableRefObject } from "react";
 
 type Props<T extends ItemIdentifier> = {
   /**
@@ -67,23 +68,39 @@ type Props<T extends ItemIdentifier> = {
 };
 
 export const List = <T extends ItemIdentifier>(props: Props<T>) => {
-  const [draggingNodeMetaState, setDraggingNodeMetaState] = React.useState<NodeMeta<T>>();
-  const [isVisibleDropLineElementState, setIsVisibleDropLineElementState] = React.useState(false);
-  const [stackedGroupIdentifierState, setStackedGroupIdentifierState] = React.useState<T>();
+  let listContext = React.useContext(ListContext);
 
-  const itemSpacing = props.itemSpacing ?? 8;
-  const stackableAreaThreshold = props.stackableAreaThreshold ?? 8;
-  const direction = props.direction ?? "vertical";
-  const isDisabled = props.isDisabled ?? false;
+  let draggingNodeMeta: NodeMeta<T> | undefined = listContext?.draggingNodeMeta;
+  let setDraggingNodeMeta = listContext?.setDraggingNodeMeta;
+  let stackedGroupIdentifier: T | undefined = listContext?.stackedGroupIdentifier;
+  let setStackedGroupIdentifier = listContext?.setStackedGroupIdentifier;
+
+  if (!setDraggingNodeMeta) {
+    [draggingNodeMeta, setDraggingNodeMeta] = React.useState<NodeMeta<T>>();
+  }
+  if (!setStackedGroupIdentifier) {
+    [stackedGroupIdentifier, setStackedGroupIdentifier] = React.useState<T>();
+  }
+
+  const [isVisibleDropLineElement, setIsVisibleDropLineElement] = React.useState(false);
+
+  if (isVisibleDropLineElement && listContext) {
+    listContext.setIsVisibleDropLineElement(!isVisibleDropLineElement);
+  }
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
   const hoveredNodeMetaRef = React.useRef<NodeMeta<T>>();
   const destinationMetaRef = React.useRef<DestinationMeta<T>>();
 
+  const itemSpacing = props.itemSpacing ?? 8;
+  const stackableAreaThreshold = props.stackableAreaThreshold ?? 8;
+  const direction = props.direction ?? "vertical";
+  const isDisabled = props.isDisabled ?? false;
+
   const dropLineElement = React.useMemo(() => {
     const style: React.CSSProperties = {
-      display: isVisibleDropLineElementState ? "block" : "none",
+      display: isVisibleDropLineElement ? "block" : "none",
       position: "absolute",
       top: 0,
       left: 0,
@@ -92,14 +109,14 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
     };
 
     return props.renderDropLine({ ref: dropLineElementRef, style });
-  }, [props.renderDropLine, isVisibleDropLineElementState, direction]);
+  }, [props.renderDropLine, isVisibleDropLineElement, direction]);
   const ghostElement = React.useMemo(() => {
-    if (draggingNodeMetaState == undefined) return;
+    if (draggingNodeMeta == undefined) return;
 
-    const { identifier, groupIdentifier, index, isGroup } = draggingNodeMetaState;
+    const { identifier, groupIdentifier, index, isGroup } = draggingNodeMeta;
 
     return props.renderGhost({ identifier, groupIdentifier, index, isGroup });
-  }, [props.renderGhost, draggingNodeMetaState]);
+  }, [props.renderGhost, draggingNodeMeta]);
 
   const padding: [string, string] = ["0", "0"];
   if (direction === "vertical") padding[0] = `${itemSpacing}px`;
@@ -110,21 +127,21 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
       value={{
         itemSpacing,
         stackableAreaThreshold,
-        draggingNodeMeta: draggingNodeMetaState,
-        setDraggingNodeMeta: setDraggingNodeMetaState,
+        draggingNodeMeta,
+        setDraggingNodeMeta,
         dropLineElementRef,
         ghostWrapperElementRef,
-        isVisibleDropLineElement: isVisibleDropLineElementState,
-        setIsVisibleDropLineElement: setIsVisibleDropLineElementState,
-        renderPlaceholder: props.renderPlaceholder,
-        stackedGroupIdentifier: stackedGroupIdentifierState,
-        setStackedGroupIdentifier: setStackedGroupIdentifierState,
-        renderStackedGroup: props.renderStackedGroup,
-        hoveredNodeMetaRef: hoveredNodeMetaRef,
+        isVisibleDropLineElement,
+        setIsVisibleDropLineElement,
+        stackedGroupIdentifier,
+        setStackedGroupIdentifier,
+        hoveredNodeMetaRef,
         destinationMetaRef,
         direction,
-        draggingCursorStyle: props.draggingCursorStyle,
         isDisabled,
+        renderPlaceholder: props.renderPlaceholder,
+        renderStackedGroup: props.renderStackedGroup,
+        draggingCursorStyle: props.draggingCursorStyle,
         onDragStart: props.onDragStart,
         onDragEnd: props.onDragEnd,
         onStackGroup: props.onStackGroup,

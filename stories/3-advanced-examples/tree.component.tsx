@@ -14,7 +14,7 @@ import {
   StackedGroupRendererMeta,
 } from "../../src";
 
-import { commonStyles } from "../shared";
+import { commonStyles2 } from "../shared";
 import styles from "./tree.css";
 
 type DummyItem = { id: string; title: string; children: DummyItem["id"][] | undefined };
@@ -155,7 +155,7 @@ const groupHeadingClassname = classnames(styles.heading, styles.withIcon);
 const itemClassName = classnames(styles.item, styles.withIcon);
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
-  <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
+  <div ref={injectedProps.ref} className={commonStyles2.dropLine} style={injectedProps.style} />
 );
 
 type Props = {
