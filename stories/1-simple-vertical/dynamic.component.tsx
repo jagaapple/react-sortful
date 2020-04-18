@@ -12,7 +12,7 @@ import {
   PlaceholderRendererMeta,
 } from "../../src";
 
-import { commonStyles2 } from "../shared";
+import { commonStyles } from "../shared";
 import { styles } from "./shared";
 
 type DummyItem = { id: string; title: string };
@@ -26,7 +26,7 @@ const initialItems: DummyItem[] = [
 ];
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
-  <div ref={injectedProps.ref} className={commonStyles2.dropLine} style={injectedProps.style} />
+  <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
 );
 
 type Props = {

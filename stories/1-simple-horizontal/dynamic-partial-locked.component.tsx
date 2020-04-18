@@ -12,7 +12,7 @@ import {
   PlaceholderRendererMeta,
 } from "../../src";
 
-import { commonStyles2 } from "../shared";
+import { commonStyles } from "../shared";
 import { styles } from "./shared";
 
 type DummyItem = { id: string; title: string };
@@ -29,7 +29,7 @@ const lockedItemIds = initialItems.filter((_, index) => index % 2 === 0).map((it
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
   <div
     ref={injectedProps.ref}
-    className={classnames(commonStyles2.dropLine, commonStyles2.horizontal)}
+    className={classnames(commonStyles.dropLine, commonStyles.horizontal)}
     style={injectedProps.style}
   />
 );

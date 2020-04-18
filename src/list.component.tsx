@@ -14,7 +14,7 @@ import {
   StackedGroupRendererMeta,
   StackGroupMeta,
 } from "./list";
-import { MutableRefObject } from "react";
+import { IListContext } from "./list/context";
 
 type Props<T extends ItemIdentifier> = {
   /**
@@ -63,17 +63,23 @@ type Props<T extends ItemIdentifier> = {
   onDragEnd: (meta: DragEndMeta<T>) => void;
   /** A callback function when an empty group item is hovered by a dragged item. */
   onStackGroup?: (meta: StackGroupMeta<T>) => void;
+  /** A unique identifier for this list (as opposed to a nested list). If you don't supply this, one will be generated.*/
+  identifier?: T;
   className?: string;
   children?: React.ReactNode;
 };
 
 export const List = <T extends ItemIdentifier>(props: Props<T>) => {
-  let listContext = React.useContext(ListContext);
+  const listContext = React.useContext(ListContext);
 
   let draggingNodeMeta: NodeMeta<T> | undefined = listContext?.draggingNodeMeta;
   let setDraggingNodeMeta = listContext?.setDraggingNodeMeta;
   let stackedGroupIdentifier: T | undefined = listContext?.stackedGroupIdentifier;
   let setStackedGroupIdentifier = listContext?.setStackedGroupIdentifier;
+  const [listIdentifier] = React.useState(props.identifier || Math.random() + "");
+
+  // children lists of this list
+  const childrenLists = React.useRef<Set<IListContext>>(new Set());
 
   if (!setDraggingNodeMeta) {
     [draggingNodeMeta, setDraggingNodeMeta] = React.useState<NodeMeta<T>>();
@@ -83,10 +89,11 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
   }
 
   const [isVisibleDropLineElement, setIsVisibleDropLineElement] = React.useState(false);
+  const [isVisibleDropLineElementOnChildList, setIsVisibleDropLineElementOnChildList] = React.useState(false);
 
-  if (isVisibleDropLineElement && listContext) {
-    listContext.setIsVisibleDropLineElement(!isVisibleDropLineElement);
-  }
+  React.useEffect(() => {
+    listContext?.setIsVisibleDropLineElementOnChildList(isVisibleDropLineElementOnChildList || isVisibleDropLineElement);
+  }, [listContext, isVisibleDropLineElement, isVisibleDropLineElementOnChildList]);
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
@@ -99,8 +106,14 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
   const isDisabled = props.isDisabled ?? false;
 
   const dropLineElement = React.useMemo(() => {
+    const displayLine =
+      draggingNodeMeta &&
+      isVisibleDropLineElement &&
+      !isVisibleDropLineElementOnChildList &&
+      hoveredNodeMetaRef.current?.listIdentifier === listIdentifier;
+
     const style: React.CSSProperties = {
-      display: isVisibleDropLineElement ? "block" : "none",
+      display: displayLine ? "block" : "none",
       position: "absolute",
       top: 0,
       left: 0,
@@ -109,9 +122,18 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
     };
 
     return props.renderDropLine({ ref: dropLineElementRef, style });
-  }, [props.renderDropLine, isVisibleDropLineElement, direction]);
+  }, [
+    props.renderDropLine,
+    draggingNodeMeta,
+    childrenLists,
+    isVisibleDropLineElement,
+    isVisibleDropLineElementOnChildList,
+    hoveredNodeMetaRef.current,
+    direction,
+  ]);
+
   const ghostElement = React.useMemo(() => {
-    if (draggingNodeMeta == undefined) return;
+    if (draggingNodeMeta == undefined || draggingNodeMeta.listIdentifier !== listIdentifier) return;
 
     const { identifier, groupIdentifier, index, isGroup } = draggingNodeMeta;
 
@@ -122,31 +144,68 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
   if (direction === "vertical") padding[0] = `${itemSpacing}px`;
   if (direction === "horizontal") padding[1] = `${itemSpacing}px`;
 
+  const rootList = listContext?.rootList || listContext;
+
+  const resetDragState = () => {
+    // Resets context values.
+    setIsVisibleDropLineElement(false);
+    setIsVisibleDropLineElementOnChildList(false);
+    listContext?.setIsVisibleDropLineElement(false);
+    listContext?.setIsVisibleDropLineElementOnChildList(false);
+    setDraggingNodeMeta(undefined);
+    setStackedGroupIdentifier(undefined);
+    hoveredNodeMetaRef.current = undefined;
+    destinationMetaRef.current = undefined;
+
+    // also go through all the children and reset their local state
+    for (const child of childrenLists.current) {
+      child.resetDragState();
+    }
+  };
+
+  const thisListContext: IListContext = {
+    itemSpacing,
+    stackableAreaThreshold,
+    draggingNodeMeta,
+    setDraggingNodeMeta,
+    dropLineElementRef,
+    ghostWrapperElementRef,
+    isVisibleDropLineElement,
+    setIsVisibleDropLineElement,
+    isVisibleDropLineElementOnChildList,
+    setIsVisibleDropLineElementOnChildList,
+    stackedGroupIdentifier,
+    setStackedGroupIdentifier,
+    listIdentifier,
+    rootList,
+    childrenLists,
+    hoveredNodeMetaRef,
+    destinationMetaRef,
+    direction,
+    isDisabled,
+    renderPlaceholder: props.renderPlaceholder,
+    renderStackedGroup: props.renderStackedGroup,
+    draggingCursorStyle: props.draggingCursorStyle,
+    resetDragState,
+    onDragStart: props.onDragStart,
+    onDragEnd: function(meta: DragEndMeta<any>) {
+      rootList ? rootList.resetDragState() : resetDragState();
+      props?.onDragEnd(meta);
+    },
+    onStackGroup: props.onStackGroup,
+  };
+
+  // add the children and the ancestor
+  React.useEffect(() => {
+    listContext?.childrenLists.current.add(thisListContext);
+
+    return () => {
+      listContext?.childrenLists.current.delete(thisListContext);
+    };
+  }, []);
+
   return (
-    <ListContext.Provider
-      value={{
-        itemSpacing,
-        stackableAreaThreshold,
-        draggingNodeMeta,
-        setDraggingNodeMeta,
-        dropLineElementRef,
-        ghostWrapperElementRef,
-        isVisibleDropLineElement,
-        setIsVisibleDropLineElement,
-        stackedGroupIdentifier,
-        setStackedGroupIdentifier,
-        hoveredNodeMetaRef,
-        destinationMetaRef,
-        direction,
-        isDisabled,
-        renderPlaceholder: props.renderPlaceholder,
-        renderStackedGroup: props.renderStackedGroup,
-        draggingCursorStyle: props.draggingCursorStyle,
-        onDragStart: props.onDragStart,
-        onDragEnd: props.onDragEnd,
-        onStackGroup: props.onStackGroup,
-      }}
-    >
+    <ListContext.Provider value={thisListContext}>
       <div className={props.className} style={{ position: "relative", padding: padding.join(" ") }}>
         {props.children}
 

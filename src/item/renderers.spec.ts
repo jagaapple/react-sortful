@@ -5,6 +5,7 @@ describe("getPlaceholderElementStyle", () => {
   const draggingNodeMeta: NodeMeta<number> = {
     identifier: 0,
     groupIdentifier: undefined,
+    listIdentifier: undefined,
     ancestorIdentifiers: [],
     index: 0,
     isGroup: false,

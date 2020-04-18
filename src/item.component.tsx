@@ -91,7 +91,15 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     );
 
     // Sets contexts to values.
-    const nodeMeta = getNodeMeta(element, props.identifier, groupContext.identifier, ancestorIdentifiers, props.index, isGroup);
+    const nodeMeta = getNodeMeta(
+      element,
+      props.identifier,
+      groupContext.identifier,
+      listContext.listIdentifier,
+      ancestorIdentifiers,
+      props.index,
+      isGroup,
+    );
     listContext.setDraggingNodeMeta(nodeMeta);
 
     // Calls callbacks.
@@ -130,14 +138,8 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       isGroup,
       nextGroupIdentifier: destinationMeta != undefined ? destinationMeta.groupIdentifier : groupContext.identifier,
       nextIndex: destinationMeta != undefined ? destinationMeta.index : props.index,
+      listIdentifier: listContext.listIdentifier,
     });
-
-    // Resets context values.
-    listContext.setDraggingNodeMeta(undefined);
-    listContext.setIsVisibleDropLineElement(false);
-    listContext.setStackedGroupIdentifier(undefined);
-    listContext.hoveredNodeMetaRef.current = undefined;
-    listContext.destinationMetaRef.current = undefined;
   }, [listContext.onDragEnd, groupContext.identifier, props.identifier, props.index, isGroup]);
 
   const onHover = React.useCallback(
@@ -161,12 +163,21 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         element,
         props.identifier,
         groupContext.identifier,
+        listContext.listIdentifier,
         ancestorIdentifiers,
         props.index,
         isGroup,
       );
     },
-    [listContext.draggingNodeMeta, groupContext.identifier, props.identifier, props.index, ancestorIdentifiers, isGroup],
+    [
+      listContext.draggingNodeMeta,
+      groupContext.identifier,
+      props.identifier,
+      props.index,
+      ancestorIdentifiers,
+      isGroup,
+      listContext.listIdentifier,
+    ],
   );
   const onMoveForStackableGroup = React.useCallback(
     <T extends ItemIdentifier>(hoveredNodeMeta: NodeMeta<T>) => {
@@ -185,6 +196,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         index: props.index,
         isGroup,
         nextGroupIdentifier: hoveredNodeMeta.identifier,
+        listIdentifier: listContext.listIdentifier,
       });
     },
     [listContext.stackableAreaThreshold, listContext.onStackGroup, groupContext.identifier, props.identifier, props.index],
@@ -223,6 +235,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
           index: props.index,
           isGroup,
           nextGroupIdentifier: undefined,
+          listIdentifier: listContext.listIdentifier,
         });
       }
 

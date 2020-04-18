@@ -11,13 +11,13 @@ import {
   StackedGroupRendererInjectedProps,
 } from "../../src";
 
-import { commonStyles2 } from "../shared";
+import { commonStyles } from "../shared";
 import { styles } from "./shared";
 
 type DummyItem = { id: string; title: string; children: DummyItem[] | undefined };
 
 const renderDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
-  <div ref={injectedProps.ref} className={commonStyles2.dropLine} style={injectedProps.style} />
+  <div ref={injectedProps.ref} className={commonStyles.dropLine} style={injectedProps.style} />
 );
 const renderGhostElement = ({ isGroup }: GhostRendererMeta<DummyItem["id"]>) => (
   <div className={classnames({ [styles.item]: !isGroup, [styles.group]: isGroup }, styles.ghost, styles.static)} />
@@ -35,21 +35,6 @@ const renderStackedGroupElement = (injectedProps: StackedGroupRendererInjectedPr
   <div className={classnames(styles.group, styles.stacked)} style={injectedProps.style} />
 );
 
-const renderHorizontalDropLineElement = (injectedProps: DropLineRendererInjectedProps) => (
-  <div
-    ref={injectedProps.ref}
-    className={classnames(commonStyles2.dropLine, commonStyles2.horizontal)}
-    style={injectedProps.style}
-  />
-);
-const renderHorizontalGhostElement = () => <div className={classnames(styles.horizontalitem, styles.horizontalghost, styles.horizontalstatic)} />;
-const renderHorizontalPlaceholderElement = (injectedProps: PlaceholderRendererInjectedProps) => (
-  <div className={classnames(styles.horizontalitem, styles.horizontalplaceholder, styles.horizontalstatic)} style={injectedProps.style} />
-);
-const renderHorizontalStackedGroupElement = (injectedProps: StackedGroupRendererInjectedProps) => (
-  <div className={classnames(styles.horizontalgroup, styles.horizontalstacked)} style={injectedProps.style} />
-);
-
 export const StaticComponent = () => (
   <List
     className={styles.wrapper}
@@ -60,30 +45,7 @@ export const StaticComponent = () => (
     onDragEnd={() => false}
   >
     <Item identifier="a" index={0}>
-      <List
-        className={styles.horizontalwrapper}
-        renderDropLine={renderHorizontalDropLineElement}
-        renderGhost={renderHorizontalGhostElement}
-        renderPlaceholder={renderHorizontalPlaceholderElement}
-        direction="horizontal"
-        onDragEnd={() => false}
-      >
-        <Item identifier="ha1" index={0}>
-          <div className={styles.horizontalitem}>Item A</div>
-        </Item>
-        <Item identifier="hb1" index={1}>
-          <div className={styles.horizontalitem}>Item B</div>
-        </Item>
-        <Item identifier="hc1" index={2}>
-          <div className={styles.horizontalitem}>Item C</div>
-        </Item>
-        <Item identifier="hd1" index={3}>
-          <div className={styles.horizontalitem}>Item D</div>
-        </Item>
-        <Item identifier="he1" index={4}>
-          <div className={styles.horizontalitem}>Item E</div>
-        </Item>
-      </List>
+      <div className={styles.item}>Item A</div>
     </Item>
     <Item identifier="b" index={1}>
       <div className={styles.item}>Item B</div>
@@ -92,64 +54,7 @@ export const StaticComponent = () => (
       <div className={styles.item}>Item C</div>
     </Item>
     <Item identifier="d" index={3}>
-      <List
-        className={styles.horizontalwrapper}
-        renderDropLine={renderHorizontalDropLineElement}
-        renderGhost={renderHorizontalGhostElement}
-        renderPlaceholder={renderHorizontalPlaceholderElement}
-        renderStackedGroup={renderHorizontalStackedGroupElement}
-        direction="horizontal"
-        onDragEnd={() => false}
-      >
-        <Item identifier="h2a" index={0}>
-          <div className={styles.horizontalitem}>Item A</div>
-        </Item>
-        <Item identifier="h2b" index={1} isGroup>
-          <div className={styles.horizontalgroup}>
-            <div className={styles.horizontalheading}>Group B</div>
-            <List
-              className={styles.wrapper}
-              renderDropLine={renderDropLineElement}
-              renderGhost={renderGhostElement}
-              renderPlaceholder={renderPlaceholderElement}
-              renderStackedGroup={renderStackedGroupElement}
-              onDragEnd={() => false}
-            >
-              <Item identifier="ne-1" index={0}>
-                <div className={styles.item}>Item E - 1</div>
-              </Item>
-              <Item identifier="ne-2" index={1}>
-                <div className={styles.item}>Item E - 2</div>
-              </Item>
-              <Item identifier="ne-3" index={2}>
-                <div className={styles.item}>Item E - 3</div>
-              </Item>
-              <Item identifier="ne-4" index={3}>
-                <div className={styles.item}>Item E - 4</div>
-              </Item>
-            </List>
-            <Item identifier="h2b-2" index={1} isGroup>
-              <div className={styles.horizontalgroup}>
-                <div className={styles.horizontalheading}>Group B - 2</div>
-                <Item identifier="h2b-2-1" index={0}>
-                  <div className={styles.horizontalitem}>Item B - 2 - 1</div>
-                </Item>
-              </div>
-            </Item>
-            <Item identifier="h2b-3" index={2} isGroup>
-              <div className={styles.horizontalgroup}>
-                <div className={styles.horizontalheading}>Group B - 3</div>
-              </div>
-            </Item>
-            <Item identifier="h2b-4" index={3}>
-              <div className={styles.horizontalitem}>Item B - 4</div>
-            </Item>
-          </div>
-        </Item>
-        <Item identifier="h2c" index={2}>
-          <div className={styles.horizontalitem}>Item C</div>
-        </Item>
-      </List>
+      <div className={styles.item}>Item D</div>
     </Item>
     <Item identifier="e" index={4} isGroup>
       <div className={styles.group}>
