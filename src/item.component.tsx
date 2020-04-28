@@ -17,6 +17,7 @@ import {
   setBodyStyle,
   setDropLineElementStyle,
 } from "./item";
+import { UseGestureConfig, UseGestureEvent } from "react-use-gesture/dist/types";
 
 type Props<T extends ItemIdentifier> = {
   /** A unique identifier in all items of list. */
@@ -40,11 +41,29 @@ type Props<T extends ItemIdentifier> = {
    */
   isLonely?: boolean;
   /**
+   * Whether droppable area on the top or left (depending on list direction) is disabled.
+   * @default false
+   */
+  isLonelyTopOrLeft?: boolean;
+  /**
+   * Whether droppable area on the bottom or right (depending on list direction) is disabled.
+   * @default false
+   */
+  isLonelyBottomOrRight?: boolean;
+  /**
    * Whether an item contains custom drag handlers in child items (not grandchildren).
    * @default false
    */
   isUsedCustomDragHandlers?: boolean;
   children?: React.ReactNode;
+  /**
+   * Specify a react-use-gesture config object to use for specifying the drag.
+   */
+  useGestureConfig?: UseGestureConfig;
+  /**
+   * If you want to do something on click or on tap, specify this option.
+   */
+  onTap?: (event: UseGestureEvent) => void;
 };
 
 export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
@@ -56,8 +75,16 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   const ancestorIdentifiers = [...groupContext.ancestorIdentifiers, props.identifier];
   const isGroup = props.isGroup ?? false;
   const isLocked = (listContext.isDisabled || props.isLocked) ?? false;
-  const isLonley = props.isLonely ?? false;
+  const isLonely = props.isLonely ?? false;
+  const isLonelyTopOrLeft = (isLonely || props.isLonelyTopOrLeft) ?? false;
+  const isLonelyBottomOrRight = (isLonely || props.isLonelyBottomOrRight) ?? false;
   const isUsedCustomDragHandlers = props.isUsedCustomDragHandlers ?? false;
+
+  const useGestureConfig: UseGestureConfig = { ...(props.useGestureConfig || {}) };
+  if (props.onTap) {
+    useGestureConfig.drag = useGestureConfig.drag || {};
+    useGestureConfig.drag.filterTaps = true;
+  }
 
   // Registers an identifier to the group context.
   const childIdentifiersRef = React.useRef<Set<ItemIdentifier>>(new Set());
@@ -91,13 +118,22 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     );
 
     // Sets contexts to values.
-    const nodeMeta = getNodeMeta(element, props.identifier, groupContext.identifier, ancestorIdentifiers, props.index, isGroup);
+    const nodeMeta = getNodeMeta(
+      element,
+      props.identifier,
+      groupContext.identifier,
+      listContext.listIdentifier,
+      ancestorIdentifiers,
+      props.index,
+      isGroup,
+    );
     listContext.setDraggingNodeMeta(nodeMeta);
 
     // Calls callbacks.
     listContext.onDragStart?.({
       identifier: nodeMeta.identifier,
       groupIdentifier: nodeMeta.groupIdentifier,
+      listIdentifier: listContext.listIdentifier,
       index: nodeMeta.index,
       isGroup: nodeMeta.isGroup,
     });
@@ -130,14 +166,8 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       isGroup,
       nextGroupIdentifier: destinationMeta != undefined ? destinationMeta.groupIdentifier : groupContext.identifier,
       nextIndex: destinationMeta != undefined ? destinationMeta.index : props.index,
+      listIdentifier: listContext.listIdentifier,
     });
-
-    // Resets context values.
-    listContext.setDraggingNodeMeta(undefined);
-    listContext.setIsVisibleDropLineElement(false);
-    listContext.setStackedGroupIdentifier(undefined);
-    listContext.hoveredNodeMetaRef.current = undefined;
-    listContext.destinationMetaRef.current = undefined;
   }, [listContext.onDragEnd, groupContext.identifier, props.identifier, props.index, isGroup]);
 
   const onHover = React.useCallback(
@@ -161,12 +191,21 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         element,
         props.identifier,
         groupContext.identifier,
+        listContext.listIdentifier,
         ancestorIdentifiers,
         props.index,
         isGroup,
       );
     },
-    [listContext.draggingNodeMeta, groupContext.identifier, props.identifier, props.index, ancestorIdentifiers, isGroup],
+    [
+      listContext.draggingNodeMeta,
+      groupContext.identifier,
+      props.identifier,
+      props.index,
+      ancestorIdentifiers,
+      isGroup,
+      listContext.listIdentifier,
+    ],
   );
   const onMoveForStackableGroup = React.useCallback(
     <T extends ItemIdentifier>(hoveredNodeMeta: NodeMeta<T>) => {
@@ -174,6 +213,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       listContext.setIsVisibleDropLineElement(false);
       listContext.setStackedGroupIdentifier(props.identifier);
       listContext.destinationMetaRef.current = {
+        listIdentifier: listContext.listIdentifier,
         groupIdentifier: props.identifier,
         index: undefined,
       };
@@ -185,18 +225,33 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
         index: props.index,
         isGroup,
         nextGroupIdentifier: hoveredNodeMeta.identifier,
+        listIdentifier: listContext.listIdentifier,
       });
     },
     [listContext.stackableAreaThreshold, listContext.onStackGroup, groupContext.identifier, props.identifier, props.index],
   );
   const onMoveForItems = React.useCallback(
     (draggingNodeMeta: NodeMeta<T>, hoveredNodeMeta: NodeMeta<T>, absoluteXY: [number, number]) => {
-      if (isLonley) {
+      const disableTopOrLeft =
+        isLonelyTopOrLeft &&
+        ((listContext.direction === "horizontal" &&
+          absoluteXY[0] < hoveredNodeMeta.absolutePosition.left + hoveredNodeMeta.width / 2) ||
+          (listContext.direction === "vertical" &&
+            absoluteXY[1] < hoveredNodeMeta.absolutePosition.top + hoveredNodeMeta.height / 2));
+      const disableBottomOrRight =
+        isLonelyBottomOrRight &&
+        ((listContext.direction === "horizontal" &&
+          absoluteXY[0] > hoveredNodeMeta.absolutePosition.left + hoveredNodeMeta.width / 2) ||
+          (listContext.direction === "vertical" &&
+            absoluteXY[1] > hoveredNodeMeta.absolutePosition.top + hoveredNodeMeta.height / 2));
+
+      if (isLonely || disableTopOrLeft || disableBottomOrRight) {
         listContext.setIsVisibleDropLineElement(false);
         listContext.destinationMetaRef.current = undefined;
 
         return;
       }
+
       if (draggingNodeMeta.index !== hoveredNodeMeta.index) listContext.setIsVisibleDropLineElement(true);
 
       const dropLineElement = listContext.dropLineElementRef.current ?? undefined;
@@ -223,12 +278,17 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
           index: props.index,
           isGroup,
           nextGroupIdentifier: undefined,
+          listIdentifier: listContext.listIdentifier,
         });
       }
 
       // Sets contexts to values.
       listContext.setStackedGroupIdentifier(undefined);
-      listContext.destinationMetaRef.current = { groupIdentifier: groupContext.identifier, index: nextIndex };
+      listContext.destinationMetaRef.current = {
+        listIdentifier: listContext.listIdentifier,
+        groupIdentifier: groupContext.identifier,
+        index: nextIndex,
+      };
     },
     [
       listContext.direction,
@@ -237,7 +297,9 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       props.identifier,
       props.index,
       isGroup,
-      isLonley,
+      isLonely,
+      isLonelyTopOrLeft,
+      isLonelyBottomOrRight,
     ],
   );
   const onMove = React.useCallback(
@@ -246,6 +308,11 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       if (draggingNodeMeta == undefined) return;
       const hoveredNodeMeta = listContext.hoveredNodeMetaRef.current;
       if (hoveredNodeMeta == undefined) return;
+
+      if (hoveredNodeMeta.listIdentifier !== listContext.listIdentifier) {
+        listContext.setIsVisibleDropLineElement(false);
+        return;
+      }
 
       const hasNoItems = childIdentifiersRef.current.size === 0;
       if (
@@ -266,8 +333,15 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     // Clears a dragging node after 50ms in order to prevent setting and clearing at the same time.
     window.clearTimeout(clearingDraggingNodeTimeoutIdRef.current);
     clearingDraggingNodeTimeoutIdRef.current = window.setTimeout(() => {
-      if (listContext.hoveredNodeMetaRef.current?.identifier !== props.identifier) return;
+      const hoveredMeta = listContext.hoveredNodeMetaRef.current;
+      if (hoveredMeta) {
+        const isDifferentList = hoveredMeta.listIdentifier !== listContext.listIdentifier;
 
+        // if it is the same list but different identifier, we don't reset the visual feedback.
+        if (!isDifferentList && hoveredMeta.identifier !== props.identifier) return;
+      }
+
+      // reset the visual feedback.
       listContext.setIsVisibleDropLineElement(false);
       listContext.setStackedGroupIdentifier(undefined);
       listContext.hoveredNodeMetaRef.current = undefined;
@@ -288,10 +362,22 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     onMove: ({ xy }) => {
       if (listContext.draggingNodeMeta == undefined) return;
 
-      // Skips if this item is an ancestor group of the dragging item.
-      const hasItems = childIdentifiersRef.current.size > 0;
-      const hoveredNodeAncestors = listContext.hoveredNodeMetaRef.current?.ancestorIdentifiers ?? [];
-      if (hasItems && checkIsAncestorItem(props.identifier, hoveredNodeAncestors)) return;
+      const hoveredMeta = listContext.hoveredNodeMetaRef.current;
+      if (hoveredMeta) {
+        const isDifferentList = hoveredMeta.listIdentifier !== listContext.listIdentifier;
+
+        if (isDifferentList) {
+          // reset the visual feedback.
+          listContext.setIsVisibleDropLineElement(false);
+        } else {
+          // Skips if this item is an ancestor group of the dragging item.
+          const hasItems = childIdentifiersRef.current.size > 0;
+          const hoveredNodeAncestors = listContext.hoveredNodeMetaRef.current?.ancestorIdentifiers ?? [];
+
+          if (hasItems && checkIsAncestorItem(props.identifier, hoveredNodeAncestors)) return;
+        }
+      }
+
       if (props.identifier === listContext.draggingNodeMeta.identifier) return;
       // Skips if the dragging item is an ancestor group of this item.
       if (checkIsAncestorItem(listContext.draggingNodeMeta.identifier, ancestorIdentifiers)) return;
@@ -301,27 +387,35 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     onPointerLeave: onLeave,
   });
   const dragHandlers: React.ContextType<typeof ItemContext>["dragHandlers"] = { onDragStart, onDrag, onDragEnd };
-  const draggableBinder = useGesture({
-    onDragStart: (state: any) => {
-      if (isLocked) return;
+  const draggableBinder = useGesture(
+    {
+      onDragStart: (state: any) => {
+        if (isLocked) return;
 
-      const event: React.SyntheticEvent = state.event;
-      event.persist();
-      event.stopPropagation();
+        const event: React.SyntheticEvent = state.event;
+        event?.persist?.();
+        event?.stopPropagation?.();
 
-      dragHandlers.onDragStart();
+        dragHandlers.onDragStart();
+      },
+      onDrag: ({ down, movement, tap, event }) => {
+        if (tap && props.onTap) {
+          props.onTap(event as any);
+          return;
+        }
+
+        if (isLocked) return;
+
+        dragHandlers.onDrag(down, movement);
+      },
+      onDragEnd: () => {
+        if (isLocked) return;
+
+        dragHandlers.onDragEnd();
+      },
     },
-    onDrag: ({ down, movement }) => {
-      if (isLocked) return;
-
-      dragHandlers.onDrag(down, movement);
-    },
-    onDragEnd: () => {
-      if (isLocked) return;
-
-      dragHandlers.onDragEnd();
-    },
-  });
+    useGestureConfig,
+  );
 
   const contentElement = React.useMemo((): JSX.Element => {
     const draggingNodeMeta = listContext.draggingNodeMeta;
@@ -331,6 +425,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     const rendererMeta: Omit<PlaceholderRendererMeta<any>, "isGroup"> | StackedGroupRendererMeta<any> = {
       identifier: props.identifier,
       groupIdentifier: groupContext.identifier,
+      listIdentifier: listContext.listIdentifier,
       index: props.index,
     };
 

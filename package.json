@@ -25,8 +25,6 @@
     "README.md"
   ],
   "main": "lib/index.js",
-  "bin": "",
-  "man": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/jagaapple/react-sortful.git"
@@ -48,7 +46,7 @@
   },
   "config": {},
   "dependencies": {
-    "react-use-gesture": "^7.0.4"
+    "react-use-gesture": "^7.0.15"
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",

@@ -10,6 +10,7 @@ type NodeRect = {
 export type NodeMeta<T extends ItemIdentifier> = {
   identifier: T;
   groupIdentifier: T | undefined;
+  listIdentifier: T | undefined;
   ancestorIdentifiers: T[];
   index: number;
   isGroup: boolean;
@@ -31,6 +32,7 @@ export const getNodeMeta = <T extends ItemIdentifier>(
   element: HTMLElement,
   identifier: T,
   groupIdentifier: T | undefined,
+  listIdentifier: T,
   ancestorIdentifiers: T[],
   index: number,
   isGroup: boolean,
@@ -38,6 +40,7 @@ export const getNodeMeta = <T extends ItemIdentifier>(
   identifier,
   groupIdentifier,
   ancestorIdentifiers,
+  listIdentifier,
   index,
   isGroup,
   element,
