@@ -76,27 +76,27 @@ export const NestedListsComponent = () => (
         onDragEnd={(meta) => console.log("list2 completed drag: ", meta)}
       >
         <Item identifier="ha1" index={0}>
-          <div className={styles.horizontalitem}>Item A</div>
+          <div className={styles.horizontalitem}>Item ha1</div>
         </Item>
         <Item identifier="hb1" index={1}>
-          <div className={styles.horizontalitem}>Item B</div>
+          <div className={styles.horizontalitem}>Item hb1</div>
         </Item>
         <Item identifier="hc1" index={2}>
-          <div className={styles.horizontalitem}>Item C</div>
+          <div className={styles.horizontalitem}>Item hc1</div>
         </Item>
         <Item identifier="hd1" index={3}>
-          <div className={styles.horizontalitem}>Item D</div>
+          <div className={styles.horizontalitem}>Item hd1</div>
         </Item>
         <Item identifier="he1" index={4}>
-          <div className={styles.horizontalitem}>Item E</div>
+          <div className={styles.horizontalitem}>Item he1</div>
         </Item>
       </List>
     </Item>
     <Item identifier="b" index={1}>
-      <div className={styles.item}>Item B</div>
+      <div className={styles.item}>Item b</div>
     </Item>
     <Item identifier="c" index={2}>
-      <div className={styles.item}>Item C</div>
+      <div className={styles.item}>Item c</div>
     </Item>
     <Item identifier="d" index={3}>
       <List
@@ -110,11 +110,11 @@ export const NestedListsComponent = () => (
         onDragEnd={(meta) => console.log("list3 completed drag: ", meta)}
       >
         <Item identifier="h2a" index={0}>
-          <div className={styles.horizontalitem}>Item A</div>
+          <div className={styles.horizontalitem}>Item h2a</div>
         </Item>
         <Item identifier="h2b" index={1} isGroup>
           <div className={styles.horizontalgroup}>
-            <div className={styles.horizontalheading}>Group B</div>
+            <div className={styles.horizontalheading}>Group h2b</div>
             <List
               identifier="list4"
               className={styles.wrapper}
@@ -125,76 +125,76 @@ export const NestedListsComponent = () => (
               onDragEnd={(meta) => console.log("list4 completed drag: ", meta)}
             >
               <Item identifier="ne-1" index={0}>
-                <div className={styles.item}>Item E - 1</div>
+                <div className={styles.item}>Item ne-1</div>
               </Item>
               <Item identifier="ne-2" index={1}>
-                <div className={styles.item}>Item E - 2</div>
+                <div className={styles.item}>Item ne-2</div>
               </Item>
               <Item identifier="ne-3" index={2}>
-                <div className={styles.item}>Item E - 3</div>
+                <div className={styles.item}>Item ne-3</div>
               </Item>
               <Item identifier="ne-4" index={3}>
-                <div className={styles.item}>Item E - 4</div>
+                <div className={styles.item}>Item ne-4</div>
               </Item>
             </List>
             <Item identifier="h2b-2" index={1} isGroup>
               <div className={styles.horizontalgroup}>
-                <div className={styles.horizontalheading}>Group B - 2</div>
+                <div className={styles.horizontalheading}>Group h2b-2</div>
                 <Item identifier="h2b-2-1" index={0}>
-                  <div className={styles.horizontalitem}>Item B - 2 - 1</div>
+                  <div className={styles.horizontalitem}>Item h2b-2-1</div>
                 </Item>
               </div>
             </Item>
             <Item identifier="h2b-3" index={2} isGroup>
               <div className={styles.horizontalgroup}>
-                <div className={styles.horizontalheading}>Group B - 3</div>
+                <div className={styles.horizontalheading}>Group h2b-3</div>
               </div>
             </Item>
             <Item identifier="h2b-4" index={3}>
-              <div className={styles.horizontalitem}>Item B - 4</div>
+              <div className={styles.horizontalitem}>Item h2b-4</div>
             </Item>
           </div>
         </Item>
         <Item identifier="h2c" index={2}>
-          <div className={styles.horizontalitem}>Item C</div>
+          <div className={styles.horizontalitem}>Item h2c</div>
         </Item>
       </List>
     </Item>
     <Item identifier="e" index={4} isGroup>
       <div className={styles.group}>
-        <div className={styles.heading}>Group E</div>
+        <div className={styles.heading}>Group e</div>
         <Item identifier="e-1" index={0}>
-          <div className={styles.item}>Item E - 1</div>
+          <div className={styles.item}>Item e-1</div>
         </Item>
         <Item identifier="e-2" index={1}>
-          <div className={styles.item}>Item E - 2</div>
+          <div className={styles.item}>Item e-2</div>
         </Item>
         <Item identifier="e-3" index={2}>
-          <div className={styles.item}>Item E - 3</div>
+          <div className={styles.item}>Item e-3</div>
         </Item>
         <Item identifier="e-4" index={3}>
-          <div className={styles.item}>Item E - 4</div>
+          <div className={styles.item}>Item e-4</div>
         </Item>
         <Item identifier="e-5" index={4} isGroup>
           <div className={styles.group}>
-            <div className={styles.heading}>Group E - 5</div>
+            <div className={styles.heading}>Group e-5</div>
             <Item identifier="e-5-1" index={0}>
-              <div className={styles.item}>Item E - 5 - 1</div>
+              <div className={styles.item}>Item e-5-1</div>
             </Item>
           </div>
         </Item>
         <Item identifier="e-6" index={4} isGroup>
           <div className={styles.group}>
-            <div className={styles.heading}>Group E - 6</div>
+            <div className={styles.heading}>Group e-6</div>
           </div>
         </Item>
         <Item identifier="e-7" index={5}>
-          <div className={styles.item}>Item E - 7</div>
+          <div className={styles.item}>Item e-7</div>
         </Item>
       </div>
     </Item>
     <Item identifier="f" index={5}>
-      <div className={styles.item}>Item F</div>
+      <div className={styles.item}>Item f</div>
     </Item>
   </List>
 );

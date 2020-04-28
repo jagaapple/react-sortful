@@ -76,6 +76,8 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
   let setDraggingNodeMeta = listContext?.setDraggingNodeMeta;
   let stackedGroupIdentifier: T | undefined = listContext?.stackedGroupIdentifier;
   let setStackedGroupIdentifier = listContext?.setStackedGroupIdentifier;
+  let hoveredNodeMetaRef = listContext?.hoveredNodeMetaRef;
+  let destinationMetaRef = listContext?.destinationMetaRef;
   const [listIdentifier] = React.useState(props.identifier || Math.random() + "");
 
   // children lists of this list
@@ -87,18 +89,17 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
   if (!setStackedGroupIdentifier) {
     [stackedGroupIdentifier, setStackedGroupIdentifier] = React.useState<T>();
   }
+  if (!hoveredNodeMetaRef) {
+    hoveredNodeMetaRef = React.useRef<NodeMeta<T>>();
+  }
+  if (!destinationMetaRef) {
+    destinationMetaRef = React.useRef<DestinationMeta<T>>();
+  }
 
   const [isVisibleDropLineElement, setIsVisibleDropLineElement] = React.useState(false);
-  const [isVisibleDropLineElementOnChildList, setIsVisibleDropLineElementOnChildList] = React.useState(false);
-
-  React.useEffect(() => {
-    listContext?.setIsVisibleDropLineElementOnChildList(isVisibleDropLineElementOnChildList || isVisibleDropLineElement);
-  }, [listContext, isVisibleDropLineElement, isVisibleDropLineElementOnChildList]);
 
   const dropLineElementRef = React.useRef<HTMLDivElement>(null);
   const ghostWrapperElementRef = React.useRef<HTMLDivElement>(null);
-  const hoveredNodeMetaRef = React.useRef<NodeMeta<T>>();
-  const destinationMetaRef = React.useRef<DestinationMeta<T>>();
 
   const itemSpacing = props.itemSpacing ?? 8;
   const stackableAreaThreshold = props.stackableAreaThreshold ?? 8;
@@ -109,8 +110,8 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
     const displayLine =
       draggingNodeMeta &&
       isVisibleDropLineElement &&
-      !isVisibleDropLineElementOnChildList &&
-      hoveredNodeMetaRef.current?.listIdentifier === listIdentifier;
+      hoveredNodeMetaRef.current &&
+      hoveredNodeMetaRef.current.listIdentifier === listIdentifier;
 
     const style: React.CSSProperties = {
       display: displayLine ? "block" : "none",
@@ -122,22 +123,20 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
     };
 
     return props.renderDropLine({ ref: dropLineElementRef, style });
-  }, [
-    props.renderDropLine,
-    draggingNodeMeta,
-    childrenLists,
-    isVisibleDropLineElement,
-    isVisibleDropLineElementOnChildList,
-    hoveredNodeMetaRef.current,
-    direction,
-  ]);
+  }, [props.renderDropLine, draggingNodeMeta, childrenLists, isVisibleDropLineElement, hoveredNodeMetaRef.current, direction]);
 
   const ghostElement = React.useMemo(() => {
     if (draggingNodeMeta == undefined || draggingNodeMeta.listIdentifier !== listIdentifier) return;
 
     const { identifier, groupIdentifier, index, isGroup } = draggingNodeMeta;
 
-    return props.renderGhost({ identifier, groupIdentifier, index, isGroup });
+    return props.renderGhost({
+      identifier,
+      groupIdentifier,
+      index,
+      isGroup,
+      listIdentifier: draggingNodeMeta.listIdentifier,
+    });
   }, [props.renderGhost, draggingNodeMeta]);
 
   const padding: [string, string] = ["0", "0"];
@@ -149,9 +148,7 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
   const resetDragState = () => {
     // Resets context values.
     setIsVisibleDropLineElement(false);
-    setIsVisibleDropLineElementOnChildList(false);
     listContext?.setIsVisibleDropLineElement(false);
-    listContext?.setIsVisibleDropLineElementOnChildList(false);
     setDraggingNodeMeta(undefined);
     setStackedGroupIdentifier(undefined);
     hoveredNodeMetaRef.current = undefined;
@@ -172,8 +169,6 @@ export const List = <T extends ItemIdentifier>(props: Props<T>) => {
     ghostWrapperElementRef,
     isVisibleDropLineElement,
     setIsVisibleDropLineElement,
-    isVisibleDropLineElementOnChildList,
-    setIsVisibleDropLineElementOnChildList,
     stackedGroupIdentifier,
     setStackedGroupIdentifier,
     listIdentifier,

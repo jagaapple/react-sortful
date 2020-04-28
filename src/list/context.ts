@@ -21,8 +21,6 @@ export type IListContext = {
   ghostWrapperElementRef: React.RefObject<HTMLDivElement>;
   isVisibleDropLineElement: boolean;
   setIsVisibleDropLineElement: (isVisible: boolean) => void;
-  isVisibleDropLineElementOnChildList: boolean;
-  setIsVisibleDropLineElementOnChildList: (isVisible: boolean) => void;
   renderPlaceholder:
     | ((injectedProps: PlaceholderRendererInjectedProps, meta: PlaceholderRendererMeta<any>) => JSX.Element)
     | undefined;

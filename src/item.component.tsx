@@ -106,6 +106,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     listContext.onDragStart?.({
       identifier: nodeMeta.identifier,
       groupIdentifier: nodeMeta.groupIdentifier,
+      listIdentifier: listContext.listIdentifier,
       index: nodeMeta.index,
       isGroup: nodeMeta.isGroup,
     });
@@ -185,6 +186,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       listContext.setIsVisibleDropLineElement(false);
       listContext.setStackedGroupIdentifier(props.identifier);
       listContext.destinationMetaRef.current = {
+        listIdentifier: listContext.listIdentifier,
         groupIdentifier: props.identifier,
         index: undefined,
       };
@@ -241,7 +243,11 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
 
       // Sets contexts to values.
       listContext.setStackedGroupIdentifier(undefined);
-      listContext.destinationMetaRef.current = { groupIdentifier: groupContext.identifier, index: nextIndex };
+      listContext.destinationMetaRef.current = {
+        listIdentifier: listContext.listIdentifier,
+        groupIdentifier: groupContext.identifier,
+        index: nextIndex,
+      };
     },
     [
       listContext.direction,
@@ -259,6 +265,11 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       if (draggingNodeMeta == undefined) return;
       const hoveredNodeMeta = listContext.hoveredNodeMetaRef.current;
       if (hoveredNodeMeta == undefined) return;
+
+      if (hoveredNodeMeta.listIdentifier !== listContext.listIdentifier) {
+        listContext.setIsVisibleDropLineElement(false);
+        return;
+      }
 
       const hasNoItems = childIdentifiersRef.current.size === 0;
       if (
@@ -279,8 +290,15 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     // Clears a dragging node after 50ms in order to prevent setting and clearing at the same time.
     window.clearTimeout(clearingDraggingNodeTimeoutIdRef.current);
     clearingDraggingNodeTimeoutIdRef.current = window.setTimeout(() => {
-      if (listContext.hoveredNodeMetaRef.current?.identifier !== props.identifier) return;
+      const hoveredMeta = listContext.hoveredNodeMetaRef.current;
+      if (hoveredMeta) {
+        const isDifferentList = hoveredMeta.listIdentifier !== listContext.listIdentifier;
 
+        // if it is the same list but different identifier, we don't reset the visual feedback.
+        if (!isDifferentList && hoveredMeta.identifier !== props.identifier) return;
+      }
+
+      // reset the visual feedback.
       listContext.setIsVisibleDropLineElement(false);
       listContext.setStackedGroupIdentifier(undefined);
       listContext.hoveredNodeMetaRef.current = undefined;
@@ -301,10 +319,22 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     onMove: ({ xy }) => {
       if (listContext.draggingNodeMeta == undefined) return;
 
-      // Skips if this item is an ancestor group of the dragging item.
-      const hasItems = childIdentifiersRef.current.size > 0;
-      const hoveredNodeAncestors = listContext.hoveredNodeMetaRef.current?.ancestorIdentifiers ?? [];
-      if (hasItems && checkIsAncestorItem(props.identifier, hoveredNodeAncestors)) return;
+      const hoveredMeta = listContext.hoveredNodeMetaRef.current;
+      if (hoveredMeta) {
+        const isDifferentList = hoveredMeta.listIdentifier !== listContext.listIdentifier;
+
+        if (isDifferentList) {
+          // reset the visual feedback.
+          listContext.setIsVisibleDropLineElement(false);
+        } else {
+          // Skips if this item is an ancestor group of the dragging item.
+          const hasItems = childIdentifiersRef.current.size > 0;
+          const hoveredNodeAncestors = listContext.hoveredNodeMetaRef.current?.ancestorIdentifiers ?? [];
+
+          if (hasItems && checkIsAncestorItem(props.identifier, hoveredNodeAncestors)) return;
+        }
+      }
+
       if (props.identifier === listContext.draggingNodeMeta.identifier) return;
       // Skips if the dragging item is an ancestor group of this item.
       if (checkIsAncestorItem(listContext.draggingNodeMeta.identifier, ancestorIdentifiers)) return;
@@ -344,6 +374,7 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     const rendererMeta: Omit<PlaceholderRendererMeta<any>, "isGroup"> | StackedGroupRendererMeta<any> = {
       identifier: props.identifier,
       groupIdentifier: groupContext.identifier,
+      listIdentifier: listContext.listIdentifier,
       index: props.index,
     };
 
