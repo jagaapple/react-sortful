@@ -41,6 +41,16 @@ type Props<T extends ItemIdentifier> = {
    */
   isLonely?: boolean;
   /**
+   * Whether droppable area on the top or left (depending on list direction) is disabled.
+   * @default false
+   */
+  isLonelyTopOrLeft?: boolean;
+  /**
+   * Whether droppable area on the bottom or right (depending on list direction) is disabled.
+   * @default false
+   */
+  isLonelyBottomOrRight?: boolean;
+  /**
    * Whether an item contains custom drag handlers in child items (not grandchildren).
    * @default false
    */
@@ -65,7 +75,9 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   const ancestorIdentifiers = [...groupContext.ancestorIdentifiers, props.identifier];
   const isGroup = props.isGroup ?? false;
   const isLocked = (listContext.isDisabled || props.isLocked) ?? false;
-  const isLonley = props.isLonely ?? false;
+  const isLonely = props.isLonely ?? false;
+  const isLonelyTopOrLeft = (isLonely || props.isLonelyTopOrLeft) ?? false;
+  const isLonelyBottomOrRight = (isLonely || props.isLonelyBottomOrRight) ?? false;
   const isUsedCustomDragHandlers = props.isUsedCustomDragHandlers ?? false;
 
   const useGestureConfig: UseGestureConfig = { ...(props.useGestureConfig || {}) };
@@ -220,12 +232,26 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   );
   const onMoveForItems = React.useCallback(
     (draggingNodeMeta: NodeMeta<T>, hoveredNodeMeta: NodeMeta<T>, absoluteXY: [number, number]) => {
-      if (isLonley) {
+      const disableTopOrLeft =
+        isLonelyTopOrLeft &&
+        ((listContext.direction === "horizontal" &&
+          absoluteXY[0] < hoveredNodeMeta.absolutePosition.left + hoveredNodeMeta.width / 2) ||
+          (listContext.direction === "vertical" &&
+            absoluteXY[1] < hoveredNodeMeta.absolutePosition.top + hoveredNodeMeta.height / 2));
+      const disableBottomOrRight =
+        isLonelyBottomOrRight &&
+        ((listContext.direction === "horizontal" &&
+          absoluteXY[0] > hoveredNodeMeta.absolutePosition.left + hoveredNodeMeta.width / 2) ||
+          (listContext.direction === "vertical" &&
+            absoluteXY[1] > hoveredNodeMeta.absolutePosition.top + hoveredNodeMeta.height / 2));
+
+      if (isLonely || disableTopOrLeft || disableBottomOrRight) {
         listContext.setIsVisibleDropLineElement(false);
         listContext.destinationMetaRef.current = undefined;
 
         return;
       }
+
       if (draggingNodeMeta.index !== hoveredNodeMeta.index) listContext.setIsVisibleDropLineElement(true);
 
       const dropLineElement = listContext.dropLineElementRef.current ?? undefined;
@@ -271,7 +297,9 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
       props.identifier,
       props.index,
       isGroup,
-      isLonley,
+      isLonely,
+      isLonelyTopOrLeft,
+      isLonelyBottomOrRight,
     ],
   );
   const onMove = React.useCallback(

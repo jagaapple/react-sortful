@@ -65,7 +65,7 @@ export const NestedListsComponent = () => (
     renderStackedGroup={renderStackedGroupElement}
     onDragEnd={(meta) => console.log("list1 completed drag: ", meta)}
   >
-    <Item identifier="a" index={0}>
+    <Item identifier="a" index={0} isLonelyBottomOrRight={true}>
       <List
         identifier="list2"
         className={styles.horizontalwrapper}
@@ -75,8 +75,8 @@ export const NestedListsComponent = () => (
         direction="horizontal"
         onDragEnd={(meta) => console.log("list2 completed drag: ", meta)}
       >
-        <Item identifier="ha1" index={0}>
-          <div className={styles.horizontalitem}>Item ha1</div>
+        <Item identifier="ha1" index={0} isLonelyTopOrLeft={true}>
+          <div className={styles.horizontalitem}>Item ha1 (isLonelyTopOrLeft=true)</div>
         </Item>
         <Item identifier="hb1" index={1}>
           <div className={styles.horizontalitem}>Item hb1</div>
@@ -92,8 +92,8 @@ export const NestedListsComponent = () => (
         </Item>
       </List>
     </Item>
-    <Item identifier="b" index={1}>
-      <div className={styles.item}>Item b</div>
+    <Item identifier="b" index={1} isLonelyTopOrLeft={true}>
+      <div className={styles.item}>Item b (isLonelyTopOrLeft=true)</div>
     </Item>
     <Item identifier="c" index={2}>
       <div className={styles.item}>Item c</div>
