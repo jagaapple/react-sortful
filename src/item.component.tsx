@@ -17,6 +17,7 @@ import {
   setBodyStyle,
   setDropLineElementStyle,
 } from "./item";
+import { UseGestureConfig, UseGestureEvent } from "react-use-gesture/dist/types";
 
 type Props<T extends ItemIdentifier> = {
   /** A unique identifier in all items of list. */
@@ -45,6 +46,14 @@ type Props<T extends ItemIdentifier> = {
    */
   isUsedCustomDragHandlers?: boolean;
   children?: React.ReactNode;
+  /**
+   * Specify a react-use-gesture config object to use for specifying the drag.
+   */
+  useGestureConfig?: UseGestureConfig;
+  /**
+   * If you want to do something on click or on tap, specify this option.
+   */
+  onTap?: (event: UseGestureEvent) => void;
 };
 
 export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
@@ -58,6 +67,12 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
   const isLocked = (listContext.isDisabled || props.isLocked) ?? false;
   const isLonley = props.isLonely ?? false;
   const isUsedCustomDragHandlers = props.isUsedCustomDragHandlers ?? false;
+
+  const useGestureConfig: UseGestureConfig = { ...(props.useGestureConfig || {}) };
+  if (props.onTap) {
+    useGestureConfig.drag = useGestureConfig.drag || {};
+    useGestureConfig.drag.filterTaps = true;
+  }
 
   // Registers an identifier to the group context.
   const childIdentifiersRef = React.useRef<Set<ItemIdentifier>>(new Set());
@@ -344,27 +359,35 @@ export const Item = <T extends ItemIdentifier>(props: Props<T>) => {
     onPointerLeave: onLeave,
   });
   const dragHandlers: React.ContextType<typeof ItemContext>["dragHandlers"] = { onDragStart, onDrag, onDragEnd };
-  const draggableBinder = useGesture({
-    onDragStart: (state: any) => {
-      if (isLocked) return;
+  const draggableBinder = useGesture(
+    {
+      onDragStart: (state: any) => {
+        if (isLocked) return;
 
-      const event: React.SyntheticEvent = state.event;
-      event.persist();
-      event.stopPropagation();
+        const event: React.SyntheticEvent = state.event;
+        event?.persist?.();
+        event?.stopPropagation?.();
 
-      dragHandlers.onDragStart();
+        dragHandlers.onDragStart();
+      },
+      onDrag: ({ down, movement, tap, event }) => {
+        if (tap && props.onTap) {
+          props.onTap(event as any);
+          return;
+        }
+
+        if (isLocked) return;
+
+        dragHandlers.onDrag(down, movement);
+      },
+      onDragEnd: () => {
+        if (isLocked) return;
+
+        dragHandlers.onDragEnd();
+      },
     },
-    onDrag: ({ down, movement }) => {
-      if (isLocked) return;
-
-      dragHandlers.onDrag(down, movement);
-    },
-    onDragEnd: () => {
-      if (isLocked) return;
-
-      dragHandlers.onDragEnd();
-    },
-  });
+    useGestureConfig,
+  );
 
   const contentElement = React.useMemo((): JSX.Element => {
     const draggingNodeMeta = listContext.draggingNodeMeta;
